@@ -1,12 +1,11 @@
 # Ignore Bazel build outputs
 bazel-out/
 build/
-.bazel-*
+bazel-*
 
 # Ignore Bazel configuration files
 # (e.g., from bazel query or bazel sync)
 *.lock
-*.bazelrc
 
 # Ignore IDE files and project-specific settings
 .idea/            # JetBrains IDE (e.g., IntelliJ, PyCharm)
