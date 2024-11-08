@@ -1,0 +1,2 @@
+startup --output_user_root=/tmp/bazel_output
+build --verbose_failures
