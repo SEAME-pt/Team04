@@ -1,0 +1,56 @@
+# Ignore Bazel build outputs
+bazel-out/
+build/
+.bazel-*
+
+# Ignore Bazel configuration files
+# (e.g., from bazel query or bazel sync)
+*.lock
+*.bazelrc
+
+# Ignore IDE files and project-specific settings
+.idea/            # JetBrains IDE (e.g., IntelliJ, PyCharm)
+.vscode/          # Visual Studio Code settings
+*.sublime-workspace
+*.sublime-project
+*.kate-swp
+
+# Ignore CMake/Build configuration files (if you ever use them)
+CMakeLists.txt.user
+CMakeCache.txt
+Makefile
+*.cmake
+
+# Ignore OS-specific files
+.DS_Store         # macOS system file
+Thumbs.db         # Windows thumbnail cache
+ehthumbs.db
+
+# Ignore compiled C++ artifacts
+*.o                # Object files
+*.a                # Static libraries
+*.so               # Shared libraries
+*.dll              # Windows dynamic link libraries
+*.dylib            # macOS shared libraries
+*.out              # Executable output
+*.exe              # Windows executables
+
+# Ignore Python virtual environments (if applicable)
+venv/
+env/
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.swp              # Vim swap files
+*.swo              # Vim temporary files
+*~                 # General editor backup files
+
+# Ignore Bazel-specific cache and logs
+/.bazel-*
+.bazel-*/         # Ignore Bazel cache files, particularly when Bazel is used as the build system
+
