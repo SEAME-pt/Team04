@@ -1,0 +1,11 @@
+## How to run
+
+```bash
+bazel run //src/hello_world:bin
+```
+
+## How to run tests
+
+```bash
+bazel test //src/hello_world:test
+```
