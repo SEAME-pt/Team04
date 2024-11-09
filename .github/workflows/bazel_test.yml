@@ -31,4 +31,3 @@ jobs:
       - name: Run Bazel test
         run: |
           bazel test //...
-
