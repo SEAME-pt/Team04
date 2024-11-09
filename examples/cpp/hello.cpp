@@ -4,3 +4,7 @@
 std::string greet() {
     return "Hello World!";
 }
+
+std::string farewell() {
+    return "Bye World!";
+}
