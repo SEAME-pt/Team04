@@ -1,0 +1,30 @@
+name: Clang-Tidy
+
+on:
+  pull_request:
+    paths:
+      - '**.cpp'
+      - '**.h'
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Clang-Tidy
+      run: |
+        sudo apt update
+        sudo apt install -y clang-tidy
+
+    - name: Run Clang-Tidy
+      run: |
+        find . -iname "*.cpp" -o -iname "*.h" | xargs clang-tidy -checks=* --quiet
+
+    - name: Upload Clang-Tidy Output (Optional)
+      uses: actions/upload-artifact@v3
+      with:
+        name: clang-tidy-report
+        path: clang-tidy-report.txt
