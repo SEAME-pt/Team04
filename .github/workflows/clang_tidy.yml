@@ -1,0 +1,39 @@
+name: Clang-Tidy
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - '**.cc'
+      - '**.cxx'
+      - '**.hxx'
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-tidy
+
+    - name: Run Clang-Tidy
+      run: |
+        files=$(find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx")
+        echo "Files to analyze: $files"
+        echo "Running clang tidy"
+        echo "$files" | xargs clang-tidy
+
+    - name: Show failure message
+      if: failure()
+      run: |
+        echo -e "To automatically apply suggested fixes, run the following command:
+        find . -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" | xargs clang-tidy -fix -fix-errors"
