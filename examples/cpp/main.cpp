@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-int main(int argc, char** argv) {
-  std::cout << greet() << std::endl;
+auto main(int argc, char** argv) -> int {
+  std::cout << greet() << '\n';
   return 0;
 }

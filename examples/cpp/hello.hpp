@@ -3,7 +3,7 @@
 
 #include <string>
 
-std::string greet();
-std::string farewell();
+auto greet() -> std::string;
+auto farewell() -> std::string;
 
 #endif
