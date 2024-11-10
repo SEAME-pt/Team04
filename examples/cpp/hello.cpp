@@ -1,10 +1,10 @@
 #include "hello.hpp"
 #include <string>
 
-std::string greet() {
+auto greet() -> std::string {
     return "Hello World!";
 }
 
-std::string farewell() {
+auto farewell() -> std::string {
     return "Bye World!";
 }
