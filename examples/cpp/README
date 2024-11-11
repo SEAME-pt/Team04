@@ -1,11 +1,11 @@
 ## How to run
 
 ```bash
-bazel run //src/hello_world:bin
+bazel run //examples/cpp:bin
 ```
 
 ## How to run tests
 
 ```bash
-bazel test //src/hello_world:test
+bazel test //examples/cpp:test
 ```
