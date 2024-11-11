@@ -1,0 +1,31 @@
+---
+name: Bazel Buildifier
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: ['*']
+    paths: [BUILD, WORKSPACE, MODULE.bazel, .bazelrc]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache bazel
+        uses: actions/cache@v2
+        env:
+          cache-name: bazel-cache
+        with:
+          path: |
+            ~/.cache/bazelisk
+            ~/.cache/bazel
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-development
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run Buildifier
+        run: |-
+          bazel run //bazel:buildifier_check
+      - name: Fail message
+        if: failure()
+        run: |-
+          echo -e "For applying automatic fixes run:
+            bazel run //bazel:buildifier"
