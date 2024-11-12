@@ -25,16 +25,25 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y clang-tidy
 
+    - name: Generate compile commands json file
+      run: |
+        bazel run @hedron_compile_commands//:refresh_all
+
     - name: Run Clang-Tidy
       run: |
-        files=$(find . \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" \) -not -name "test*.cpp")
+        files=$(find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" )
 
-        echo "Files to analyze: $files"
-        echo "Running clang tidy"
-        echo "$files" | xargs clang-tidy
+        echo -e "Running clang-tidy on the following files: \n$files"
+        clang-tidy --version
+        echo "$files" | xargs clang-tidy -p ./compile_commands.json
 
     - name: Show failure message
       if: failure()
       run: |
         echo -e "To automatically apply suggested fixes, run the following command:
-        find . \( -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" \) -not -name \"test*.cpp\" | xargs clang-tidy -fix -fix-errors"
+        ======================================================================================
+        1. Generate compile commands:
+        bazel run @hedron_compile_commands//:refresh_all
+        2. Run clang-tidy:
+        find . -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" | xargs clang-tidy -fix -fix-errors -p ./compile_commands.json
+        ======================================================================================"
