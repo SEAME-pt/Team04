@@ -4,20 +4,29 @@ name: Clang-Tidy
 on:  # yamllint disable-line rule:truthy
   pull_request:
     branches: ['*']
-    paths: ['**.cpp', '**.h', '**.hpp', '**.cc', '**.cxx', '**.hxx']
 jobs:
   clang-tidy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Get changed files
+        uses: jitterbit/get-changed-files@v1
+        id: changed_files
+        with:
+          format: space-delimited
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Clang-Tidy
         run: |
-          echo -e "Running clang-tidy"
-          bazel build //... \
-          --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect \
-          --output_groups=report \
-          --@bazel_clang_tidy//:clang_tidy_config=//:clang_tidy_config
+          if echo "${{ steps.changed_files.outputs.all }}" | grep -qE '\.(cpp|h|hpp|cc|cxx|hxx)$'; then
+            echo -e "Running clang-tidy"
+            bazel build //... \
+            --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect \
+            --output_groups=report \
+            --@bazel_clang_tidy//:clang_tidy_config=//:clang_tidy_config
+          else
+            echo -e "Skipping clang-tidy since no source files were changed."
+          fi
       - name: Show failure message
         if: failure()
         run: |-
