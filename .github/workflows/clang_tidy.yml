@@ -1,40 +1,30 @@
+# yamllint disable rule:line-length
+---
 name: Clang-Tidy
-
-on:
+on:  # yamllint disable-line rule:truthy
   pull_request:
-    branches:
-      - '*'
-    paths:
-      - '**.cpp'
-      - '**.h'
-      - '**.hpp'
-      - '**.cc'
-      - '**.cxx'
-      - '**.hxx'
-
+    branches: ['*']
+    paths: ['**.cpp', '**.h', '**.hpp', '**.cc', '**.cxx', '**.hxx']
 jobs:
   clang-tidy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Run Clang-Tidy
-      run: |
-        echo -e "Running clang-tidy"
-        bazel build //... \
-        --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect \
-        --output_groups=report \
-        --@bazel_clang_tidy//:clang_tidy_config=//:clang_tidy_config
-
-    - name: Show failure message
-      if: failure()
-      run: |
-        echo -e "To automatically apply suggested fixes, run the following command:
-        ======================================================================================
-        1. Generate compile commands:
-        bazel run @hedron_compile_commands//:refresh_all
-        2. Run clang-tidy:
-        find . -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" | xargs clang-tidy -fix -fix-errors -p ./compile_commands.json
-        ======================================================================================"
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run Clang-Tidy
+        run: |
+          echo -e "Running clang-tidy"
+          bazel build //... \
+          --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect \
+          --output_groups=report \
+          --@bazel_clang_tidy//:clang_tidy_config=//:clang_tidy_config
+      - name: Show failure message
+        if: failure()
+        run: |-
+          echo -e "To automatically apply suggested fixes, run the following command:
+          ======================================================================================
+          1. Generate compile commands:
+          bazel run @hedron_compile_commands//:refresh_all
+          2. Run clang-tidy:
+          find . -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" | xargs clang-tidy -fix -fix-errors -p ./compile_commands.json
+          ======================================================================================"
