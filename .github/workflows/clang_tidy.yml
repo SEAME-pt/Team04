@@ -20,22 +20,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y clang-tidy
-
-    - name: Generate compile commands json file
-      run: |
-        bazel run @hedron_compile_commands//:refresh_all
-
     - name: Run Clang-Tidy
       run: |
-        files=$(find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" )
-
-        echo -e "Running clang-tidy on the following files: \n$files"
-        clang-tidy --version
-        echo "$files" | xargs clang-tidy -p ./compile_commands.json
+        echo -e "Running clang-tidy"
+        bazel build //... \
+        --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect \
+        --output_groups=report \
+        --@bazel_clang_tidy//:clang_tidy_config=//:clang_tidy_config
 
     - name: Show failure message
       if: failure()
