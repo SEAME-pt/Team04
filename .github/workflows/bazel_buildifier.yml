@@ -2,8 +2,7 @@
 ---
 name: Bazel Buildifier
 on:  # yamllint disable-line rule:truthy
-  pull_request:
-    branches: ['*']
+  workflow_call:
 jobs:
   bazel_buildifier:
     runs-on: ubuntu-latest

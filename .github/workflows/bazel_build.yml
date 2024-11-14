@@ -1,8 +1,7 @@
 ---
 name: Bazel Build
 on:  # yamllint disable-line rule:truthy
-  pull_request:
-    branches: ['*']
+  workflow_call:
 jobs:
   bazel_build:
     runs-on: ubuntu-latest
