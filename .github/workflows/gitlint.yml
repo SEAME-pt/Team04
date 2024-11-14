@@ -1,0 +1,25 @@
+name: GitLint
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  gitlint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Install gitlint
+        run: |
+          python -m pip install gitlint
+
+      - name: Run gitlint
+        run: |
+          gitlint --commits "${{ github.event.pull_request.base.sha }}..HEAD"
