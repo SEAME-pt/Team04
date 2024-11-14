@@ -1,0 +1,23 @@
+---
+name: Check pipeline
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  push:
+    branches: ['*']
+jobs:
+  bazel_build:
+    uses: ./.github/workflows/bazel_build.yml
+  bazel_test:
+    uses: ./.github/workflows/bazel_test.yml
+  bazel_buildifier:
+    uses: ./.github/workflows/bazel_buildifier.yml
+  check_pipeline:
+    uses: ./.github/workflows/check_pipeline.yml
+  check_pr_description:
+    uses: ./.github/workflows/check_pr_description.yml
+  clang_tidy:
+    uses: ./.github/workflows/clang_tidy.yml
+  gitlint:
+    uses: ./.github/workflows/gitlint.yml
+  yamllint:
+    uses: ./.github/workflows/yamllint.yml
