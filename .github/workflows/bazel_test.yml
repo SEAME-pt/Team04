@@ -1,14 +1,11 @@
+---
 name: Bazel Test
-
-on:
+on:  # yamllint disable-line rule:truthy
   pull_request:
-    branches:
-      - '*'
-
+    branches: ['*']
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Cache bazel
         uses: actions/cache@v2
@@ -21,10 +18,8 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-development
-
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Run Bazel test
-        run: |
+        run: |-
           bazel test //...
