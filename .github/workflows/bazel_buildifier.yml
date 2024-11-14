@@ -5,7 +5,7 @@ on:  # yamllint disable-line rule:truthy
     branches: ['*']
     paths: [BUILD, WORKSPACE, MODULE.bazel, .bazelrc]
 jobs:
-  build:
+  bazel_buildifier:
     runs-on: ubuntu-latest
     steps:
       - name: Cache bazel
