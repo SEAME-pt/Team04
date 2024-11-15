@@ -15,7 +15,7 @@
 
 ## Related Issue
 
-- Link to the related GitHub issue.
+- Link to the related GitHub issue (<https://github.com/orgs/SEAME-pt/projects/1>).
 
 ## Notes
 
