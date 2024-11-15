@@ -29,8 +29,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Buildifier
         run: |-
-          echo "${{ steps.changed_files.outputs.all }}"
-          if echo "${{ steps.changed_files.outputs.all }}" | grep -qE '(BUILD|WORKSPACE|MODULE\.bazel|\.bazelrc)$'; then
+          IFS=' ' read -r -a files <<< "${{ steps.changed_files.outputs.all }}"
+          bazel_files=()
+          for file in "${files[@]}"; do
+              if [[ "$file" == BUILD || "$file" == WORKSPACE || "$file" == MODULE\.bazel || "$file" == \.bazelrc ]]; then
+                  bazel_files+=("$file")
+              fi
+          done
+
+          if [ ${#bazel_files[@]} -gt 0 ]; then
             echo "Running bazel buildifier"
             bazel run //bazel:buildifier_check
           else

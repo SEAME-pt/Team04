@@ -20,10 +20,18 @@ jobs:
       - name: Set up clang-format
         run: sudo apt-get install clang-format
       - name: Run clang-format
-        run: |
-          if echo "${{ steps.changed_files.outputs.all }}" | grep -qE '\.(cpp|h|hpp|cc|cxx|hxx)$'; then
+        run: |-
+          IFS=' ' read -r -a files <<< "${{ steps.changed_files.outputs.all }}"
+          cpp_files=()
+          for file in "${files[@]}"; do
+              if [[ "$file" == *.cpp || "$file" == *.h || "$file" == *.hpp || "$file" == *.cc || "$file" == *.cxx || "$file" == *.hxx ]]; then
+                  cpp_files+=("$file")
+              fi
+          done
+
+          if [ ${#cpp_files[@]} -gt 0 ]; then
               echo -e "Running clang-format"
-              find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-format --dry-run --Werror
+              clang-format --dry-run --Werror "${cpp_files[@]}"
           else
               echo -e "Skipping clang-format since no source files were changed."
           fi
