@@ -22,7 +22,15 @@ jobs:
           pip install yamllint
       - name: Lint YAML files
         run: |-
-          if echo "${{ steps.changed_files.outputs.all }}" | grep -qE '\.(yml|yaml)$'; then
+          IFS=' ' read -r -a files <<< "${{ steps.changed_files.outputs.all }}"
+          yaml_files=()
+          for file in "${files[@]}"; do
+              if [[ "$file" == *.yaml || "$file" == *.yml ]]; then
+                  yaml_files+=("$file")
+              fi
+          done
+
+          if [ ${#yaml_files[@]} -gt 0 ]; then
             echo -e "Running yamllint"
             yamllint . || exit 1
           else
