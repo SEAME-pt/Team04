@@ -32,7 +32,7 @@ jobs:
           IFS=' ' read -r -a files <<< "${{ steps.changed_files.outputs.all }}"
           bazel_files=()
           for file in "${files[@]}"; do
-              if [[ "$file" == BUILD || "$file" == WORKSPACE || "$file" == MODULE\.bazel || "$file" == \.bazelrc ]]; then
+              if [[ "$file" == *BUILD || "$file" == *WORKSPACE || "$file" == *MODULE.bazel || "$file" == *.bazelrc ]]; then
                   bazel_files+=("$file")
               fi
           done
