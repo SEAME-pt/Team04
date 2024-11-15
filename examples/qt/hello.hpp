@@ -1,9 +1,9 @@
 #include <qwidget.h>
+
 #include <QWidget>
 
-class MyWidget : public QWidget
-{
-public:
+class MyWidget : public QWidget {
+   public:
     MyWidget();
     ~MyWidget() override;
     MyWidget(const MyWidget&) = delete;

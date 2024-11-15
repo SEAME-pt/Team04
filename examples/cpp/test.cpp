@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include "hello.hpp"
 
 #pragma GCC diagnostic push
