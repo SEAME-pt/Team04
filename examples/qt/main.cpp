@@ -1,7 +1,9 @@
-#include "hello.hpp"
-#include <QApplication>
 #include <qapplication.h>
+
+#include <QApplication>
 #include <memory>
+
+#include "hello.hpp"
 
 auto main(int argc, char **argv) -> int {
     QApplication const app(argc, argv);

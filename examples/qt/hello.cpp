@@ -1,7 +1,9 @@
 #include "hello.hpp"
+
+#include <qlabel.h>
+
 #include <QLabel>
 #include <memory>
-#include <qlabel.h>
 
 MyWidget::MyWidget() {
     constexpr int LabelXPos = 100;
