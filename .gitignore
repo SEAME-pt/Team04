@@ -53,3 +53,5 @@ __pycache__/
 /.bazel-*
 .bazel-*/         # Ignore Bazel cache files, particularly when Bazel is used as the build system
 
+# Coverage
+genhtml/
