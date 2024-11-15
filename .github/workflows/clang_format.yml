@@ -1,0 +1,39 @@
+# yamllint disable rule:line-length
+---
+name: Clang-Format
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: ['*']
+jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Get changed files
+        uses: jitterbit/get-changed-files@v1
+        id: changed_files
+        with:
+          format: space-delimited
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up clang-format
+        run: sudo apt-get install clang-format
+      - name: Run clang-format
+        run: |
+          if echo "${{ steps.changed_files.outputs.all }}" | grep -qE '\.(cpp|h|hpp|cc|cxx|hxx)$'; then
+              echo -e "Running clang-format"
+              find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-format --dry-run --Werror
+          else
+              echo -e "Skipping clang-format since no source files were changed."
+          fi
+      - name: Show failure message
+        if: failure()
+        run: |-
+          echo -e "To automatically apply suggested fixes, run the following command:
+          ======================================================================================
+          1. Install clang-format:
+          sudo apt-get install clang-format
+          2. Run clang-format:
+          find . -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" | xargs clang-format -i
+          ======================================================================================"
