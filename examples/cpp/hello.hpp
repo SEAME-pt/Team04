@@ -1,4 +1,4 @@
 #include <string>
 
-auto greet() -> std::string;
+std::string greet();
 auto farewell() -> std::string;
