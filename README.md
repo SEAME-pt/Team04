@@ -23,7 +23,7 @@
 
 Follow step 1 and 2 of bazel documentation: <https://bazel.build/install/ubuntu>
 
-## 1.1.2 Test Run
+## 1.1.2 Run Hello World
 
 ```bash
 bazel run //examples/cpp:bin
