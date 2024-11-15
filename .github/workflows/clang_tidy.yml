@@ -17,8 +17,16 @@ jobs:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Clang-Tidy
-        run: |
-          if echo "${{ steps.changed_files.outputs.all }}" | grep -qE '\.(cpp|h|hpp|cc|cxx|hxx)$'; then
+        run: |-
+          IFS=' ' read -r -a files <<< "${{ steps.changed_files.outputs.all }}"
+          cpp_files=()
+          for file in "${files[@]}"; do
+              if [[ "$file" == *.cpp || "$file" == *.h || "$file" == *.hpp || "$file" == *.cc || "$file" == *.cxx || "$file" == *.hxx ]]; then
+                  cpp_files+=("$file")
+              fi
+          done
+
+          if [ ${#cpp_files[@]} -gt 0 ]; then
             echo -e "Running clang-tidy"
             bazel build //... \
             --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect \
