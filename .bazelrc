@@ -3,12 +3,46 @@ build --verbose_failures
 build --repo_env=CC=clang
 build --cxxopt=-std=c++20
 
-# Warning options follow https://github.com/cpp-best-practices/cppbestpractices/blob/master/02-Use_the_Tools_Available.md#gcc%E2%80%94clang
-build --cxxopt=-Weverything # incompatible with gcc
+# Non-critical (Default)
+
+build --cxxopt=-Wall
+build --cxxopt=-Wextra
+build --cxxopt=-Wpedantic
+build --cxxopt=-Wshadow
+build --cxxopt=-Wnon-virtual-dtor
+build --cxxopt=-Wold-style-cast
+build --cxxopt=-Wcast-align
+build --cxxopt=-Wunused
+build --cxxopt=-Woverloaded-virtual
+build --cxxopt=-Wconversion
+build --cxxopt=-Wsign-conversion
+build --cxxopt=-Wmisleading-indentation
+build --cxxopt=-Wnull-dereference
+build --cxxopt=-Wformat=2
+build --cxxopt=-Wimplicit-fallthrough
 build --cxxopt=-Werror
-# Disable warnings about C++98 incompatibility. We're using C++17 features...
-build --cxxopt=-Wno-c++98-compat
-build --cxxopt=-Wno-c++98-compat-pedantic
-# Disable warnings for external libs
+
+# Disable warning option for external libs
+
+build --per_file_copt=third_party/.*,external/.*@-Wno-all
+build --per_file_copt=third_party/.*,external/.*@-Wno-extra
+build --per_file_copt=third_party/.*,external/.*@-Wno-pedantic
+build --per_file_copt=third_party/.*,external/.*@-Wno-shadow
+build --per_file_copt=third_party/.*,external/.*@-Wno-non-virtual-dtor
+build --per_file_copt=third_party/.*,external/.*@-Wno-old-style-cast
+build --per_file_copt=third_party/.*,external/.*@-Wno-cast-align
+build --per_file_copt=third_party/.*,external/.*@-Wno-unused
+build --per_file_copt=third_party/.*,external/.*@-Wno-overloaded-virtual
+build --per_file_copt=third_party/.*,external/.*@-Wno-conversion
+build --per_file_copt=third_party/.*,external/.*@-Wno-sign-conversion
+build --per_file_copt=third_party/.*,external/.*@-Wno-misleading-indentation
+build --per_file_copt=third_party/.*,external/.*@-Wno-null-dereference
+build --per_file_copt=third_party/.*,external/.*@-Wno-format=2
+build --per_file_copt=third_party/.*,external/.*@-Wno-implicit-fallthrough
 build --per_file_copt=third_party/.*,external/.*@-Wno-everything
 build --per_file_copt=third_party/.*,external/.*@-Wno-error
+
+# Disable warnings incompatible with C++20
+
+build --cxxopt=-Wno-c++98-compat
+build --cxxopt=-Wno-c++98-compat-pedantic
