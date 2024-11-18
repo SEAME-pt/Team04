@@ -11,6 +11,40 @@ git_repository(
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+# Hermetic python toolchain - required to run python as non root in docker
+# https://github.com/bazelbuild/rules_python/releases.
+
+http_archive(
+    name = "rules_python",
+    sha256 = "690e0141724abb568267e003c7b6d9a54925df40c275a870a4d934161dc9dd53",
+    strip_prefix = "rules_python-0.40.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.40.0/rules_python-0.40.0.tar.gz",
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories", "python_register_toolchains")
+
+py_repositories()
+
+python_register_toolchains(
+    name = "python39",
+    ignore_root_user_error = True,
+    python_version = "3.9",
+)
+
+git_repository(
+    name = "rules_qt",
+    branch = "main",
+    remote = "https://github.com/Vertexwahn/rules_qt6.git",
+)
+
+load("@rules_qt//:fetch_qt.bzl", "fetch_qt6")
+
+fetch_qt6()
+
+load("@rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchains")
+
+register_qt_toolchains()
+
 # buildifier is written in Go and hence needs rules_go to be built.
 # See https://github.com/bazelbuild/rules_go for the up to date setup instructions.
 http_archive(
@@ -64,17 +98,3 @@ http_archive(
         "https://github.com/bazelbuild/buildtools/archive/refs/tags/4.2.2.tar.gz",
     ],
 )
-
-git_repository(
-    name = "rules_qt",
-    branch = "main",
-    remote = "https://github.com/Vertexwahn/rules_qt6.git",
-)
-
-load("@rules_qt//:fetch_qt.bzl", "fetch_qt6")
-
-fetch_qt6()
-
-load("@rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchains")
-
-register_qt_toolchains()
