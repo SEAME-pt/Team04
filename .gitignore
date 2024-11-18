@@ -19,6 +19,9 @@ CMakeLists.txt.user
 CMakeCache.txt
 Makefile
 *.cmake
+_deps/
+CMakeFiles*/
+build/
 
 # Ignore OS-specific files
 .DS_Store         # macOS system file
@@ -51,7 +54,10 @@ __pycache__/
 
 # Ignore Bazel-specific cache and logs
 /.bazel-*
-.bazel-*/         # Ignore Bazel cache files, particularly when Bazel is used as the build system
+.bazel-*/
 
-# Coverage
+# Ignore coverage report files
 genhtml/
+
+# Ignore compile commands
+compile_commands.json
