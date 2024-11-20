@@ -18,6 +18,10 @@
     - [Apply Fixes](#242-apply-fixes)
   - [2.5. Bazel Buildifier](#25-bazel-buildifier)
     - [How to Run](#251-how-to-run)
+- [3. Hardware](#3-hardware)
+  - [3.1. Jetson Nano](#31-jetson-nano)
+    - [Flashing](#311-flashing)
+    - [Remote Connection](#312-remote-connection)
 
 ## 1. Development Environment
 
@@ -187,3 +191,88 @@ To run Buildifier execute the following command:
 ```bash
 bazel run //bazel:buildifier
 ```
+
+## 3. Hardware
+
+### 3.1. Jetson Nano
+
+#### 3.1.1. Flashing
+
+The approach described in the [official documentation](https://www.waveshare.com/wiki/JetRacer_AI_Kit#Support) did not work for this setup. Instead, the solution is to use the [NVIDIA SDK Manager with Docker containers](https://docs.nvidia.com/sdk-manager/docker-containers/index.html).
+
+1. **Install NVIDIA SDK Manager with Docker**:
+
+   During installation, choose the Docker image that uses Ubuntu 18.04, as the Jetson Nano is not compatible with newer versions.
+
+2. **Install Required Dependencies**:
+
+   Ensure that the following dependencies are installed:
+
+   ```bash
+   sudo apt install qemu-user-static binfmt-support
+   sudo update-binfmts --enable
+   ```
+
+3. **Load the Docker Image**:
+
+   Load the Docker image from the tar file:
+
+   ```bash
+   docker load -i ./sdkmanager-2.2.0.12021-Ubuntu_18.04_docker.tar.gz
+   ```
+
+4. **Tag the Docker Image**:
+
+   Tag the image as latest:
+
+   ```bash
+   docker tag sdkmanager:2.2.0.12021-Ubuntu_18.04 sdkmanager:latest
+   ```
+
+5. **Put the Jetson Nano into Recovery Mode**:
+
+   Before running the container, connect the pin "fcrec" and ground to put the board into recovery mode, needed to flash the os.
+   Insert the SD card into the Jetson Nano and connect the micro-USB cable.
+
+6. **Run the Docker Container**:
+
+   Execute the following command to run the SDK Manager container:
+
+   ```bash
+   sudo docker run -it --privileged \
+       -v /dev/bus/usb:/dev/bus/usb/ \
+       -v /dev:/dev \
+       -v /media/$USER:/media/nvidia:slave \
+       --network host --name jetson_flash sdkmanager --cli
+   ```
+
+7. **Follow the Steps**:
+
+   - Select Action: Install
+   - Select Product: Jetson
+   - Select System Configuration: Host Machine [Ubuntu 18.04 - x86_64]
+   - Select Target Hardware: Jetson Nano module
+   - Choose manual configuration and **wait for the download to finish before selecting the Flash option**. Else flashing will not work.
+
+For more details on Jetson Nano pins, refer to the Jetson Nano 2GB DevKit User Guide.
+
+#### 3.1.2. Remote Connection
+
+   After flashing is complete, turn off the Jetson board and remove the connected pins.
+   Ensure peripherals are connected to the board before powering it up.
+
+1. **Check IP Address**:
+
+   On the Jetson Nano, check its IP address by running:
+
+   ```bash
+   ipconfig
+   ```
+
+2. **SSH into the Jetson Nano**:
+
+   Connect to the device using SSH:
+
+   ```bash
+   ssh <user>@<wlan_inet>
+   ```
