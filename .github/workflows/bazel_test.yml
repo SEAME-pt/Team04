@@ -1,8 +1,7 @@
 ---
 name: Bazel Test
 on:  # yamllint disable-line rule:truthy
-  pull_request:
-    branches: ['*']
+  workflow_call:
 jobs:
   bazel_test:
     runs-on: ubuntu-latest

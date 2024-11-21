@@ -2,8 +2,7 @@
 ---
 name: Clang-Tidy
 on:  # yamllint disable-line rule:truthy
-  pull_request:
-    branches: ['*']
+  workflow_call:
 jobs:
   clang-tidy:
     runs-on: ubuntu-latest
