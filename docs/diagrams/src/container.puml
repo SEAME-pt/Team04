@@ -1,0 +1,40 @@
+@startuml "techtribesjs"
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Container.puml
+
+title Container Diagram for JetRacer System
+
+LAYOUT_TOP_DOWN()
+'LAYOUT_AS_SKETCH()
+'LAYOUT_WITH_LEGEND()
+
+
+Person(driver, "Driver")
+
+System_Boundary(c1, "JetRacer System"){
+
+    Container(in_cluster, "Instrument Cluster", "QT, QML, C++", "Allows drivers to view car related info such as speed, RPM and battery level")
+    Container(motion, "Car Motion", "C++", "Controls the motion of the car")
+    Container(m_controls, "Manual Controls", "C++", "Handles the gamepad input controls")
+    Container(perception, "Camera/Perception", "C++", "Handles camera data")
+    Container(planning, "Planning", "TBD", "Autonomous Driving [TBD]")
+    Container(sensors, "Sensor Interface", "Arduino, C++", "Converts sensor data to usable data")
+    Container(connect_mid, "Connection Middleware", "C++", "Stores can messages in a queue for multiple programs")
+    Container(data_center, "Data Center", "C++", "Fetches relevant car data and stores in DB")
+    ContainerDb(aws, "Cloud Database", "AWS", "Stores car data")
+}
+
+Rel(driver, in_cluster, "Views")
+Rel(driver, m_controls, "Controls with gamepad")
+Rel_U(sensors, connect_mid, "Sends sensor data", "CAN")
+Rel_D(in_cluster, connect_mid, "Fetches Speed CAN data", "DBus")
+Rel(data_center, connect_mid, "Fetches Speed CAN data", "DBus")
+Rel(planning,motion,"Controls motion")
+Rel(m_controls,motion,"Controls motion")
+Rel(planning,perception,"Gets camera data")
+
+Rel(data_center, aws, "Stores car data", "HTTPS")
+'Lay_R(in_cluster, aws)
+
+@enduml

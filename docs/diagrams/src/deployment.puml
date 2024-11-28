@@ -1,0 +1,27 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+title Deployment Diagram for JetRacer System
+
+Node(mcp2515, "CAN Module", "MCP2515", "Converts SPI signal to CAN-BUS")
+Node(rs485can, "RS485 CAN Module", "MCP2515", "Converts SPI signal to CAN-BUS")
+Node(arduino, "Arduino Uno R3", "ATmega328P", "Interfaces with sensors")
+Node(jetson, "Jetson Nano", "JetPack SDK 4.6.2, Ubuntu 18.04, Python, QT, C++", "GUI, Car Control")
+Node(jetracer, "JetRacer", "", "Controllable Car")
+Node(lm393, "Speed Sensor", "LM393")
+Node(gamepad, "Gamepad", "Bluetooth", "Controls JetRacer")
+Node(camera, "Camera", "IMX219-77", "Captures video feed")
+Node(lcd, "LCD Display", "", "Displays Car data")
+
+Lay_D(gamepad, camera)
+Lay_D(camera, lcd)
+Rel_L(camera, jetson, "Sends video feed")
+Rel_L(jetson, lcd, "", "HDMI")
+Rel_L(gamepad, jetson, "Sends car controls", "Bluetooth, USB")
+Rel_L(jetracer, lm393, "Speed Sensor", "DI")
+Rel_U(jetson, jetracer, "Controls", "GPIO")
+Rel(lm393, arduino, "Speed data", "PWM")
+Rel(arduino, mcp2515, "Sends data", "SPI")
+Rel_U(rs485can, jetson, "Receives data", "SPI")
+BiRel_R(mcp2515, rs485can, "CAN BUS", "CAN")
+
+@enduml

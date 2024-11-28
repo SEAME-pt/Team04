@@ -9,6 +9,7 @@ bazel-*
 
 # Ignore IDE files and project-specific settings
 .idea/            # JetBrains IDE (e.g., IntelliJ, PyCharm)
+.idea
 .vscode/          # Visual Studio Code settings
 *.sublime-workspace
 *.sublime-project
@@ -21,7 +22,6 @@ Makefile
 *.cmake
 _deps/
 CMakeFiles*/
-build/
 
 # Ignore OS-specific files
 .DS_Store         # macOS system file

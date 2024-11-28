@@ -1,0 +1,23 @@
+@startuml InstrumentCluster
+
+node "JetRacer" as JR
+node "Jetson Nano" as JN
+node "DSI LCD" as LCD
+node "Arduino Nano" as ARDN
+node "Speedsensor LM393" as LM393
+node "MCP2515" as CANI_1
+node "MCP2515" as CANI_2
+
+CANI_1 - CANI_2: CAN_L
+CANI_1 - CANI_2: CAN_H
+
+JN -u- CANI_1: SPI
+CANI_2 -d- ARDN : SPI
+
+JR -u- JN: GPIO
+JR -r- LM393
+JN -l- LCD: HDMI
+
+ARDN -d- LM393: pulse
+
+@enduml
