@@ -1,0 +1,13 @@
+@startuml System
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title System Diagram for JetRacer System
+
+Person(driver, "Driver")
+
+System(jetracer, "JetRacer System", "Contains all the software functionalities of a JetRacer car")
+
+Rel(driver, jetracer, "Uses and drives", "Bluetooth")
+
+
+@enduml

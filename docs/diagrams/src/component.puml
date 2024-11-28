@@ -1,0 +1,14 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component Diagram for JetRacer System
+
+'Person(person, "User", "User of the JetRacer system", "person")
+
+'component "Instrument Cluster" as IC
+'component "Head Unit" as HU
+'component "Clo"
+
+Component(db, Database)
+
+@enduml
