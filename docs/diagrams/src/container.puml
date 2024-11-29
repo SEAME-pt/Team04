@@ -17,7 +17,7 @@ System_Boundary(c1, "JetRacer System"){
     Container(in_cluster, "Instrument Cluster", "QT, QML, C++", "Allows drivers to view car related info such as speed, RPM and battery level")
     Container(motion, "Car Motion", "C++", "Controls the motion of the car")
     Container(m_controls, "Manual Controls", "C++", "Handles the gamepad input controls")
-    Container(perception, "Camera/Perception", "C++", "Handles camera data")
+    Container(perception, "Camera/Perception", "TBD", "Handles camera data [TBD]")
     Container(planning, "Planning", "TBD", "Autonomous Driving [TBD]")
     Container(sensors, "Sensor Interface", "Arduino, C++", "Converts sensor data to usable data")
     Container(connect_mid, "Connection Middleware", "C++", "Stores can messages in a queue for multiple programs")

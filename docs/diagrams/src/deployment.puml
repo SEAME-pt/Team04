@@ -10,7 +10,7 @@ Node(jetracer, "JetRacer", "", "Controllable Car")
 Node(lm393, "Speed Sensor", "LM393")
 Node(gamepad, "Gamepad", "Bluetooth", "Controls JetRacer")
 Node(camera, "Camera", "IMX219-77", "Captures video feed")
-Node(lcd, "LCD Display", "", "Displays Car data")
+Node(lcd, "LCD", "", "Displays Car data")
 
 Lay_D(gamepad, camera)
 Lay_D(camera, lcd)
