@@ -36,6 +36,7 @@ supportability (testing, compatibility).
 ### Usability
 
 * The GUI should be clear on the used metric system (km/h or mph)
+* The metric system should be configurable
 * The GUI should be responsive (adapt to screen size)
 
 ### Reliability
