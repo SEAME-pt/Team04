@@ -27,7 +27,7 @@ System_Boundary(c1, "JetRacer System"){
 
 Rel(driver, in_cluster, "Views")
 Rel(driver, m_controls, "Controls with gamepad")
-Rel_U(sensors, connect_mid, "Sends sensor data", "CAN")
+BiRel_U(sensors, connect_mid, "Data (speed, config)", "CAN")
 Rel_D(in_cluster, connect_mid, "Fetches Speed CAN data", "DBus")
 Rel(data_center, connect_mid, "Fetches Speed CAN data", "DBus")
 Rel(planning,motion,"Controls motion")
