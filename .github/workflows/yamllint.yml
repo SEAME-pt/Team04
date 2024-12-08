@@ -4,35 +4,49 @@ name: Lint YAML files
 on:  # yamllint disable-line rule:truthy
   pull_request:
     branches: ['*']
+
 jobs:
   yamllint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Get changed files
-        uses: jitterbit/get-changed-files@v1
-        id: changed_files
-        with:
-          format: space-delimited
-          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Find affected files
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          git diff --name-only origin/${{ github.base_ref }} > affected_files.txt
+          echo "Affected files:"
+          cat affected_files.txt
+
+      - name: Find affected yaml files
+        id: bazel_targets
+        run: |
+          > affected_yaml_files.txt
+
+          while read file; do
+            if [[ "$file" == *.yaml || "$file" == *.yml ]]; then
+              echo "$file" >> affected_yaml_files.txt
+            fi
+          done < affected_files.txt
+
+          sort -u affected_yaml_files.txt -o affected_yaml_files.txt
+          echo "Affected yaml files:"
+          cat affected_yaml_files.txt
+
+          echo "yaml_files=$(cat affected_yaml_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
       - name: Install yamllint
+        if: env.yaml_files != ''
         run: |
           python -m pip install --upgrade pip
           pip install yamllint
-      - name: Lint YAML files
-        run: |-
-          IFS=' ' read -r -a files <<< "${{ steps.changed_files.outputs.all }}"
-          yaml_files=()
-          for file in "${files[@]}"; do
-              if [[ "$file" == *.yaml || "$file" == *.yml ]]; then
-                  yaml_files+=("$file")
-              fi
-          done
 
-          if [ ${#yaml_files[@]} -gt 0 ]; then
-            echo -e "Running yamllint"
-            yamllint . || exit 1
-          else
-            echo -e "Skipping yamllint since no YAML files were changed."
-          fi
+      - name: Lint YAML files
+        if: env.yaml_files != ''
+        run: |-
+          yamllint ${yaml_files} || exit 1
+
+      - name: No yaml files affected
+        if: env.yaml_files == ''
+        run: echo "No affected yaml files found. Skipping yamllint."
