@@ -4,12 +4,40 @@ name: Bazel Buildifier
 on:  # yamllint disable-line rule:truthy
   pull_request:
     branches: ['*']
+
 jobs:
   bazel_buildifier:
     runs-on: ubuntu-latest
     steps:
-      - name: Cache bazel
-        uses: actions/cache@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find affected files
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          git diff --name-only origin/${{ github.base_ref }} > affected_files.txt
+          echo "Affected files:"
+          cat affected_files.txt
+
+      - name: Find affected Bazel files
+        run: |
+          > affected_bazel_files.txt
+
+          while read file; do
+            if [[ "$file" == *BUILD || "$file" == *WORKSPACE || "$file" == *MODULE.bazel || "$file" == *.bazelrc ]]; then
+              echo "$file" >> affected_bazel_files.txt
+            fi
+          done < affected_files.txt
+
+          sort -u affected_bazel_files.txt -o affected_bazel_files.txt
+          echo "Affected Bazel files:"
+          cat affected_bazel_files.txt
+
+          echo "bazel_files=$(cat affected_bazel_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+      - name: Setup bazel cache
+        if: env.bazel_files != ''
+        uses: actions/cache@v4
         env:
           cache-name: bazel-cache
         with:
@@ -19,30 +47,17 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-development
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Get changed files
-        uses: jitterbit/get-changed-files@v1
-        id: changed_files
-        with:
-          format: space-delimited
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run Buildifier
-        run: |-
-          IFS=' ' read -r -a files <<< "${{ steps.changed_files.outputs.all }}"
-          bazel_files=()
-          for file in "${files[@]}"; do
-              if [[ "$file" == *BUILD || "$file" == *WORKSPACE || "$file" == *MODULE.bazel || "$file" == *.bazelrc ]]; then
-                  bazel_files+=("$file")
-              fi
-          done
 
-          if [ ${#bazel_files[@]} -gt 0 ]; then
-            echo "Running bazel buildifier"
-            bazel run //bazel:buildifier_check
-          else
-            echo -e "Skipping bazel buildifier since no bazel files were changed."
-          fi
+      - name: Run Buildifier on affected files
+        if: env.bazel_files != ''
+        run: |-
+          echo "Running buildifier check on: $bazel_files"
+          bazel run //bazel:buildifier_check -- ${bazel_files}
+
+      - name: No Bazel files affected
+        if: env.bazel_files == ''
+        run: echo "No affected Bazel files found. Skipping buildifier."
+
       - name: Fail message
         if: failure()
         run: |-
