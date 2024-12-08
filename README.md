@@ -148,7 +148,7 @@ To automatically apply fixes suggested by Clang-Tidy, follow these steps:
     Now, you can apply Clang-Tidy fixes by running the following command:
 
     ```bash
-    find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-tidy --header-filter=".*" -p ./compile_commands.json
+    find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-tidy -p ./compile_commands.json
     ```
 
     This command:
