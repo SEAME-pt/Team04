@@ -1,7 +1,7 @@
 startup --output_user_root=/tmp/bazel_output
 build --verbose_failures
 build --repo_env=CC=clang
-build --cxxopt=-std=c++20
+build --cxxopt=-std=c++17
 
 # Non-critical (Default)
 
@@ -42,7 +42,7 @@ build --per_file_copt=third_party/.*,external/.*@-Wno-implicit-fallthrough
 build --per_file_copt=third_party/.*,external/.*@-Wno-everything
 build --per_file_copt=third_party/.*,external/.*@-Wno-error
 
-# Disable warnings incompatible with C++20
+# Disable warnings incompatible with newer C++ versions
 
 build --cxxopt=-Wno-c++98-compat
 build --cxxopt=-Wno-c++98-compat-pedantic
