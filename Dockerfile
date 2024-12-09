@@ -35,6 +35,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get update \
     && apt-get clean
 
+RUN pip install yamllint
+
 RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.23.0/bazelisk-linux-amd64 && \
     chmod 755 bazelisk-linux-amd64 && \
     mv bazelisk-linux-amd64 /usr/bin/bazelisk

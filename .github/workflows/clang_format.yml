@@ -7,41 +7,55 @@ on:  # yamllint disable-line rule:truthy
 jobs:
   clang-format:
     runs-on: ubuntu-latest
+    container:
+      image: dtors/base-cpp:latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Get changed files
-        uses: jitterbit/get-changed-files@v1
-        id: changed_files
-        with:
-          format: space-delimited
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set up clang-format
-        run: sudo apt-get install clang-format
-      - name: Run clang-format
-        run: |-
-          IFS=' ' read -r -a files <<< "${{ steps.changed_files.outputs.all }}"
-          cpp_files=()
-          for file in "${files[@]}"; do
-              if [[ "$file" == *.cpp || "$file" == *.h || "$file" == *.hpp || "$file" == *.cc || "$file" == *.cxx || "$file" == *.hxx ]]; then
-                  cpp_files+=("$file")
-              fi
-          done
+        uses: actions/checkout@v4
 
-          if [ ${#cpp_files[@]} -gt 0 ]; then
-              echo -e "Running clang-format"
-              clang-format --dry-run --Werror "${cpp_files[@]}"
-          else
-              echo -e "Skipping clang-format since no source files were changed."
-          fi
+      - name: Configure Git Safe Directory
+        run: |
+          git config --global --add safe.directory $(pwd)
+
+      - name: Find affected files
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          git diff --name-only origin/${{ github.base_ref }} > affected_files.txt
+          echo "Affected files:"
+          cat affected_files.txt
+
+      - name: Find affected cpp files
+        run: |
+          > affected_cpp_files.txt
+
+          while read file; do
+            if [[ "$file" == *.cpp || "$file" == *.h || "$file" == *.hpp || "$file" == *.cc || "$file" == *.cxx || "$file" == *.hxx ]]; then
+              echo "$file" >> affected_cpp_files.txt
+            fi
+          done < affected_files.txt
+
+          sort -u affected_cpp_files.txt -o affected_cpp_files.txt
+          echo "Affected cpp files:"
+          cat affected_cpp_files.txt
+          echo "cpp_files=$(cat affected_cpp_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Run Clang-Format
+        if: env.cpp_files != ''
+        run: |
+          echo "Running: clang-format --dry-run --Werror ${cpp_files}"
+          clang-format --dry-run --Werror ${cpp_files}
+
+      - name: Skip Clang-Format
+        if: env.cpp_files == ''
+        run: echo "No affected cpp files found. Skipping Clang-Format."
+
       - name: Show failure message
         if: failure()
         run: |-
           echo -e "To automatically apply suggested fixes, run the following command:
           ======================================================================================
-          1. Install clang-format:
-          sudo apt-get install clang-format
-          2. Run clang-format:
+          1. Run clang-format:
           find . -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" | xargs clang-format -i
           ======================================================================================"
