@@ -8,9 +8,16 @@ on:  # yamllint disable-line rule:truthy
 jobs:
   bazel_test:
     runs-on: ubuntu-latest
+    container:
+      image: dtors/base-cpp:latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Configure Git Safe Directory
+        run: |
+          git config --global --add safe.directory $(pwd)
 
       - name: Find affected files
         id: affected_files
@@ -38,6 +45,7 @@ jobs:
           cat affected_targets.txt
 
           echo "targets=$(cat affected_targets.txt | tr '\n' ' ')" >> $GITHUB_ENV
+        shell: bash
 
       - name: Setup bazel cache
         if: env.targets != ''
@@ -56,7 +64,7 @@ jobs:
         if: env.targets != ''
         run: |
           echo "Building targets: $targets"
-          bazel test ${targets}
+          bazelisk test ${targets}
 
       - name: No targets to test
         if: env.targets == ''
