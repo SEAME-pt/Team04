@@ -8,9 +8,16 @@ on:  # yamllint disable-line rule:truthy
 jobs:
   bazel_buildifier:
     runs-on: ubuntu-latest
+    container:
+      image: dtors/base-cpp:latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Configure Git Safe Directory
+        run: |
+          git config --global --add safe.directory $(pwd)
 
       - name: Find affected files
         run: |
@@ -32,8 +39,8 @@ jobs:
           sort -u affected_bazel_files.txt -o affected_bazel_files.txt
           echo "Affected Bazel files:"
           cat affected_bazel_files.txt
-
           echo "bazel_files=$(cat affected_bazel_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+        shell: bash
 
       - name: Setup bazel cache
         if: env.bazel_files != ''
@@ -52,7 +59,7 @@ jobs:
         if: env.bazel_files != ''
         run: |-
           echo "Running buildifier check on: $bazel_files"
-          bazel run //bazel:buildifier_check -- ${bazel_files}
+          bazelisk run //bazel:buildifier_check -- ${bazel_files}
 
       - name: No Bazel files affected
         if: env.bazel_files == ''
