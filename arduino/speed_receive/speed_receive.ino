@@ -3,6 +3,10 @@
 // loovee, 2014-6-13
 #include <SPI.h>
 
+// DISTANCES
+#define KMPH_SETTING 0x00
+#define MPH_SETTING 0x01
+
 #define CAN_2515
 // #define CAN_2518FD
 
@@ -56,18 +60,21 @@ void loop() {
 
         SERIAL_PORT_MONITOR.println("-----------------------------");
         SERIAL_PORT_MONITOR.print("Get data from ID: 0x");
+        SERIAL_PORT_MONITOR.println(canId, HEX);
+
         // SPEED
         byte speed = buf[0];
+        byte distanceUnit = buf[1];
 
         // RPM
-        byte lowByte = buf[1];
-        byte highByte = buf[2];
+        byte lowByte = buf[2];
+        byte highByte = buf[3];
         word rpm = word(highByte, lowByte);
-
-        SERIAL_PORT_MONITOR.println(canId, HEX);
 
         SERIAL_PORT_MONITOR.print("SPEED: ");
         SERIAL_PORT_MONITOR.print(speed);
+        SERIAL_PORT_MONITOR.print("\t");
+        SERIAL_PORT_MONITOR.print(distanceUnit == KMPH_SETTING ? "KMPH" : "MPH");
         SERIAL_PORT_MONITOR.print("\t");
         SERIAL_PORT_MONITOR.print("RPM: ");
         SERIAL_PORT_MONITOR.print(rpm);

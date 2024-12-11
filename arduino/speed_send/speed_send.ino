@@ -1,10 +1,16 @@
 #include <SPI.h>
 #include <EEPROM.h>
 
+// DISTANCES
 #define KMPH_DISTANCE 1000.000
 #define MPH_DISTANCE 1609.340
 #define KMPH_SETTING 0x00
 #define MPH_SETTING 0x01
+
+// CAN MESSAGES
+#define SPEED_MESSAGE_ID 0x01
+#define SETTINGS_MESSAGE_ID 0x02
+
 #define WHEEL_DIAMETER 0.067
 #define CAN_2515
 //#define CAN_2518FD
@@ -51,6 +57,7 @@ const unsigned long period = 1000; //the value is a number of milliseconds, ie 1
 
 // Settings
 const unsigned int settingsAddress = 0; //EEPROM address to start reading from
+byte distanceUnitSetting;
 float distanceUnit;
 
 void setup() {
@@ -105,7 +112,7 @@ void onReceiveCanMessage() {
       SERIAL_PORT_MONITOR.println(canId, HEX);
 
       switch(canId) {
-        case 0x01:
+        case SETTINGS_MESSAGE_ID:
           changeSettings(buf, len);
           break;
         default:
@@ -115,7 +122,7 @@ void onReceiveCanMessage() {
   }
 }
 
-byte canMessage[3] = {0, 0, 0};
+byte canMessage[4] = {0, 0, 0, 0};
 void loop() {
   currentMillis = millis();  //get the current "time" (actually the number of milliseconds since the program started)
   if (currentMillis - startMillis >= period)  //test whether the period has elapsed
@@ -136,12 +143,13 @@ void onPulse(){
 void sendSpeedMessage(word rpm, byte speed) {
   // Assign the byte value to the first byte of the message
   canMessage[0] = speed;
+  canMessage[1] = distanceUnitSetting;
 
   // Assign the short value to the next two bytes of the message
-  canMessage[1] = lowByte(rpm);
-  canMessage[2] = highByte(rpm);
+  canMessage[2] = lowByte(rpm);
+  canMessage[3] = highByte(rpm);
 
-  byte res = CAN.sendMsgBuf(0x10, 0, 3, canMessage);
+  byte res = CAN.sendMsgBuf(SPEED_MESSAGE_ID, 0, 4, canMessage);
 
   if(CAN_OK != res) {
     SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf fail!");
@@ -211,10 +219,12 @@ bool setDistanceUnit(byte unit) {
   switch(unit) {
     case KMPH_SETTING:
       SERIAL_PORT_MONITOR.println("setting to kmph");
+      distanceUnitSetting = KMPH_SETTING;
       distanceUnit = KMPH_DISTANCE;
       break;
     case MPH_SETTING:
       SERIAL_PORT_MONITOR.println("setting to mph");
+      distanceUnitSetting = MPH_SETTING;
       distanceUnit = MPH_DISTANCE;
       break;
     default:
