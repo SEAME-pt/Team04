@@ -1,0 +1,53 @@
+# yamllint disable rule:line-length
+---
+name: Arduino Lint
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: ['*']
+
+jobs:
+  arduino-lint:
+    runs-on: ubuntu-latest
+    container:
+      image: dtors/base-cpp:latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure Git Safe Directory
+        run: |
+          git config --global --add safe.directory $(pwd)
+
+      - name: Find affected files
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          git diff --name-only origin/${{ github.base_ref }} > affected_files.txt
+          echo "Affected files:"
+          cat affected_files.txt
+
+      - name: Find affected ino files
+        run: |
+          > affected_ino_files.txt
+
+          while read file; do
+            if [[ "$file" == *.ino || "$file" == *.pde ]]; then
+              echo "$file" >> affected_ino_files.txt
+            fi
+          done < affected_files.txt
+
+          sort -u affected_ino_files.txt -o affected_ino_files.txt
+          echo "Affected ino files:"
+          cat affected_ino_files.txt
+          echo "ino_files=$(cat affected_ino_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Run arduino-lint
+        if: env.ino_files != ''
+        run: |
+          echo "Running: arduino-lint ./arduino"
+          arduino-lint ./arduino
+
+      - name: Skip arduino-lint
+        if: env.ino_files == ''
+        run: echo "No affected ino files found. Skipping arduino-lint."
