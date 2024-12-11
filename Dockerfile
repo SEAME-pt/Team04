@@ -37,7 +37,15 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install yamllint
 
+RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/etc/install.sh | sh
+
 RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.23.0/bazelisk-linux-amd64 && \
     chmod 755 bazelisk-linux-amd64 && \
     mv bazelisk-linux-amd64 /usr/bin/bazelisk
-RUN echo "alias bazel='bazelisk'" >> ~/.bashrc
+
+ENV HOME=/root
+
+RUN echo "alias bazel='bazelisk'" >> $HOME/.bashrc
+
+RUN echo 'if [ -d "$HOME/bin" ] ; then\n    PATH="$HOME/bin:$PATH"\nfi' >> $HOME/.bashrc && \
+    echo 'if [ -d "$HOME/usr/bin" ] ; then\n    PATH="$HOME/usr/bin:$PATH"\nfi' >> $HOME/.bashrc
