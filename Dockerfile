@@ -37,6 +37,8 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install yamllint
 
+RUN pip install gitlint
+
 RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/etc/install.sh | sh
 
 RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.23.0/bazelisk-linux-amd64 && \
@@ -49,3 +51,5 @@ RUN echo "alias bazel='bazelisk'" >> $HOME/.bashrc
 
 RUN echo 'if [ -d "$HOME/bin" ] ; then\n    PATH="$HOME/bin:$PATH"\nfi' >> $HOME/.bashrc && \
     echo 'if [ -d "$HOME/usr/bin" ] ; then\n    PATH="$HOME/usr/bin:$PATH"\nfi' >> $HOME/.bashrc
+
+RUN git config --global --add safe.directory /Team04
