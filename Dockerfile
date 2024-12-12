@@ -29,11 +29,21 @@ RUN apt-get update && apt-get install -y \
     libxcb-xkb1 \
     libxcb-cursor0 \
     locales \
-    clang \
-    clang-format \
-    clang-tidy \
-    && apt-get update \
     && apt-get clean
+
+RUN wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc \
+    && echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | tee -a /etc/apt/sources.list.d/llvm.list
+
+RUN apt-get update && apt-get install -y \
+    llvm-18 \
+    llvm-18-dev \
+    clang-18 \
+    clang-tools-18 \
+    clang-format-18 \
+    clang-tidy-18 \
+    lld-18 \
+    lldb-18 \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN pip install yamllint
 
@@ -41,11 +51,15 @@ RUN pip install gitlint
 
 RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/etc/install.sh | sh
 
-RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.23.0/bazelisk-linux-amd64 && \
+RUN wget https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 && \
     chmod 755 bazelisk-linux-amd64 && \
     mv bazelisk-linux-amd64 /usr/bin/bazelisk
 
 ENV HOME=/root
+
+RUN update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-18 100
+
+RUN update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-18 100
 
 RUN echo "alias bazel='bazelisk'" >> $HOME/.bashrc
 
