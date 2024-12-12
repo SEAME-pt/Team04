@@ -1,10 +1,11 @@
+#include "basicdisplay.h"
+
 #include <QApplication>
 
-#include "display.h"
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     QApplication a(argc, argv);
-    Display w;
+    BasicDisplay w;
     w.show();
     return a.exec();
 }
