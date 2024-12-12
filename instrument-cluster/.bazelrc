@@ -1,0 +1,2 @@
+build:clang --cxxopt=-std=c++20
+build:clang --cxxopt=-stdlib=libc++
