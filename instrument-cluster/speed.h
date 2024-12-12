@@ -1,9 +1,9 @@
 #ifndef SPEED_H
 #define SPEED_H
 class Speed {
-   private:
+private:
     double current;
-   public:
+public:
     Speed(double initial);
     void increase();
     void decrease();
