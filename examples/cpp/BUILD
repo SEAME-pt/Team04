@@ -2,13 +2,16 @@ cc_library(
     name = "lib",
     srcs = ["hello.cpp"],
     hdrs = ["hello.hpp"],
+    features = [
+        "warnings_critical_code",
+    ],
 )
 
 cc_binary(
     name = "bin",
     srcs = ["main.cpp"],
-    copts = [
-        "-Weverything",  # critical
+    features = [
+        "warnings_critical_code",
     ],
     deps = [
         ":lib",
