@@ -1,15 +1,24 @@
 bazel_dep(name = "googletest", version = "1.15.2")
+bazel_dep(name = "buildifier_prebuilt", version = "7.3.1")
+bazel_dep(name = "rules_python", version = "1.0.0")
 
-# Hedron's Compile Commands Extractor for Bazel
-# https://github.com/hedronvision/bazel-compile-commands-extractor
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    configure_coverage_tool = False,
+    ignore_root_user_error = True,
+    python_version = "3.12",
+)
+
+# Compile commands
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 git_override(
     module_name = "hedron_compile_commands",
-    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
     commit = "4f28899228fb3ad0126897876f147ca15026151e",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
 )
 
 bazel_dep(name = "platforms", version = "0.0.10")
+
 register_toolchains(
     "//toolchain:cc_toolchain_for_linux_x86_64",
 )
