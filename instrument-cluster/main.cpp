@@ -6,7 +6,7 @@
 
 void decodeMessage(const zmq::message_t &message, BasicDisplay *display) {
     if (message.size() < 4) {
-        // Mensagem inválida, não processar
+        std::cerr << "Invalid message!" << std::endl;
         return;
     }
 
@@ -26,38 +26,33 @@ void decodeMessage(const zmq::message_t &message, BasicDisplay *display) {
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
 
     zmq::context_t context(1);
-
-    zmq::socket_t subscriber (context, zmq::socket_type::sub);
+    zmq::socket_t subscriber(context, zmq::socket_type::sub);
 
     try {
-        subscriber.connect("tcp://localhost:5556");
         subscriber.connect("ipc:///tmp/speed.ipc");
-    } catch (const zmq::error_t& e) {
-        std::cerr << "Erro trying to connect: " << e.what() << std::endl;
+
+        subscriber.set(zmq::sockopt::subscribe, "");
+
+        BasicDisplay display;
+
+        QTimer timer;
+        QObject::connect(&timer, &QTimer::timeout, [&]() {
+            zmq::message_t message;
+            if (subscriber.recv(message, zmq::recv_flags::none)) {
+                decodeMessage(message, &display);
+            }
+        });
+
+        timer.start(100);
+
+        display.show();
+        return app.exec();
+
+    } catch (const zmq::error_t &e) {
+        std::cerr << "Erro: " << e.what() << std::endl;
         return -1;
     }
-
-    subscriber.set(zmq::sockopt::subscribe, ""); //Subscribe to all messages
-
-    BasicDisplay display;
-
-    QTimer timer;
-    QObject::connect(&timer, &QTimer::timeout, [&]() {
-        zmq::message_t message;
-        if (subscriber.recv(message, zmq::recv_flags::none)) {
-            decodeMessage(message, &display);
-        }
-    });
-    timer.start(100); // Check for messages every 100 ms.
-
-    QObject::connect(&a, &QApplication::aboutToQuit, [&]() {
-        subscriber.close();
-        context.close();
-    });
-
-    display.show();
-    return a.exec();
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>443</width>
-    <height>373</height>
+    <height>271</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QLCDNumber" name="lcdNumber">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>260</x>
       <y>50</y>
       <width>151</width>
       <height>61</height>
@@ -30,14 +30,55 @@
    <widget class="QLCDNumber" name="lcdRPM">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>150</y>
+      <x>260</x>
+      <y>140</y>
       <width>151</width>
       <height>61</height>
      </rect>
     </property>
     <property name="intValue" stdset="0">
      <number>-1</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="speedLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>231</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Monospace</family>
+      <pointsize>50</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>SPEED:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="rpmLabel">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>140</y>
+      <width>171</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Monospace</family>
+      <pointsize>50</pointsize>
+      <bold>true</bold>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="text">
+     <string>RPM:</string>
     </property>
    </widget>
   </widget>
