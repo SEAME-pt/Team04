@@ -1,0 +1,22 @@
+@startuml com_can
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+participant "COM Middleware" as COM
+participant "Publisher" as MQ
+
+loop infinite
+  [-> COM: CAN Message
+  activate COM
+  COM --> MQ: publish(message)
+  deactivate COM
+  activate MQ
+  deactivate MQ
+  note over MQ
+  Message becomes
+  available to subscribers
+  end note
+end
+
+@enduml

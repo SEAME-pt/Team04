@@ -1,0 +1,21 @@
+@startuml cluster_subscriber
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+participant "Subscriber" as MQ
+participant "InstrumentCluster" as QT
+
+loop infinite
+  [-> MQ: Receive message
+  activate MQ
+  MQ --> QT: updateValues(message)
+  deactivate MQ
+  activate QT
+  deactivate QT
+  note over QT
+    Screen is updated
+  end note
+end
+
+@enduml

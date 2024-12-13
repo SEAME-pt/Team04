@@ -1,0 +1,13 @@
+@startuml arduino_speed_calc
+autonumber
+
+participant "Arduino Uno R3" as Arduino
+participant "CAN Controller" as CAN
+
+loop every x milliseconds
+  Arduino -> Arduino: rpm = getRPM()
+
+  Arduino -> Arduino: speed = calculateSpeed(rpm)
+  Arduino -> CAN: sendMessage(rpm, unit, speed)
+end
+@enduml
