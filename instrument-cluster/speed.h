@@ -1,12 +1,18 @@
 #ifndef SPEED_H
 #define SPEED_H
+
 class Speed {
-private:
-    double current;
-public:
-    Speed(double initial);
-    void increase();
-    void decrease();
-    double getCurrent();
+   private:
+    double value;
+
+   public:
+    Speed(double initial = 0.0);
+
+    void setSpeed(double speed);
+
+    double getSpeed() const;
+
+    ~Speed();
 };
-#endif  // SPEED_H
+
+#endif
