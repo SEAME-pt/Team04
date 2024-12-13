@@ -1,8 +1,15 @@
 #include "basicdisplay.h"
+#include <iostream>
 #include <zmq.hpp>
+#include <QTimer>
 #include <QApplication>
 
 void decodeMessage(const zmq::message_t &message, BasicDisplay *display) {
+    if (message.size() < 4) {
+        // Mensagem inválida, não processar
+        return;
+    }
+
     const uint8_t* data = static_cast<const uint8_t*>(message.data());
 
     uint8_t speedValue = data[0];
@@ -12,12 +19,10 @@ void decodeMessage(const zmq::message_t &message, BasicDisplay *display) {
 
     uint16_t rpm = (rpmHighByte << 8) | rpmLowByte;
 
-    std::string unitString = (unit == 0x00) ? "km/h" : "mph";
-
     display->updateSpeed(speedValue);
     display->updateRPM(rpm);
-    display->show();
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -25,22 +30,34 @@ int main(int argc, char *argv[])
 
     zmq::context_t context(1);
 
-    zmq::socket_t subscriber(context, zmq::socket_type::sub);
+    zmq::socket_t subscriber (context, zmq::socket_type::sub);
 
-    subscriber.connect("tcp://localhost:5556");
+    try {
+        subscriber.connect("tcp://localhost:5556");
+        subscriber.connect("ipc:///tmp/speed.ipc");
+    } catch (const zmq::error_t& e) {
+        std::cerr << "Erro trying to connect: " << e.what() << std::endl;
+        return -1;
+    }
 
-    subscriber.setsockopt(ZMQ_SUBSCRIBE, "speed", 5);
+    subscriber.set(zmq::sockopt::subscribe, ""); //Subscribe to all messages
 
     BasicDisplay display;
 
-    while (true) {
+    QTimer timer;
+    QObject::connect(&timer, &QTimer::timeout, [&]() {
         zmq::message_t message;
-        subscriber.recv(message, zmq::recv_flags::none);
+        if (subscriber.recv(message, zmq::recv_flags::none)) {
+            decodeMessage(message, &display);
+        }
+    });
+    timer.start(100); // Check for messages every 100 ms.
 
-        std::string received_msg(static_cast<char*>(message.data()), message.size());
+    QObject::connect(&a, &QApplication::aboutToQuit, [&]() {
+        subscriber.close();
+        context.close();
+    });
 
-        decodeMessage(message, &display);
-    }
-
+    display.show();
     return a.exec();
 }
