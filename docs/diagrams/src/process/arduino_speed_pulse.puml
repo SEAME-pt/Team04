@@ -1,0 +1,18 @@
+@startuml arduino_speed_pulse
+autonumber
+
+participant "Speed Sensor" as SpeedSensor
+participant "Interrupt Pin" as InterruptPin
+participant "Arduino Uno R3" as Arduino
+
+loop forever
+SpeedSensor o-> InterruptPin: Pulse
+activate InterruptPin
+InterruptPin -> Arduino: onPulse()
+deactivate InterruptPin
+activate Arduino
+deactivate Arduino
+note over Arduino: Increments total pulses
+
+end
+@enduml
