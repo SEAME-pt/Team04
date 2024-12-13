@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "speed.h"
+#include "rpm.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -14,16 +15,17 @@ class BasicDisplay : public QMainWindow
 {
     Q_OBJECT
 
-public:
+   public:
     BasicDisplay(QWidget *parent = nullptr);
-    ~BasicDisplay();
-private slots:
-    void simulate();
-    void showSpeed(double speed);
-    void on_accelerate_pressed();
-    void on_decelerate_pressed();
-private:
+    ~BasicDisplay();  // Destruidor
+
+    void updateSpeed(double speed);
+    void updateRPM(int rpm);
+
+   private:
     Ui::BasicDisplay *ui;
-    Speed speed = *new Speed(30);
+    Speed speed;
+    RPM rpm;
 };
-#endif // BASICDISPLAY_H
+
+#endif

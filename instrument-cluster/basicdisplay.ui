@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>443</width>
+    <height>373</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,40 +17,27 @@
    <widget class="QLCDNumber" name="lcdNumber">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>180</y>
+      <x>230</x>
+      <y>50</y>
       <width>151</width>
       <height>61</height>
      </rect>
     </property>
     <property name="intValue" stdset="0">
-     <number>0</number>
+     <number>-1</number>
     </property>
    </widget>
-   <widget class="QPushButton" name="accelerate">
+   <widget class="QLCDNumber" name="lcdRPM">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>250</y>
-      <width>111</width>
-      <height>21</height>
+      <x>230</x>
+      <y>150</y>
+      <width>151</width>
+      <height>61</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Accelerate</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="decelerate">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>250</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Decelerate</string>
+    <property name="intValue" stdset="0">
+     <number>-1</number>
     </property>
    </widget>
   </widget>
@@ -59,8 +46,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>21</height>
+     <width>443</width>
+     <height>19</height>
     </rect>
    </property>
   </widget>

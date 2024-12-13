@@ -1,11 +1,15 @@
 #include "speed.h"
-Speed::Speed(double initial) {this->current = initial;}
-void Speed::increase(){
-    this->current+=0.1;
+
+Speed::Speed(double initial) {
+    this->value = initial;
 }
-void Speed::decrease(){
-    this->current-=0.1;
+
+Speed::~Speed() {}
+
+void Speed::setSpeed(double speed) {
+    this->value = speed;
 }
-double Speed::getCurrent(){
-    return this->current;
+
+double Speed::getSpeed() const {
+    return this->value;
 }
