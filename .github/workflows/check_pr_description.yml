@@ -4,12 +4,15 @@ name: PR description
 on:  # yamllint disable-line rule:truthy
   pull_request:
     types: [opened, edited, synchronize]
+
 jobs:
   check-description:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
       - name: Check PR description for issue link
         id: contains_issue
         run: |
@@ -25,6 +28,7 @@ jobs:
           else
             echo "PR description contains a valid issue link."
           fi
+
       - name: Fail PR if no issue link found
         if: failure()
         run: |-

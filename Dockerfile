@@ -62,6 +62,10 @@ RUN update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/cl
 
 RUN update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-18 100
 
+RUN update-alternatives --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-18 100
+
+RUN update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-18 100
+
 RUN echo "alias bazel='bazelisk'" >> $HOME/.bashrc
 
 RUN echo 'if [ -d "$HOME/bin" ] ; then\n    PATH="$HOME/bin:$PATH"\nfi' >> $HOME/.bashrc && \

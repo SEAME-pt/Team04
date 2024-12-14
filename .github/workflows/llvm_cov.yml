@@ -1,3 +1,4 @@
+# yamllint disable rule:line-length
 ---
 name: Run llvm-cov
 on:  # yamllint disable-line rule:truthy
@@ -7,14 +8,12 @@ on:  # yamllint disable-line rule:truthy
 jobs:
   coverage:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    container:
+      image: dtors/base-cpp:latest
 
-      - name: Install LLVM
-        run: |
-          sudo apt update
-          sudo apt install -y llvm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Run Coverage Script
-        run: bazel run //tools/coverage:llvm_cov -- -t //examples/cpp:test -s
+        run: bazelisk run //tools/coverage:llvm_cov -- -t //examples/cpp:test -s

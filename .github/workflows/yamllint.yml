@@ -8,9 +8,16 @@ on:  # yamllint disable-line rule:truthy
 jobs:
   yamllint:
     runs-on: ubuntu-latest
+    container:
+      image: dtors/base-cpp:latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Configure Git Safe Directory
+        run: |
+          git config --global --add safe.directory $(pwd)
 
       - name: Find affected files
         run: |
@@ -20,7 +27,6 @@ jobs:
           cat affected_files.txt
 
       - name: Find affected yaml files
-        id: bazel_targets
         run: |
           > affected_yaml_files.txt
 
@@ -33,14 +39,8 @@ jobs:
           sort -u affected_yaml_files.txt -o affected_yaml_files.txt
           echo "Affected yaml files:"
           cat affected_yaml_files.txt
-
           echo "yaml_files=$(cat affected_yaml_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
-
-      - name: Install yamllint
-        if: env.yaml_files != ''
-        run: |
-          python -m pip install --upgrade pip
-          pip install yamllint
+        shell: bash
 
       - name: Lint YAML files
         if: env.yaml_files != ''
