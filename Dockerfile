@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y \
     libxcb-xkb1 \
     libxcb-cursor0 \
     locales \
+    qtbase5-dev  \
     && apt-get clean
 
 RUN wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc \

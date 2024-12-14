@@ -1,18 +1,29 @@
-load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
-
-qt_cc_library(
+cc_library(
     name = "lib",
     srcs = ["hello.cpp"],
-    hdrs = ["hello.hpp"],
-    deps = [
-        "@rules_qt//:qt_core",
-        "@rules_qt//:qt_widgets",
+    hdrs = [
+        "hello.hpp",
+    ],
+    copts = [
+        "-I/usr/include/x86_64-linux-gnu/qt5",
+        "-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+        "-I/usr/include/x86_64-linux-gnu/qt5/QtCore",
+    ],
+    linkopts = [
+        "-lQt5Widgets",
+        "-lQt5Core",
+        "-lQt5Gui",
     ],
 )
 
-qt_cc_binary(
+cc_binary(
     name = "bin",
     srcs = ["main.cpp"],
+    copts = [
+        "-I/usr/include/x86_64-linux-gnu/qt5",
+        "-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+        "-I/usr/include/x86_64-linux-gnu/qt5/QtCore",
+    ],
     deps = [
         ":lib",
     ],
