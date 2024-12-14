@@ -31,7 +31,7 @@ if [[ -z "${BAZEL_TESTS}" ]]; then
 fi
 
 OUTPUT_DIR="${OUTPUT_DIR:-"$(mktemp -d)/cov_report"}"
-BAZEL_OUTPUT=${BAZEL_OUTPUT:-"/home/${USER}/.cache/coverage"}
+BAZEL_OUTPUT=${BAZEL_OUTPUT:-"${HOME}/.cache/coverage"}
 SKIP_HTML_REPORT=${SKIP_HTML_REPORT:-false}
 echo "INFO: Bazel cache: ${BAZEL_OUTPUT}"
 echo "INFO: Tests target: ${BAZEL_TESTS}"
