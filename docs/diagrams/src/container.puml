@@ -21,6 +21,7 @@ System_Boundary(c1, "JetRacer System"){
     Container(planning, "Planning", "TBD", "Autonomous Driving [TBD]")
     Container(sensors, "Sensor Interface", "Arduino, C++", "Converts sensor data to usable data")
     Container(connect_mid, "Connection Middleware", "C++", "Stores can messages in a queue for multiple programs")
+    Container(config_manager, "Configuration Manager", "C++", "Manages global configurations")
     Container(data_center, "Data Center", "C++", "Fetches relevant car data and stores in DB")
     ContainerDb(aws, "Cloud Database", "AWS", "Stores car data")
 }
@@ -28,11 +29,13 @@ System_Boundary(c1, "JetRacer System"){
 Rel(driver, in_cluster, "Views")
 Rel(driver, m_controls, "Controls with gamepad")
 Rel_U(sensors, connect_mid, "Sends sensor data", "CAN")
-Rel_D(in_cluster, connect_mid, "Fetches Speed CAN data", "DBus")
-Rel(data_center, connect_mid, "Fetches Speed CAN data", "DBus")
+Rel_D(in_cluster, connect_mid, "Fetches Speed CAN data", "0MQ")
+Rel(data_center, connect_mid, "Fetches Speed CAN data", "0MQ")
+Rel(config_manager, connect_mid, "Sends configurations", "0MQ")
 Rel(planning,motion,"Controls motion")
 Rel(m_controls,motion,"Controls motion")
 Rel(planning,perception,"Gets camera data")
+Rel_R(in_cluster, config_manager, "Gets configurations")
 
 Rel(data_center, aws, "Stores car data", "HTTPS")
 'Lay_R(in_cluster, aws)
