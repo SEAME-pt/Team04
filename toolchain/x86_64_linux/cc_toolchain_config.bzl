@@ -11,6 +11,19 @@ all_link_actions = [
     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
 ]
 
+all_compile_actions = [
+    ACTION_NAMES.assemble,
+    ACTION_NAMES.c_compile,
+    ACTION_NAMES.clif_match,
+    ACTION_NAMES.cpp_compile,
+    ACTION_NAMES.cpp_header_parsing,
+    ACTION_NAMES.cpp_module_codegen,
+    ACTION_NAMES.cpp_module_compile,
+    ACTION_NAMES.linkstamp_compile,
+    ACTION_NAMES.lto_backend,
+    ACTION_NAMES.preprocess_assemble,
+]
+
 def _impl(ctx):
     tool_paths = [
         tool_path(name = "gcc", path = "/usr/bin/clang-18"),
@@ -19,13 +32,35 @@ def _impl(ctx):
         tool_path(name = "cpp", path = "/usr/bin/clang-cpp18"),
         tool_path(name = "gcov", path = "/usr/bin/gcov"),
         tool_path(name = "llvm-cov", path = "/usr/bin/llvm-cov-18"),
+        tool_path(name = "llvm-profdata", path = "/usr/bin/llvm-profdata-18"),
         tool_path(name = "nm", path = "/usr/bin/nm"),
         tool_path(name = "objdump", path = "/usr/bin/objdump"),
         tool_path(name = "strip", path = "/usr/bin/strip"),
+        tool_path(name = "clang-tidy", path = "/usr/bin/clang-tidy-18"),
+        tool_path(name = "clang-format", path = "/usr/bin/clang-format-18"),
     ]
 
     features = [
-        # Default linker flags
+        feature(
+            name = "default_compiler_flags",
+            enabled = True,
+            flag_sets = [
+                flag_set(
+                    actions = all_compile_actions,
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                "-no-canonical-prefixes",
+                                "-Wno-builtin-macro-redefined",
+                                "-D__DATE__=\"redacted\"",
+                                "-D__TIMESTAMP__=\"redacted\"",
+                                "-D__TIME__=\"redacted\"",
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+        ),
         feature(
             name = "default_linker_flags",
             enabled = True,
@@ -33,24 +68,25 @@ def _impl(ctx):
                 flag_set(
                     actions = all_link_actions,
                     flag_groups = [
-                        flag_group(flags = ["-lstdc++", "-lm"]),
+                        flag_group(
+                            flags = [
+                                "-lstdc++",
+                                "-lm",
+                            ],
+                        ),
                     ],
                 ),
             ],
         ),
-        # Enable stack protector
         feature(
             name = "stack_protector",
             enabled = True,
             flag_sets = [
                 flag_set(
-                    actions = all_link_actions + [
-                        ACTION_NAMES.c_compile,
-                        ACTION_NAMES.cpp_compile,
-                    ],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
-                            flags = ["-fstack-protector-strong"],  # Or use -fstack-protector/-fstack-protector-all
+                            flags = ["-fstack-protector-strong"],
                         ),
                     ],
                 ),
@@ -68,7 +104,6 @@ def _impl(ctx):
                 ),
             ],
         ),
-        # Enable position-independent code
         feature(
             name = "pic",
             enabled = True,
@@ -81,16 +116,13 @@ def _impl(ctx):
                 ),
             ],
         ),
-        # Enable Sanitizer
+        # Sanitizer
         feature(
             name = "asan",
             enabled = False,
             flag_sets = [
                 flag_set(
-                    actions = all_link_actions + [
-                        ACTION_NAMES.c_compile,
-                        ACTION_NAMES.cpp_compile,
-                    ],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
                             flags = [
@@ -102,16 +134,12 @@ def _impl(ctx):
                 ),
             ],
         ),
-        # Enable UndefinedBehaviorSanitizer
         feature(
             name = "ubsan",
             enabled = False,
             flag_sets = [
                 flag_set(
-                    actions = all_link_actions + [
-                        ACTION_NAMES.c_compile,
-                        ACTION_NAMES.cpp_compile,
-                    ],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
                             flags = ["-fsanitize=undefined"],
@@ -120,16 +148,12 @@ def _impl(ctx):
                 ),
             ],
         ),
-        # Enable ThreadSanitizer
         feature(
             name = "tsan",
             enabled = False,
             flag_sets = [
                 flag_set(
-                    actions = all_link_actions + [
-                        ACTION_NAMES.c_compile,
-                        ACTION_NAMES.cpp_compile,
-                    ],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
                             flags = ["-fsanitize=thread"],
@@ -138,16 +162,12 @@ def _impl(ctx):
                 ),
             ],
         ),
-        # Warning options
         feature(
-            name = "warnings_critical_code",
+            name = "warnings_critical_code_clang",
             enabled = False,
             flag_sets = [
                 flag_set(
-                    actions = all_link_actions + [
-                        ACTION_NAMES.c_compile,
-                        ACTION_NAMES.cpp_compile,
-                    ],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
                             flags = [
@@ -162,14 +182,11 @@ def _impl(ctx):
             ],
         ),
         feature(
-            name = "warnings_medium_code",
+            name = "warnings_critical_code_gcc",
             enabled = False,
             flag_sets = [
                 flag_set(
-                    actions = all_link_actions + [
-                        ACTION_NAMES.c_compile,
-                        ACTION_NAMES.cpp_compile,
-                    ],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
                             flags = [
@@ -202,10 +219,7 @@ def _impl(ctx):
             enabled = True,
             flag_sets = [
                 flag_set(
-                    actions = all_link_actions + [
-                        ACTION_NAMES.c_compile,
-                        ACTION_NAMES.cpp_compile,
-                    ],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
                             flags = [
@@ -226,13 +240,14 @@ def _impl(ctx):
         features = features,
         cxx_builtin_include_directories = [
             "/usr/lib/llvm-18/lib/clang/18/include",
-            "/usr/lib/llvm-18/lib/clang/18/share",  # Add the directory containing `asan_ignorelist.txt`
+            "/usr/lib/llvm-18/lib/clang/18/share",  # Dir containing `asan_ignorelist.txt`
+            "/usr/lib/clang/18/include",
             "/usr/include",
         ],
-        toolchain_identifier = "local",
+        toolchain_identifier = "linux_aarch64-toolchain",
         host_system_name = "local",
-        target_system_name = "local",
-        target_cpu = "k8",
+        target_system_name = "unknown",
+        target_cpu = "unknown",
         target_libc = "unknown",
         compiler = "clang",
         abi_version = "unknown",

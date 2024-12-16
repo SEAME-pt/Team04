@@ -74,7 +74,7 @@ function create_html_report() {
         Bazel output: ${BAZEL_OUTPUT}
         Profile files: ${BAZEL_OUTPUT}/coverage.profdata
         Output report html: ${OUTPUT_DIR}/index.html\n"
-    SOURCE_FILES=$(find ${BAZEL_OUTPUT} \
+    SOURCE_FILES=$(find -L ${BAZEL_OUTPUT} \
         -type f \
         -name "*.o" |
         grep -vE "external/|test/.*")
@@ -89,7 +89,7 @@ function show_summary() {
         Bazel output: ${BAZEL_OUTPUT}
         Profile files: ${BAZEL_OUTPUT}/coverage.profdata
         Output report html: ${OUTPUT_DIR}/index.html\n"
-    SOURCE_FILES=$(find ${BAZEL_OUTPUT} \
+    SOURCE_FILES=$(find -L ${BAZEL_OUTPUT} \
         -type f \
         -name "*.o" |
         grep -vE "external/|test/.*")
