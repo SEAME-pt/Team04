@@ -17,8 +17,7 @@ class BasicDisplay : public QMainWindow
 
    public:
     BasicDisplay(QWidget *parent = nullptr);
-    ~BasicDisplay();  // Destruidor
-
+    ~BasicDisplay();
     void updateSpeed(double speed);
     void updateRPM(int rpm);
 
@@ -26,6 +25,7 @@ class BasicDisplay : public QMainWindow
     Ui::BasicDisplay *ui;
     Speed speed;
     RPM rpm;
+
 };
 
 #endif
