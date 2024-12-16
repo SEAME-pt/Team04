@@ -43,8 +43,12 @@ RUN apt-get update && apt-get install -y \
     clang-format-18 \
     clang-tidy-18 \
     lld-18 \
-    lldb-18 \
-    && rm -rf /var/lib/apt/lists/*
+    lldb-18
+
+# Cross-compilation
+RUN apt-get install -y \
+    gcc-aarch64-linux-gnu \
+    g++-aarch64-linux-gnu
 
 RUN pip install yamllint
 
