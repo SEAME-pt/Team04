@@ -1,0 +1,17 @@
+@startuml component_car_motion
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component Diagram for Car Motion
+
+Container(m_controls, "Manual Controls", "C++", "Handles the gamepad input controls")
+Container(planning, "Planning", "TBD", "Autonomous Driving [TBD]")
+
+Container_Boundary(motion, "Car Motion") {
+  Component(car_controller, "Motion Controller", "C++", "Controls Car Motion")
+  Component(orchestrator, "Motion Orchestrator", "C++", "Decides which controls to perform")
+}
+
+Rel(orchestrator, car_controller, "sends motion controls", "IPC")
+Rel(m_controls, orchestrator, "sends motion controls", "0MQ")
+Rel(planning, orchestrator, "sends motion controls", "0MQ")
+@enduml
