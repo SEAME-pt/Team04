@@ -1,0 +1,22 @@
+@startuml component_ins_cluster
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component Diagram for Instrument Cluster
+
+Container(connect_mid, "Connection Middleware", "C++", "Stores can messages in a queue for multiple programs")
+Container(config_manager, "Configuration Manager", "C++", "Manages global configurations")
+
+Container_Boundary(in_cluster, "Instrument Cluster") {
+  Component(gui, "GUI", "QT, QML", "Displays data")
+  Component(can_subscriber, "MQ Subscriber", "0MQ", "Subscribes to MQ messages")
+  Component(can_processor, "MQ Processor", "C++", "Processes MQ messages")
+  Component(ins_cluster_be, "Cluster Backend", "C++", "Holds Instrument Cluster data")
+}
+
+Rel_R(can_subscriber, connect_mid, "fetches messages", "0MQ")
+Rel_D(can_subscriber, can_processor, "calls")
+Rel_L(can_processor, ins_cluster_be, "sets data (speed, rpm, battery)")
+Rel(gui, ins_cluster_be, "fetches data")
+Rel_D(ins_cluster_be, config_manager, "gets configurations")
+
+@enduml
