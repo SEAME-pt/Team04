@@ -25,6 +25,18 @@
 
 ### Component (Level 3)
 
+Car Motion
+
+![CarMotion](diagrams/out/component_car_motion.png)
+
+Communication Middleware
+
+![ComMid](diagrams/out/component_com_mid.png)
+
+Instrument Cluster
+
+![InstrumentCluster](diagrams/out/component_ins_cluster.png)
+
 ## Physical View
 
 ![Deployment](diagrams/out/deployment-Deployment_Diagram_for_JetRacer_System.png)
