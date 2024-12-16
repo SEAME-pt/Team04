@@ -8,6 +8,8 @@ CONFIG += c++20
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+
+# Zero MQ
 INCLUDEPATH += /usr/include
 LIBS += -L/usr/lib/x86_64-linux-gnu -lzmq
 
@@ -15,7 +17,7 @@ SOURCES += \
     main.cpp \
     basicdisplay.cpp \
     rpm.cpp \
-    speed.cpp
+    speed.cpp \
 
 HEADERS += \
     basicdisplay.h \
@@ -36,3 +38,4 @@ DISTFILES += \
     WORKSPACE \
     qt.BUILD \
     qt_config.bzl
+
