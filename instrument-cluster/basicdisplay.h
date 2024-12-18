@@ -24,7 +24,7 @@ class BasicDisplay : public QMainWindow
    private:
     Ui::BasicDisplay *ui;
     Speed speed;
-    RPM rpm;
+    Rpm rpm;
 
 };
 

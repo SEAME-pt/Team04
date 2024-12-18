@@ -1,15 +1,15 @@
 #include "rpm.h"
 
-RPM::RPM(int initial) {
+Rpm::Rpm(int initial) {
     this->value = initial;
 }
 
-RPM::~RPM() {}
+Rpm::~Rpm() {}
 
-void RPM::setRPM(int rpm) {
+void Rpm::setRPM(int rpm) {
     this->value = rpm;
 }
 
-int RPM::getRPM() const {
+int Rpm::getRPM() const {
     return this->value;
 }
