@@ -31,7 +31,7 @@ jobs:
           > affected_cpp_files.txt
 
           while read file; do
-            if [[ "$file" == *.cpp || "$file" == *.h || "$file" == *.hpp || "$file" == *.cc || "$file" == *.cxx || "$file" == *.hxx ]]; then
+            if [[ "$file" == *.c || "$file" == *.cc || "$file" == *.cpp || "$file" == *.cxx || "$file" == *.h || "$file" == *.hpp || "$file" == *.hxx ]]; then
               echo "$file" >> affected_cpp_files.txt
             fi
           done < affected_files.txt
@@ -58,5 +58,5 @@ jobs:
           echo -e "To automatically apply suggested fixes, run the following command:
           ======================================================================================
           1. Run clang-format:
-          find . -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" | xargs clang-format -i
+          find . -iname \"*.c\" -o -iname \"*.cc\" -o -iname \"*.cpp\" -o -iname \"*.cxx\" -o -iname \"*.h\" -o -iname \"*.hpp\" -o -iname \"*.hxx\" | xargs clang-format -i
           ======================================================================================"
