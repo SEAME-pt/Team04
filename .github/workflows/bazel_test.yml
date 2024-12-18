@@ -33,7 +33,7 @@ jobs:
           > affected_targets.txt
 
           while read file; do
-            if [[ "$file" == *.cpp || "$file" == *.h || "$file" == *.hpp || "$file" == *.cc || "$file" == *.cxx || "$file" == *.hxx ]]; then
+            if [[ "$file" == *.c || "$file" == *.cc || "$file" == *.cpp || "$file" == *.cxx || "$file" == *.h || "$file" == *.hpp || "$file" == *.hxx ]]; then
               echo "Finding targets for: $file"
               targets=$(bazel query --output=package "$file" || true)/...
               echo "$targets" >> affected_targets.txt
