@@ -18,11 +18,16 @@ SOURCES += \
     basicdisplay.cpp \
     rpm.cpp \
     speed.cpp \
+    zmqpublisher.cpp \
+    zmqsubscriber.cpp
 
 HEADERS += \
     basicdisplay.h \
+    config.h \
     rpm.h \
-    speed.h
+    speed.h \
+    zmqpublisher.h \
+    zmqsubscriber.h
 
 FORMS += \
     basicdisplay.ui
@@ -32,10 +37,5 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    .bazelrc \
-    BUILD \
-    WORKSPACE \
-    qt.BUILD \
-    qt_config.bzl
+DISTFILES +=
 
