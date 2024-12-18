@@ -18,6 +18,7 @@
     - [Apply Fixes](#242-apply-fixes)
   - [2.5. Bazel Buildifier](#25-bazel-buildifier)
     - [How to Run](#251-how-to-run)
+  - [2.6. Sanitizers](#26-sanitizers)
 
 ## 1. Development Environment
 
@@ -258,3 +259,35 @@ To run Buildifier execute the following command:
 ```bash
 bazel run //bazel:buildifier
 ```
+
+### 2.6. Sanitizers
+
+Sanitizers help detect memory errors, undefined behavior, and threading issues during runtime. The following sanitizers are supported:
+
+- **ASAN (AddressSanitizer):** Detects memory errors like buffer overflows and use-after-free.
+- **UBSAN (UndefinedBehaviorSanitizer):** Flags undefined behavior in the code.
+- **TSAN (ThreadSanitizer):** Identifies data races and threading issues.
+
+#### How to run
+
+To run a target with specific sanitizers using the `--features` options:
+
+```bash
+bazel run <bazel_target> --features=<sanitizer>
+```
+
+#### Examples
+
+To enable ASAN and UBSAN:
+
+```bash
+bazel run //examples/cpp:bin --features=asan --features=ubsan
+```
+
+To enable TSAN:
+
+```bash
+bazel run //examples/cpp:bin --features=tsan
+```
+
+**Note**: TSAN needs to run separatly from ASAN because `-fsanitize=address` is incompatible with `-fsanitize=thread`.
