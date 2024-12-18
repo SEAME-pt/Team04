@@ -191,7 +191,7 @@ To automatically apply fixes suggested by Clang-Tidy, follow these steps:
     Use the following command to find all relevant C++ source files in the project.
 
     ```bash
-    find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-tidy -p ./compile_commands.json
+    find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.hxx"" | xargs clang-tidy -p ./compile_commands.json
     ```
 
 3. To automatically apply any fixes, use the following commands:
@@ -203,7 +203,7 @@ To automatically apply fixes suggested by Clang-Tidy, follow these steps:
    To run for all relevant C++ source files:
 
     ```bash
-    find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-tidy -fix -fix-errors -p ./compile_commands.json
+    find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.hxx" | xargs clang-tidy -fix --fix-errors -p ./compile_commands.json
     ```
 
 ### 2.4. Clang-Format
@@ -221,11 +221,11 @@ clang-format <filepath> --dry-run --Werror
 To run for all relevant C++ source files:
 
 ```bash
-find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-format --dry-run --Werror
+find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.hxx" | xargs clang-format --dry-run --Werror
 ```
 
 - `find .` recursively searches for C++ source files in the current directory and its subdirectories.
-- `-name` "*.cpp" -o -name "*.h" ... ensures all common C++ file extensions are included.
+- `-iname` "*.cpp" -o -iname "*.h" ... ensures common C++ file extensions are included.
 - `xargs clang-format --dry-run --Werror` applies clang-format to the found files, in "dry-run" mode (no changes are made), and treats any formatting violations as errors (--Werror).
 
 #### 2.4.2. Apply Fixes
@@ -239,7 +239,7 @@ clang-format <filepath> -fix -fix-errors
 To run for all relevant C++ source files:
 
 ```bash
-find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-format -fix -fix-errors
+find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.hxx" | xargs clang-format -fix -fix-errors
 ```
 
 For intended file:

@@ -31,7 +31,7 @@ jobs:
           > affected_cpp_files.txt
 
           while read file; do
-            if [[ "$file" == *.cpp || "$file" == *.h || "$file" == *.hpp || "$file" == *.cc || "$file" == *.cxx || "$file" == *.hxx ]]; then
+            if [[ "$file" == *.c || "$file" == *.cc || "$file" == *.cpp || "$file" == *.cxx || "$file" == *.h || "$file" == *.hpp || "$file" == *.hxx ]]; then
               echo "$file" >> affected_cpp_files.txt
             fi
           done < affected_files.txt
@@ -66,5 +66,7 @@ jobs:
           1. Generate compile commands:
           bazel run @hedron_compile_commands//:refresh_all
           2. Run clang-tidy:
-          find . -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.cc\" -o -name \"*.cxx\" -o -name \"*.hxx\" | xargs clang-tidy -fix -fix-errors -p ./compile_commands.json
+          find . -iname \"*.c\" -o -iname \"*.cc\" -o -iname \"*.cpp\" -o -iname \"*.cxx\" -o -iname \"*.h\" -o -iname \"*.hpp\" -o -iname \"*.hxx\" | xargs clang-tidy -p ./compile_commands.json
+          3. Run clang-tidy:
+          find . -iname \"*.c\" -o -iname \"*.cc\" -o -iname \"*.cpp\" -o -iname \"*.cxx\" -o -iname \"*.h\" -o -iname \"*.hpp\" -o -iname \"*.hxx\" | xargs clang-tidy -p ./compile_commands.json -fix --fix-errors
           ======================================================================================"
