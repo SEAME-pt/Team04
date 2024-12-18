@@ -5,11 +5,11 @@
 - [1. Development Environment](#1-development-environment)
   - [1.1. Install Docker](#11-install-docker)
   - [1.2. Build the Docker Image](#12-build-the-docker-image)
-  - [1.3. Run Docker](#13-run-docker)
+  - [1.3. Run Docker Container](#13-run-docker-container)
   - [1.4. Common Issues](#14-common-issues)
 - [2. Tooling](#2-tooling)
   - [2.1. Bazel](#21-bazel)
-  - [2.2. Compiler](#22-compiler)
+  - [2.2. Toolchains And Cross-Compilation](#22-toolchains-and-cross-compilation)
   - [2.3. Clang-Tidy](#23-clang-tidy)
     - [Run Analysis](#231-run-analysis)
     - [Apply Fixes](#232-apply-fixes)
@@ -18,16 +18,14 @@
     - [Apply Fixes](#242-apply-fixes)
   - [2.5. Bazel Buildifier](#25-bazel-buildifier)
     - [How to Run](#251-how-to-run)
-- [3. Hardware](#3-hardware)
-  - [3.1. Jetson Nano](#31-jetson-nano)
-    - [Flashing](#311-flashing)
-    - [Remote Connection](#312-remote-connection)
 
 ## 1. Development Environment
 
-To set up the development environment with Docker, follow these steps:
+The development environment is fully containerized using Docker. Follow the steps below to set up your environment.
 
 ### 1.1. Install Docker
+
+Ensure Docker is installed on your system. For Ubuntu, use the following commands:
 
 ```bash
 sudo apt-get update
@@ -36,7 +34,7 @@ sudo apt-get install docker.io
 
 ### 1.2. Build the Docker Image
 
-Once Docker is installed, build the Docker image with this command:
+Once Docker is installed, build the image with:
 
 ```bash
 sudo docker build -t team04_docker .
@@ -44,13 +42,10 @@ sudo docker build -t team04_docker .
 
 Explanation:
 
-- `--build-arg UID=$(id -u) --build-arg GID=$(id -g)`: These arguments pass the current user’s UID (User ID) and GID (Group ID) to the Docker build process. This ensures that files created by the container will have the correct ownership matching your local user and group.
 - `-t team04_docker`: This flags the built image with the name team04_docker. You can choose a different name if needed.
 - `.`: The dot (.) at the end specifies the current directory as the build context. Docker will use the Dockerfile in this directory to build the image.
 
-Once the image is built, you can verify it by running docker images, which will display a list of available Docker images on your system.
-
-### 1.3. Run Docker
+### 1.3. Run Docker Container
 
 To run the Docker container with the image and necessary volumes mounted, use the following command:
 
@@ -96,6 +91,8 @@ This command allows local Docker containers to connect to the X server and use g
 
 ## 2. Tooling
 
+This section outlines the key tools integrated into the development environment.
+
 ### 2.1. Bazel
 
 Bazel is a powerful, fast, and extensible build system.
@@ -108,9 +105,51 @@ bazel run //examples/cpp:bin
 
 This will build and run the bin target from the examples/cpp directory.
 
-### 2.2. Compiler
+### 2.2. Toolchains And Cross-Compilation
 
-The build settings, such as the choice of compiler, the C++ standard version, and default warning options, are configured in the `.bazelrc` file. In this setup, the compiler is set to Clang, and the C++ standard version is defined as C++20.
+Two toolchains are implemented to build for `x86_64_linux` and `aarch64_linux`. These toolchains define the tool binaries and the corresponding sets of options.
+
+To compile for the `x86_64`, use the following command:
+
+```bash
+bazel build <bazel_target> --platforms=//bazel/platforms:x86_64_linux
+```
+
+To compile for the `aarch64` (ARM64), use the following command:
+
+```bash
+bazel build <bazel_target> --platforms=//bazel/platforms:aarch64_linux
+```
+
+#### Examples
+
+```bash
+bazel build //examples/cpp:bin --platforms=//bazel/platforms:x86_64_linux
+```
+
+#### Toolchain Features
+
+The toolchains also define platform-specific warning options, which are passed via features in the `BUILD` file for each target. Different features can be applied depending on the platform, as shown in the following example:
+
+```starlark
+cc_binary(
+    name = "bin",
+    srcs = ["main.cpp"],
+    features = select({
+        "//bazel/platforms:aarch64_config": ["warnings_critical_code_gcc"],
+        "//conditions:default": ["warnings_critical_code_clang"],
+    }),
+    deps = [
+        ":lib",
+    ],
+)
+```
+
+### Key Points
+
+1. **Toolchain Selection**: Use the `--platforms` flag to select the desired platform-specific toolchain.
+2. **Configurable Features**: Customize build features, such as compiler warnings, based on the target platform.
+3. **Cross-Platform Compatibility**: The toolchains enable seamless cross-compilation for both `x86_64` and `aarch64` architectures.
 
 ### 2.3. Clang-Tidy
 
@@ -118,13 +157,12 @@ Clang-Tidy is a static analysis tool for C++ code. It helps identify potential i
 
 #### 2.3.1. Run Analysis
 
-To run Clang-Tidy analysis on your codebase using Bazel, execute the following command:
+To run Clang-Tidy analysis install the Clang-Tidy package or run the docker image.
+
+Run Clang-Tidy with the following command:
 
 ```bash
-bazel build //... \
-  --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect \
-  --output_groups=report \
-  --@bazel_clang_tidy//:clang_tidy_config=//:clang_tidy_config
+clang-tidy <filepath>
 ```
 
 The checks are define on .clang-tidy file.
@@ -143,18 +181,29 @@ To automatically apply fixes suggested by Clang-Tidy, follow these steps:
 
     This ensures that the compile_commands.json file is up-to-date and reflects the latest build settings.
 
-2. Run Clang-Tidy with the -fix option:
+2. Run Clang-Tidy Analysis:
 
-    Now, you can apply Clang-Tidy fixes by running the following command:
+    ```bash
+    clang-tidy <filepath> -p ./compile_commands.json
+    ```
+
+    Use the following command to find all relevant C++ source files in the project.
 
     ```bash
     find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-tidy -p ./compile_commands.json
     ```
 
-    This command:
-    Finds all relevant C++ source files in the project.
-    Runs Clang-Tidy on each file using the compile_commands.json for accurate analysis.
-    Applies any fixes Clang-Tidy suggests (e.g., code style corrections, best practice recommendations).
+3. To automatically apply any fixes, use the following commands:
+
+    ```bash
+    clang-tidy <filepath> -fix -fix-errors -p ./compile_commands.json
+    ```
+
+   To run for all relevant C++ source files:
+
+    ```bash
+    find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-tidy -fix -fix-errors -p ./compile_commands.json
+    ```
 
 ### 2.4. Clang-Format
 
@@ -163,6 +212,12 @@ Clang-Format is a tool that automatically formats C++ source code according to a
 #### 2.4.1. Run Analysis
 
 To check the formatting of your code without making any changes, use the following command. It will run `clang-format` in "dry-run" mode, which simulates formatting and reports any issues without modifying files.
+
+```bash
+clang-format <filepath> --dry-run --Werror
+```
+
+To run for all relevant C++ source files:
 
 ```bash
 find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-format --dry-run --Werror
@@ -177,7 +232,19 @@ find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*
 To automatically fix the formatting of your code based on the predefined style, you can use the following command. It will rewrite the files in-place according to Clang-Format's rules.
 
 ```bash
-find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-format -i
+clang-format <filepath> -fix -fix-errors
+```
+
+To run for all relevant C++ source files:
+
+```bash
+find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hxx" | xargs clang-format -fix -fix-errors
+```
+
+For intended file:
+
+```bash
+clang-format -fix -fix-errors
 ```
 
 ### 2.5. Bazel Buildifier
@@ -191,88 +258,3 @@ To run Buildifier execute the following command:
 ```bash
 bazel run //bazel:buildifier
 ```
-
-## 3. Hardware
-
-### 3.1. Jetson Nano
-
-#### 3.1.1. Flashing
-
-The approach described in the [official documentation](https://www.waveshare.com/wiki/JetRacer_AI_Kit#Support) did not work for this setup. Instead, the solution is to use the [NVIDIA SDK Manager with Docker containers](https://docs.nvidia.com/sdk-manager/docker-containers/index.html).
-
-1. **Install NVIDIA SDK Manager with Docker**:
-
-   During installation, choose the Docker image that uses Ubuntu 18.04, as the Jetson Nano is not compatible with newer versions.
-
-2. **Install Required Dependencies**:
-
-   Ensure that the following dependencies are installed:
-
-   ```bash
-   sudo apt install qemu-user-static binfmt-support
-   sudo update-binfmts --enable
-   ```
-
-3. **Load the Docker Image**:
-
-   Load the Docker image from the tar file:
-
-   ```bash
-   docker load -i ./sdkmanager-2.2.0.12021-Ubuntu_18.04_docker.tar.gz
-   ```
-
-4. **Tag the Docker Image**:
-
-   Tag the image as latest:
-
-   ```bash
-   docker tag sdkmanager:2.2.0.12021-Ubuntu_18.04 sdkmanager:latest
-   ```
-
-5. **Put the Jetson Nano into Recovery Mode**:
-
-   Before running the container, connect the pin "fcrec" and ground to put the board into recovery mode, needed to flash the os.
-   Insert the SD card into the Jetson Nano and connect the micro-USB cable.
-
-6. **Run the Docker Container**:
-
-   Execute the following command to run the SDK Manager container:
-
-   ```bash
-   sudo docker run -it --privileged \
-       -v /dev/bus/usb:/dev/bus/usb/ \
-       -v /dev:/dev \
-       -v /media/$USER:/media/nvidia:slave \
-       --network host --name jetson_flash sdkmanager --cli
-   ```
-
-7. **Follow the Steps**:
-
-   - Select Action: Install
-   - Select Product: Jetson
-   - Select System Configuration: Host Machine [Ubuntu 18.04 - x86_64]
-   - Select Target Hardware: Jetson Nano module
-   - Choose manual configuration and **wait for the download to finish before selecting the Flash option**. Else flashing will not work.
-
-For more details on Jetson Nano pins, refer to the Jetson Nano 2GB DevKit User Guide.
-
-#### 3.1.2. Remote Connection
-
-   After flashing is complete, turn off the Jetson board and remove the connected pins.
-   Ensure peripherals are connected to the board before powering it up.
-
-1. **Check IP Address**:
-
-   On the Jetson Nano, check its IP address by running:
-
-   ```bash
-   ipconfig
-   ```
-
-2. **SSH into the Jetson Nano**:
-
-   Connect to the device using SSH:
-
-   ```bash
-   ssh <user>@<wlan_inet>
-   ```
