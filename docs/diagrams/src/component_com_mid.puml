@@ -1,0 +1,23 @@
+@startuml component_com_mid
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component Diagram for COM Middleware
+
+Container(in_cluster, "Instrument Cluster", "QT, QML, C++", "Allows drivers to view car related info such as speed, RPM and battery level")
+Container(config_manager, "Configuration Manager", "C++", "Manages global configurations")
+Container(data_center, "Data Center", "C++", "Fetches relevant car data and stores in DB")
+
+Container_Boundary(connect_mid, "Communication Middleware") {
+  Component(can2zqm_bridge, "CAN2ZMQ Bridge", "C++", "Bridges CAN BUS messages to ZeroMQ")
+  Component(can_publisher, "CAN Publisher", "0MQ", "Publishes to 0MQ")
+  Component(zmq2can_bridge, "ZMQ2CAN Bridge", "C++", "Bridges ZeroMQ messages to CAN BUS")
+  Component(can_subscriber, "CAN Subscriber", "0MQ", "Publishes to 0MQ")
+}
+
+Rel(can2zqm_bridge, can_publisher, "publishes CAN messages")
+Rel(zmq2can_bridge, can_subscriber, "subscribes to messages to be sent via CAN")
+
+Rel_U(in_cluster, can_publisher, "fetches CAN data", "0MQ")
+Rel_U(data_center, can_publisher, "fetches CAN data", "0MQ")
+Rel_U(config_manager, can_subscriber, "sends CAN data", "0MQ")
+@enduml
