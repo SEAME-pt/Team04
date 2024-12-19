@@ -1,6 +1,6 @@
 # yamllint disable rule:line-length
 ---
-name: Run Sanitizers
+name: Sanitizers
 on:  # yamllint disable-line rule:truthy
   pull_request:
     branches: ['*']

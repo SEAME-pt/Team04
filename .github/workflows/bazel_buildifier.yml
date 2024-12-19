@@ -1,12 +1,12 @@
 # yamllint disable rule:line-length
 ---
-name: Bazel Buildifier
+name: Lint
 on:  # yamllint disable-line rule:truthy
   pull_request:
     branches: ['*']
 
 jobs:
-  bazel_buildifier:
+  bazel:
     runs-on: ubuntu-latest
     container:
       image: dtors/base-cpp:latest
