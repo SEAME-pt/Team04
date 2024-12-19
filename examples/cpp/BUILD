@@ -10,7 +10,9 @@ cc_library(
 
 cc_binary(
     name = "bin",
-    srcs = ["main.cpp"],
+    srcs = [
+        "main.cpp",
+    ],
     features = select({
         "//bazel/platforms:aarch64_config": ["warnings_critical_code_gcc"],
         "//conditions:default": ["warnings_critical_code_clang"],

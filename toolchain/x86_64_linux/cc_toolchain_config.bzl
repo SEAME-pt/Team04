@@ -128,6 +128,7 @@ def _impl(ctx):
                             flags = [
                                 "-fsanitize=address",
                                 "-fno-omit-frame-pointer",
+                                "-O0",
                             ],
                         ),
                     ],
@@ -142,7 +143,10 @@ def _impl(ctx):
                     actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
-                            flags = ["-fsanitize=undefined"],
+                            flags = [
+                                "-fsanitize=undefined",
+                                "-O0",
+                            ],
                         ),
                     ],
                 ),
@@ -156,7 +160,10 @@ def _impl(ctx):
                     actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(
-                            flags = ["-fsanitize=thread"],
+                            flags = [
+                                "-fsanitize=thread",
+                                "-O0",
+                            ],
                         ),
                     ],
                 ),
