@@ -17,6 +17,7 @@ SOURCES += \
     main.cpp \
     basicdisplay.cpp \
     rpm.cpp \
+    rpm.cpp \
     speed.cpp \
     zmqpublisher.cpp \
     zmqsubscriber.cpp
@@ -24,6 +25,7 @@ SOURCES += \
 HEADERS += \
     basicdisplay.h \
     config.h \
+    rpm.h \
     rpm.h \
     speed.h \
     zmqpublisher.h \
@@ -37,5 +39,6 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES +=
+DISTFILES += \
+    BUILD
 
