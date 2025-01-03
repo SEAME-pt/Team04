@@ -260,7 +260,7 @@ def _impl(ctx):
         target_system_name = "unknown",
         target_cpu = "unknown",
         target_libc = "unknown",
-        compiler = "unknown",
+        compiler = "gcc",
         abi_version = "unknown",
         abi_libc_version = "unknown",
         tool_paths = tool_paths,
