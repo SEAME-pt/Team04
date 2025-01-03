@@ -2,19 +2,13 @@ cc_library(
     name = "lib",
     srcs = ["hello.cpp"],
     hdrs = ["hello.hpp"],
-    features = select({
-        "//bazel/platforms:aarch64_config": ["warnings_critical_code_gcc"],
-        "//conditions:default": ["warnings_critical_code_clang"],
-    }),
+    features = ["warnings_critical_code_gcc"],
 )
 
 cc_binary(
     name = "bin",
     srcs = ["main.cpp"],
-    features = select({
-        "//bazel/platforms:aarch64_config": ["warnings_critical_code_gcc"],
-        "//conditions:default": ["warnings_critical_code_clang"],
-    }),
+    features = ["warnings_critical_code_gcc"],
     deps = [
         ":lib",
     ],

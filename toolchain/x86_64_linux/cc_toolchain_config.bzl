@@ -26,10 +26,10 @@ all_compile_actions = [
 
 def _impl(ctx):
     tool_paths = [
-        tool_path(name = "gcc", path = "/usr/bin/clang-18"),
-        tool_path(name = "ld", path = "/usr/bin/ld"),
-        tool_path(name = "ar", path = "/usr/bin/ar"),
-        tool_path(name = "cpp", path = "/usr/bin/clang-cpp18"),
+        tool_path(name = "gcc", path = "/usr/bin/x86_64-linux-gnu-gcc"),
+        tool_path(name = "ld", path = "/usr/bin/x86_64-linux-gnu-ld"),
+        tool_path(name = "ar", path = "/usr/bin/x86_64-linux-gnu-ar"),
+        tool_path(name = "cpp", path = "/usr/bin/x86_64-linux-gnu-cpp18"),
         tool_path(name = "gcov", path = "/usr/bin/gcov"),
         tool_path(name = "llvm-cov", path = "/usr/bin/llvm-cov-18"),
         tool_path(name = "llvm-profdata", path = "/usr/bin/llvm-profdata-18"),
@@ -109,7 +109,7 @@ def _impl(ctx):
             enabled = True,
             flag_sets = [
                 flag_set(
-                    actions = [ACTION_NAMES.assemble, ACTION_NAMES.preprocess_assemble],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(flags = ["-fPIC"]),
                     ],
@@ -213,8 +213,6 @@ def _impl(ctx):
                                 "-Wformat=2",
                                 "-Wimplicit-fallthrough",
                                 "-Werror",
-                                "-Wno-c++98-compat",
-                                "-Wno-c++98-compat-pedantic",
                             ],
                         ),
                     ],
@@ -232,8 +230,6 @@ def _impl(ctx):
                             flags = [
                                 "-Wall",
                                 "-Wshadow",
-                                "-Wno-c++98-compat",
-                                "-Wno-c++98-compat-pedantic",
                             ],
                         ),
                     ],
@@ -246,17 +242,16 @@ def _impl(ctx):
         ctx = ctx,
         features = features,
         cxx_builtin_include_directories = [
-            "/usr/lib/llvm-18/lib/clang/18/include",
-            "/usr/lib/llvm-18/lib/clang/18/share",  # Dir containing `asan_ignorelist.txt`
-            "/usr/lib/clang/18/include",
             "/usr/include",
+            "/usr/lib/x86_64-linux-gnu",
+            "/usr/lib/gcc/x86_64-linux-gnu",
         ],
-        toolchain_identifier = "linux_aarch64-toolchain",
+        toolchain_identifier = "linux_x86_64-toolchain",
         host_system_name = "local",
         target_system_name = "unknown",
         target_cpu = "unknown",
         target_libc = "unknown",
-        compiler = "clang",
+        compiler = "gcc",
         abi_version = "unknown",
         abi_libc_version = "unknown",
         tool_paths = tool_paths,
