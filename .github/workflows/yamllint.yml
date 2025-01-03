@@ -22,7 +22,7 @@ jobs:
       - name: Find affected files
         run: |
           git fetch origin ${{ github.base_ref }} --depth=1
-          git diff --name-only origin/${{ github.base_ref }} > affected_files.txt
+          git diff --diff-filter=ACM --name-only origin/${{ github.base_ref }} > affected_files.txt
           echo "Affected files:"
           cat affected_files.txt
 
