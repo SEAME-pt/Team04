@@ -110,7 +110,7 @@ def _impl(ctx):
             enabled = True,
             flag_sets = [
                 flag_set(
-                    actions = [ACTION_NAMES.assemble, ACTION_NAMES.preprocess_assemble],
+                    actions = all_link_actions + all_compile_actions,
                     flag_groups = [
                         flag_group(flags = ["-fPIC"]),
                     ],
@@ -215,8 +215,6 @@ def _impl(ctx):
                                 "-Wformat=2",
                                 "-Wimplicit-fallthrough",
                                 "-Werror",
-                                "-Wno-c++98-compat",
-                                "-Wno-c++98-compat-pedantic",
                             ],
                         ),
                     ],
@@ -234,8 +232,6 @@ def _impl(ctx):
                             flags = [
                                 "-Wall",
                                 "-Wshadow",
-                                "-Wno-c++98-compat",
-                                "-Wno-c++98-compat-pedantic",
                             ],
                         ),
                     ],
@@ -248,12 +244,10 @@ def _impl(ctx):
         ctx = ctx,
         features = features,
         cxx_builtin_include_directories = [
-            "/usr/aarch64-linux-gnu",
-            "/usr/lib/gcc-cross/aarch64-linux-gnu",
-            "/usr/lib/llvm-18/lib/clang/18/include",
-            "/usr/lib/llvm-18/lib/clang/18/share",  # Dir containing `asan_ignorelist.txt`
-            "/usr/lib/clang/18/include",
             "/usr/include",
+            "/usr/aarch64-linux-gnu",
+            "/usr/lib/aarch64-linux-gnu",
+            "/usr/lib/gcc-cross/aarch64-linux-gnu",
         ],
         toolchain_identifier = "aarch64_linux-toolchain",
         host_system_name = "local",
