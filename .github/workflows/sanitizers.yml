@@ -23,7 +23,7 @@ jobs:
         id: affected_files
         run: |
           git fetch origin ${{ github.base_ref }} --depth=1
-          git diff --name-only origin/${{ github.base_ref }} > affected_files.txt
+          git diff --diff-filter=ACM --name-only origin/${{ github.base_ref }} > affected_files.txt
           echo "Affected files:"
           cat affected_files.txt
 
@@ -56,13 +56,15 @@ jobs:
           for target in $targets; do
             result=$(bazelisk cquery "kind('cc_test', deps('$target'))") || exit 1
 
-            # Remove the part in parentheses (e.g., (f37096a))
-            formatted_result=$(echo "$result" | sed 's/ ([^)]*)//g')
+            if [[ -n "$result" ]]; then
+              # Remove the part in parentheses (e.g., (f37096a))
+              formatted_result=$(echo "$result" | sed 's/ ([^)]*)//g')
 
-            # Prefix each line of the result with a `-`
-            formatted_result=$(echo "$formatted_result" | sed 's/^/-/')
+              # Prefix each line of the result with a `-`
+              formatted_result=$(echo "$formatted_result" | sed 's/^/-/')
 
-            test_targets+="$formatted_result"$'\n'
+              test_targets+="$formatted_result"$'\n'
+            fi
           done
 
           echo "$test_targets" > test_targets.txt
