@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
     branches: ['*']
 
 jobs:
-  llvm-cov:
+  lcov:
     runs-on: ubuntu-latest
     container:
       image: dtors/base-cpp:latest
@@ -16,5 +16,5 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Coverage Script
-        run: bazelisk run //tools/coverage:llvm_cov --platforms=//bazel/platforms:x86_64_linux -- -t //examples/cpp:test -s
+        run: bazelisk run //tools/coverage:lcov --platforms=//bazel/platforms:x86_64_linux -- -t //examples/cpp:test
         shell: bash

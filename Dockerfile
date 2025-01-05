@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     cmake \
+    lcov \
     mesa-common-dev \
     mesa-utils \
     libvulkan-dev \
