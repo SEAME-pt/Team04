@@ -39,13 +39,15 @@ jobs:
           sort -u affected_yaml_files.txt -o affected_yaml_files.txt
           echo "Affected yaml files:"
           cat affected_yaml_files.txt
-          echo "yaml_files=$(cat affected_yaml_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+          echo "yaml_files=$(cat affected_yaml_files.txt | tr -s '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')" >> $GITHUB_ENV
         shell: bash
 
       - name: Lint YAML files
         if: env.yaml_files != ''
         run: |-
-          yamllint ${yaml_files} || exit 1
+          yamllint $yaml_files || exit 1
+        shell: bash
 
       - name: No yaml files affected
         if: env.yaml_files == ''

@@ -39,14 +39,16 @@ jobs:
           sort -u affected_cpp_files.txt -o affected_cpp_files.txt
           echo "Affected cpp files:"
           cat affected_cpp_files.txt
-          echo "cpp_files=$(cat affected_cpp_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+          echo "cpp_files=$(cat affected_cpp_files.txt | tr -s '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')" >> $GITHUB_ENV
         shell: bash
 
       - name: Run Clang-Format
         if: env.cpp_files != ''
         run: |
           echo "Running: clang-format --dry-run --Werror ${cpp_files}"
-          clang-format --dry-run --Werror ${cpp_files}
+          clang-format --dry-run --Werror $cpp_files
+        shell: bash
 
       - name: Skip Clang-Format
         if: env.cpp_files == ''

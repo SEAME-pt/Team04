@@ -35,7 +35,7 @@ jobs:
           while read file; do
             if [[ "$file" == *.c || "$file" == *.cc || "$file" == *.cpp || "$file" == *.cxx || "$file" == *.h || "$file" == *.hpp || "$file" == *.hxx ]]; then
               echo "Finding targets for: $file"
-              targets=$(bazelisk query --output=package "$file" || true)/...
+              targets=$(bazelisk query --output=package "$file")/...
               echo "$targets" >> affected_targets.txt
             fi
           done < affected_files.txt
@@ -43,7 +43,8 @@ jobs:
           sort -u affected_targets.txt -o affected_targets.txt
           echo "Affected targets:"
           cat affected_targets.txt
-          echo "targets=$(cat affected_targets.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+          echo "targets=$(cat affected_targets.txt | tr -s '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')" >> $GITHUB_ENV
         shell: bash
 
       - name: Setup bazel cache
@@ -63,7 +64,8 @@ jobs:
         if: env.targets != ''
         run: |
           echo "Building targets: $targets"
-          bazelisk build ${targets}
+          bazelisk build $targets
+        shell: bash
 
       - name: No targets to build
         if: env.targets == ''

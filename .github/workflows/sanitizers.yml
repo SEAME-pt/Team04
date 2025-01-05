@@ -35,7 +35,7 @@ jobs:
           while read file; do
             if [[ ("$file" == *.c || "$file" == *.cc || "$file" == *.cpp || "$file" == *.cxx || "$file" == *.h || "$file" == *.hpp || "$file" == *.hxx) && "$file" != *test* ]]; then
               echo "Finding targets for: $file"
-              targets=$(bazelisk query --output=package "$file" || true)/...
+              targets=$(bazelisk query --output=package "$file")/...
               if [[ "$targets" != *test* ]]; then
                 echo "$targets" >> affected_targets.txt
               fi
@@ -45,7 +45,8 @@ jobs:
           sort -u affected_targets.txt -o affected_targets.txt
           echo "Affected targets:"
           cat affected_targets.txt
-          echo "targets=$(cat affected_targets.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+          echo "targets=$(cat affected_targets.txt | tr -s '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')" >> $GITHUB_ENV
         shell: bash
 
       - name: Find tests target of affected targets
@@ -54,14 +55,11 @@ jobs:
           test_targets=""
 
           for target in $targets; do
-            result=$(bazelisk cquery "kind('cc_test', deps('$target'))") || exit 1
+            result=$(bazelisk query "kind('cc_test', deps('$target'))") || exit 1
 
             if [[ -n "$result" ]]; then
-              # Remove the part in parentheses (e.g., (f37096a))
-              formatted_result=$(echo "$result" | sed 's/ ([^)]*)//g')
-
               # Prefix each line of the result with a `-`
-              formatted_result=$(echo "$formatted_result" | sed 's/^/-/')
+              formatted_result=$(echo "$result" | sed 's/^/-/')
 
               test_targets+="$formatted_result"$'\n'
             fi
@@ -69,6 +67,7 @@ jobs:
 
           echo "$test_targets" > test_targets.txt
           single_line_test_targets=$(echo "$test_targets" | tr '\n' ' ' | sed 's/ $//')
+
           echo "test_targets=-- $single_line_test_targets" >> $GITHUB_ENV
         shell: bash
 
@@ -91,7 +90,8 @@ jobs:
           echo -e "Running ASAN on:
             Targets: $targets
             Excluded targets: $test_targets"
-          bazelisk build ${targets} --features=asan ${test_targets}
+          bazelisk build $targets --features=asan $test_targets
+        shell: bash
 
       - name: Run UBSAN
         if: env.targets != ''
@@ -99,7 +99,8 @@ jobs:
           echo -e "Running UBSAN on:
             Targets: $targets
             Excluded targets: $test_targets"
-          bazelisk build ${targets} --features=ubsan ${test_targets}
+          bazelisk build $targets --features=ubsan $test_targets
+        shell: bash
 
       - name: Run TSAN
         if: env.targets != ''
@@ -107,7 +108,8 @@ jobs:
           echo -e "Running TSAN on:
             Targets: $targets
             Excluded targets: $test_targets"
-          bazelisk build ${targets} --features=tsan ${test_targets}
+          bazelisk build $targets --features=tsan $test_targets
+        shell: bash
 
       - name: No targets to build
         if: env.targets == ''

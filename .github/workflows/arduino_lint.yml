@@ -39,7 +39,8 @@ jobs:
           sort -u affected_ino_files.txt -o affected_ino_files.txt
           echo "Affected ino files:"
           cat affected_ino_files.txt
-          echo "ino_files=$(cat affected_ino_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+          echo "ino_files=$(cat affected_ino_files.txt | tr -s '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')" >> $GITHUB_ENV
         shell: bash
 
       - name: Run arduino-lint
@@ -47,6 +48,7 @@ jobs:
         run: |
           echo "Running: arduino-lint"
           arduino-lint --recursive ./arduino
+        shell: bash
 
       - name: Skip arduino-lint
         if: env.ino_files == ''
