@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     cmake \
     lcov \
+    file \
     mesa-common-dev \
     mesa-utils \
     libvulkan-dev \
@@ -56,6 +57,18 @@ RUN pip install yamllint
 RUN pip install gitlint
 
 RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/etc/install.sh | sh
+
+# Download and extract precompiled Qt aarch64 libs
+ENV RELEASE_URL=https://github.com/parker-int64/qt-aarch64-binary/releases/download/5.15.5
+RUN wget ${RELEASE_URL}/qt-5.15.5-aarch64-cross-compile-gcc-5.tar.gz -O /tmp/qt-aarch64-binary.tar.gz && \
+    mkdir -p /opt/qt && \
+    tar -xzf /tmp/qt-aarch64-binary.tar.gz -C /opt/qt
+
+RUN rm /tmp/qt-aarch64-binary.tar.gz && \
+    mv /opt/qt/qt-5.15.5-aarch64/lib/* /usr/lib/aarch64-linux-gnu
+
+RUN cp /usr/aarch64-linux-gnu/lib/* /lib/aarch64-linux-gnu && \
+    cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib
 
 RUN wget https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 && \
     chmod 755 bazelisk-linux-amd64 && \
