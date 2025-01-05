@@ -39,7 +39,8 @@ jobs:
           sort -u affected_cpp_files.txt -o affected_cpp_files.txt
           echo "Affected cpp files:"
           cat affected_cpp_files.txt
-          echo "cpp_files=$(cat affected_cpp_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+          echo "cpp_files=$(cat affected_cpp_files.txt | tr -s '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')" >> $GITHUB_ENV
         shell: bash
 
       - name: Generate Compile Commands
@@ -47,12 +48,14 @@ jobs:
         run: |
           echo "Generating compile commands"
           bazelisk run @hedron_compile_commands//:refresh_all
+        shell: bash
 
       - name: Run Clang-Tidy
         if: env.cpp_files != ''
         run: |
           echo "Running: clang-tidy ${cpp_files} -p ./compile_commands.json"
-          clang-tidy ${cpp_files} -p ./compile_commands.json
+          clang-tidy $cpp_files -p ./compile_commands.json
+        shell: bash
 
       - name: Skip Clang-Tidy
         if: env.cpp_files == ''

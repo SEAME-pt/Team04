@@ -17,3 +17,4 @@ jobs:
 
       - name: Run Coverage Script
         run: bazelisk run //tools/coverage:llvm_cov --platforms=//bazel/platforms:x86_64_linux -- -t //examples/cpp:test -s
+        shell: bash
