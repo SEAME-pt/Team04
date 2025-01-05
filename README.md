@@ -74,13 +74,13 @@ If you encounter an error similar to the following when trying to run Qt applica
 ```bash
 Authorization required, but no authorization protocol specified
 qt.qpa.xcb: could not connect to display :1
-qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "external/qt_linux_x86_64/plugins/platforms" even though it was found.
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
 This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
 
 Available platform plugins are: eglfs, wayland-egl, vnc, minimal, xcb, vkkhrdisplay, offscreen, wayland, linuxfb, minimalegl.
 ```
 
-#### Solution: Allow Docker to Access the X Server
+#### **Solution: Allow Docker to Access the X Server**
 
 To resolve this, run the following command on the host machine to grant Docker containers access to your X server:
 
