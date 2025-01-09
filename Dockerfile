@@ -30,6 +30,7 @@ RUN apt-get update && apt-get install -y \
     libxcb-xfixes0 \
     libxcb-xkb1 \
     libxcb-cursor0 \
+    libzmq3-dev \
     locales \
     qtbase5-dev  \
     && apt-get clean
