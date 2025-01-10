@@ -60,15 +60,28 @@ RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/etc/i
 
 # Download and extract precompiled Qt aarch64 libs
 ENV RELEASE_URL=https://github.com/parker-int64/qt-aarch64-binary/releases/download/5.15.5
-RUN wget ${RELEASE_URL}/qt-5.15.5-aarch64-cross-compile-gcc-5.tar.gz -O /tmp/qt-aarch64-binary.tar.gz && \
+RUN wget ${RELEASE_URL}/qt-5.15.5-aarch64-native-compile-gcc-5.tar.gz -O /tmp/qt-aarch64-binary.tar.gz && \
     mkdir -p /opt/qt && \
     tar -xzf /tmp/qt-aarch64-binary.tar.gz -C /opt/qt
 
 RUN rm /tmp/qt-aarch64-binary.tar.gz && \
-    mv /opt/qt/qt-5.15.5-aarch64/lib/* /usr/lib/aarch64-linux-gnu
+    cp -r /opt/qt/qt-5.15.5/lib/* /usr/lib/aarch64-linux-gnu && \
+    mkdir -p /usr/lib/aarch64-linux-gnu/qt5 && \
+    cp -r /opt/qt/qt-5.15.5/* /usr/lib/aarch64-linux-gnu/qt5 && \
+    mkdir -p /usr/include/aarch64-linux-gnu/qt5 && \
+    cp -r /opt/qt/qt-5.15.5/include/* /usr/include/aarch64-linux-gnu/qt5
 
 RUN cp /usr/aarch64-linux-gnu/lib/* /lib/aarch64-linux-gnu && \
     cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib
+
+# RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/aarch64-linux-gnu
+
+RUN cp /usr/aarch64-linux-gnu/lib/* /lib/aarch64-linux-gnu && \
+    cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib
+
+RUN wget https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 && \
+    chmod 755 bazelisk-linux-amd64 && \
+    mv bazelisk-linux-amd64 /usr/bin/bazelisk
 
 RUN wget https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 && \
     chmod 755 bazelisk-linux-amd64 && \
