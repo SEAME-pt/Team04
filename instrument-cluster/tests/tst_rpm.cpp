@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include "rpm.h"
+#include "../rpm.h"
 
 class TestRPM : public ::testing::Test {
    protected:
-    RPM rpm;
+    Rpm rpm;
 
     TestRPM() : rpm(0) {}
 };

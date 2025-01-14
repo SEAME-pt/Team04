@@ -1,4 +1,4 @@
-#include "zmqsubscriber.h"
+#include "../zmqsubscriber.h"
 #include <gtest/gtest.h>
 #include <QObject>
 

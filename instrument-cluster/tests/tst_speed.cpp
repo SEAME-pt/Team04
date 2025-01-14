@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include "speed.h"
+#include "../speed.h"
 
 class TestSpeed : public ::testing::Test {
    protected:

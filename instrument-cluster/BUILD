@@ -23,12 +23,14 @@ cc_library(
     name = "speed",
     srcs = ["speed.cpp"],
     hdrs = ["speed.h"],
+    visibility = ["//visibility:public"]
 )
 
 cc_library(
     name = "rpm",
     srcs = ["rpm.cpp"],
     hdrs = ["rpm.h"],
+    visibility = ["//visibility:public"]
 )
 
 cc_library(
@@ -51,6 +53,7 @@ cc_library(
         "-lzmq",
         "-lQt5Core",
     ],
+    visibility = ["//visibility:public"]
 )
 
 cc_library(
@@ -65,6 +68,7 @@ cc_library(
         "-lzmq",
         "-lQt5Core",
     ],
+    visibility = ["//visibility:public"]
 )
 
 cc_library(
@@ -126,3 +130,9 @@ cc_binary(
         "-lQt5Gui",
     ],
 )
+
+exports_files([
+    "speed.cpp",
+    "rpm.cpp",
+    "zmqsubscriber.cpp",
+])
