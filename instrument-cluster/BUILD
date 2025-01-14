@@ -23,12 +23,14 @@ cc_library(
     name = "speed",
     srcs = ["speed.cpp"],
     hdrs = ["speed.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "rpm",
     srcs = ["rpm.cpp"],
     hdrs = ["rpm.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -51,6 +53,7 @@ cc_library(
         "-lzmq",
         "-lQt5Core",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -65,6 +68,7 @@ cc_library(
         "-lzmq",
         "-lQt5Core",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -77,16 +81,7 @@ cc_library(
         "basicdisplay.h",
         ":generate_ui_basicdisplay_h",
     ],
-    deps = [
-        ":speed",
-        ":rpm",
-        ":zmqsubscriber",
-        ":zmqpublisher",
-        ":config",
-    ],
     copts = [
-        "-I.",
-        "-Ibazel-out/k8-fastbuild/bin",
         "-Ibazel-out/k8-fastbuild/bin/instrument-cluster",
         "-I/usr/include/x86_64-linux-gnu/qt5",
         "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
@@ -97,24 +92,20 @@ cc_library(
         "-lQt5Widgets",
         "-lQt5Core",
         "-lQt5Gui",
+    ],
+    deps = [
+        ":config",
+        ":rpm",
+        ":speed",
+        ":zmqpublisher",
+        ":zmqsubscriber",
     ],
 )
 
 cc_binary(
     name = "bin",
     srcs = ["main.cpp"],
-    deps = [
-        ":basicdisplay",
-        ":speed",
-        ":rpm",
-        ":zmqsubscriber",
-        ":zmqpublisher",
-        ":config",
-    ],
     copts = [
-        "-I.",
-        "-Ibazel-out/k8-fastbuild/bin",
-        "-Ibazel-out/k8-fastbuild/bin/instrument-cluster",
         "-I/usr/include/x86_64-linux-gnu/qt5",
         "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
         "-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
@@ -125,4 +116,18 @@ cc_binary(
         "-lQt5Core",
         "-lQt5Gui",
     ],
+    deps = [
+        ":basicdisplay",
+        ":config",
+        ":rpm",
+        ":speed",
+        ":zmqpublisher",
+        ":zmqsubscriber",
+    ],
 )
+
+exports_files([
+    "speed.cpp",
+    "rpm.cpp",
+    "zmqsubscriber.cpp",
+])
