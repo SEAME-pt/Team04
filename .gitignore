@@ -61,3 +61,7 @@ genhtml/
 
 # Ignore compile commands
 compile_commands.json
+
+#Ignore qtcreator generated files
+*.pro.user*
+CMakeLists.txt.user*

@@ -89,8 +89,6 @@ cc_library(
         ":config",
     ],
     copts = [
-        "-I.",
-        "-Ibazel-out/k8-fastbuild/bin",
         "-Ibazel-out/k8-fastbuild/bin/instrument-cluster",
         "-I/usr/include/x86_64-linux-gnu/qt5",
         "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
@@ -116,9 +114,6 @@ cc_binary(
         ":config",
     ],
     copts = [
-        "-I.",
-        "-Ibazel-out/k8-fastbuild/bin",
-        "-Ibazel-out/k8-fastbuild/bin/instrument-cluster",
         "-I/usr/include/x86_64-linux-gnu/qt5",
         "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
         "-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
@@ -136,3 +131,4 @@ exports_files([
     "rpm.cpp",
     "zmqsubscriber.cpp",
 ])
+
