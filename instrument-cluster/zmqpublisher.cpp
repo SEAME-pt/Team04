@@ -1,4 +1,7 @@
 #include "zmqpublisher.h"
+#include <string>
+#include <zmq.hpp>
+#include <cstdint>
 
 ZmqPublisher::ZmqPublisher(const std::string &socketAddress)
     : context(1), publisher(context, zmq::socket_type::pub) {

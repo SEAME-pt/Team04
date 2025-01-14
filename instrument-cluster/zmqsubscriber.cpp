@@ -1,4 +1,9 @@
 #include "zmqsubscriber.h"
+#include <string>
+#include "qobject.h"
+#include <zmq.hpp>
+#include <cstdint>
+#include "qobjectdefs.h"
 
 ZmqSubscriber::ZmqSubscriber(const std::string &socketAddress, QObject *parent)
     : QObject(parent), context(1), subscriber(context, zmq::socket_type::sub) {
@@ -22,13 +27,13 @@ void ZmqSubscriber::decodeMessage(const zmq::message_t &message) {
         return;
     }
 
-    const uint8_t* data = static_cast<const uint8_t*>(message.data());
+    const auto* data = static_cast<const uint8_t*>(message.data());
 
-    uint8_t speedValue = data[0];
-    uint8_t rpmLowByte = data[2];
-    uint8_t rpmHighByte = data[3];
+    uint8_t const speedValue = data[0];
+    uint8_t const rpmLowByte = data[2];
+    uint8_t const rpmHighByte = data[3];
 
-    uint16_t rpm = (rpmHighByte << 8) | rpmLowByte;
+    uint16_t const rpm = (rpmHighByte << 8) | rpmLowByte;
 
     emit messageReceived(speedValue, rpm);
 }

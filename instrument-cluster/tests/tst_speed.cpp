@@ -14,7 +14,7 @@ TEST_F(TestSpeed, SetAndGetSpeed) {
     speed.setSpeed(50.5);
 
     std::cout << "Getting speed..." <<  "\n";
-    double currentSpeed = speed.getSpeed();
+    double const currentSpeed = speed.getSpeed();
     std::cout << "Speed: " << currentSpeed <<  "\n";
 
     EXPECT_EQ(currentSpeed, 50.5);
@@ -22,7 +22,7 @@ TEST_F(TestSpeed, SetAndGetSpeed) {
 
 TEST_F(TestSpeed, GetInitialSpeed) {
     std::cout << "Getting initial speed..." <<  "\n";
-    double initialSpeed = speed.getSpeed();
+    double const initialSpeed = speed.getSpeed();
     std::cout << "Initial Speed: " << initialSpeed <<  "\n";
 
     EXPECT_EQ(initialSpeed, 0.0);

@@ -1,15 +1,10 @@
 cc_test(
     name = "instrument_cluster_tests",
     srcs = [
-        "main.cpp",          
+        "main.cpp",
         "tst_rpm.cpp",
         "tst_speed.cpp",
         "tst_zmqsubscriber.cpp",
-    ],
-    deps = [
-        "//instrument-cluster:speed",
-        "//instrument-cluster:rpm",
-        "//instrument-cluster:zmqsubscriber",
     ],
     copts = [
         "-I.",
@@ -24,5 +19,10 @@ cc_test(
         "-lQt5Core",
         "-lQt5Gui",
         "-lgtest",
+    ],
+    deps = [
+        "//instrument-cluster:rpm",
+        "//instrument-cluster:speed",
+        "//instrument-cluster:zmqsubscriber",
     ],
 )

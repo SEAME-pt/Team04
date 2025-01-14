@@ -14,7 +14,7 @@ TEST_F(TestRPM, SetAndGetRPM) {
     rpm.setRPM(3000);
 
     std::cout << "Getting RPM..." << "\n";
-    int currentRPM = rpm.getRPM();
+    int const currentRPM = rpm.getRPM();
     std::cout << "RPM: " << currentRPM << "\n";
 
     EXPECT_EQ(currentRPM, 3000);
@@ -22,7 +22,7 @@ TEST_F(TestRPM, SetAndGetRPM) {
 
 TEST_F(TestRPM, GetInitialRPM) {
     std::cout << "Getting initial RPM..." << "\n";
-    int initialRPM = rpm.getRPM();
+    int const initialRPM = rpm.getRPM();
     std::cout << "Initial RPM: " << initialRPM << "\n";
 
     EXPECT_EQ(initialRPM, 0);

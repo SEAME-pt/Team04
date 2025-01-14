@@ -1,4 +1,7 @@
 #include "basicdisplay.h"
+#include "qwidget.h"
+#include "qmainwindow.h"
+#include "qobject.h"
 #include "ui_basicdisplay.h"
 
 BasicDisplay::BasicDisplay(QWidget *parent)

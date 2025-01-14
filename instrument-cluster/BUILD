@@ -23,14 +23,14 @@ cc_library(
     name = "speed",
     srcs = ["speed.cpp"],
     hdrs = ["speed.h"],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "rpm",
     srcs = ["rpm.cpp"],
     hdrs = ["rpm.h"],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -53,7 +53,7 @@ cc_library(
         "-lzmq",
         "-lQt5Core",
     ],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -68,7 +68,7 @@ cc_library(
         "-lzmq",
         "-lQt5Core",
     ],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -80,13 +80,6 @@ cc_library(
     hdrs = [
         "basicdisplay.h",
         ":generate_ui_basicdisplay_h",
-    ],
-    deps = [
-        ":speed",
-        ":rpm",
-        ":zmqsubscriber",
-        ":zmqpublisher",
-        ":config",
     ],
     copts = [
         "-Ibazel-out/k8-fastbuild/bin/instrument-cluster",
@@ -100,19 +93,18 @@ cc_library(
         "-lQt5Core",
         "-lQt5Gui",
     ],
+    deps = [
+        ":config",
+        ":rpm",
+        ":speed",
+        ":zmqpublisher",
+        ":zmqsubscriber",
+    ],
 )
 
 cc_binary(
     name = "bin",
     srcs = ["main.cpp"],
-    deps = [
-        ":basicdisplay",
-        ":speed",
-        ":rpm",
-        ":zmqsubscriber",
-        ":zmqpublisher",
-        ":config",
-    ],
     copts = [
         "-I/usr/include/x86_64-linux-gnu/qt5",
         "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
@@ -124,6 +116,14 @@ cc_binary(
         "-lQt5Core",
         "-lQt5Gui",
     ],
+    deps = [
+        ":basicdisplay",
+        ":config",
+        ":rpm",
+        ":speed",
+        ":zmqpublisher",
+        ":zmqsubscriber",
+    ],
 )
 
 exports_files([
@@ -131,4 +131,3 @@ exports_files([
     "rpm.cpp",
     "zmqsubscriber.cpp",
 ])
-

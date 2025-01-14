@@ -1,15 +1,15 @@
 #include "speed.h"
 
-Speed::Speed(double initial) {
-    this->value = initial;
+Speed::Speed(double initial) : value(initial) {
+    
 }
 
-Speed::~Speed() {}
+Speed::~Speed() = default;
 
 void Speed::setSpeed(double speed) {
     this->value = speed;
 }
 
-double Speed::getSpeed() const {
+auto Speed::getSpeed() const -> double {
     return this->value;
 }

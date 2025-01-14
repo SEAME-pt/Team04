@@ -1,6 +1,9 @@
 #include "../zmqsubscriber.h"
+#include "qobject.h"
 #include <gtest/gtest.h>
 #include <QObject>
+#include <cstdint>
+#include <zmq.hpp>
 
 class TestZmqSubscriber : public ::testing::Test {
    protected:
@@ -24,7 +27,7 @@ TEST_F(TestZmqSubscriber, DecodeMessageTest) {
 
             // Simular uma mensagem válida
     uint8_t messageData[4] = {100, 0, 0x70, 0x17}; // Speed = 100, RPM = 6000
-    zmq::message_t message(messageData, 4);
+    zmq::message_t const message(messageData, 4);
 
     subscriber.checkForMessages(); // Força o processamento da mensagem
 
@@ -42,7 +45,7 @@ TEST_F(TestZmqSubscriber, InvalidMessageTest) {
     });
 
     uint8_t invalidData[2] = {50, 0}; // Mensagem inválida
-    zmq::message_t invalidMessage(invalidData, 2);
+    zmq::message_t const invalidMessage(invalidData, 2);
 
     subscriber.checkForMessages(); // Não deve emitir sinal
 
