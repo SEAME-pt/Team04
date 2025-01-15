@@ -1,15 +1,19 @@
-cc_binary(
+load("//bazel/rules:qt.bzl", "qt_cc_binary", "qt_cc_library", "qt_ui_library")
+
+qt_ui_library(
+    name = "ui",
+    ui = "mainwindow.ui",
+)
+
+qt_cc_library(
+    name = "lib",
+    srcs = ["mainwindow.cpp"],
+    hdrs = ["mainwindow.h"],
+    deps = [":ui"],
+)
+
+qt_cc_binary(
     name = "bin",
     srcs = ["main.cpp"],
-    copts = [
-        "-I/usr/include/x86_64-linux-gnu/qt5",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtCore",
-    ],
-    linkopts = [
-        "-lQt5Widgets",
-        "-lQt5Core",
-        "-lQt5Gui",
-    ],
+    deps = [":lib"],
 )
