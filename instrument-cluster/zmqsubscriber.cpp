@@ -4,6 +4,7 @@
 #include <zmq.hpp>
 #include <cstdint>
 #include "qobjectdefs.h"
+#include <iostream>
 
 ZmqSubscriber::ZmqSubscriber(const std::string &socketAddress, QObject *parent)
     : QObject(parent), context(1), subscriber(context, zmq::socket_type::sub) {
@@ -17,13 +18,14 @@ ZmqSubscriber::~ZmqSubscriber() {
 
 void ZmqSubscriber::checkForMessages() {
     zmq::message_t message;
-    if (subscriber.recv(message, zmq::recv_flags::dontwait)) {
+    while (subscriber.recv(message, zmq::recv_flags::dontwait)) {
         decodeMessage(message);
     }
 }
 
 void ZmqSubscriber::decodeMessage(const zmq::message_t &message) {
     if (message.size() < 4) {
+        std::cerr << "Error: Invalid message - size is too small." << std::endl;
         return;
     }
 

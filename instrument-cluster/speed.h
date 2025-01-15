@@ -12,7 +12,7 @@ class Speed {
 
     double getSpeed() const;
 
-    ~Speed();
+    ~Speed() = default;
 };
 
 #endif

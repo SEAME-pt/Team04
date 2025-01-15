@@ -22,7 +22,7 @@ class BasicDisplay : public QMainWindow
     void updateRPM(int rpm);
 
    private:
-    Ui::BasicDisplay *ui;
+    Ui::BasicDisplay *ui{};
     Speed speed;
     Rpm rpm;
 

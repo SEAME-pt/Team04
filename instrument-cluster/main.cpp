@@ -1,15 +1,19 @@
 #include "basicdisplay.h"
+#include "qapplication.h"
+#include "qobject.h"
+#include "qtimer.h"
 #include "zmqsubscriber.h"
 #include "config.h"
 #include <QApplication>
 #include <QTimer>
+#include <cstdint>
 
-int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);
+auto main(int argc, char *argv[]) -> int {
+    QApplication const app(argc, argv);
 
     BasicDisplay display;
 
-    ZmqSubscriber subscriber(ZMQ_SOCKET_ADDRESS);
+    ZmqSubscriber const subscriber(ZMQ_SOCKET_ADDRESS);
 
     QObject::connect(&subscriber, &ZmqSubscriber::messageReceived, [&](uint8_t speed, uint16_t rpm) {
         display.updateSpeed(speed);
@@ -21,6 +25,6 @@ int main(int argc, char *argv[]) {
     timer.start(TIMER_INTERVAL_MS);
 
     display.show();
-    return app.exec();
+    return QApplication::exec();
 }
 

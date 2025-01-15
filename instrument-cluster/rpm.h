@@ -13,7 +13,7 @@ class Rpm {
 
     int getRPM() const;
 
-    ~Rpm();
+    ~Rpm() = default;
 };
 
 #endif
