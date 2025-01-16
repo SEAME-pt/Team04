@@ -64,6 +64,13 @@ RUN wget ${RELEASE_URL}/qt-5.15.5-aarch64-cross-compile-gcc-5.tar.gz -O /tmp/qt-
     mkdir -p /opt/qt && \
     tar -xzf /tmp/qt-aarch64-binary.tar.gz -C /opt/qt
 
+# Download and install libzmq3-dev
+RUN echo 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_22.04/ /' | \
+    tee /etc/apt/sources.list.d/network:messaging:zeromq:release-stable.list && \
+    curl -fsSL https://download.opensuse.org/repositories/network:messaging:zeromq:release-stable/xUbuntu_22.04/Release.key | \
+    gpg --dearmor | tee /etc/apt/trusted.gpg.d/network_messaging_zeromq_release-stable.gpg > /dev/null && \
+    apt-get update && apt-get install -y libzmq3-dev
+
 RUN rm /tmp/qt-aarch64-binary.tar.gz && \
     mv /opt/qt/qt-5.15.5-aarch64/lib/* /usr/lib/aarch64-linux-gnu
 
