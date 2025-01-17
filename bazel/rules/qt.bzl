@@ -14,10 +14,10 @@ QT_INCLUDE_PATHS = select({
         "-I/usr/include/x86_64-linux-gnu/qt5/QtCore",
     ],
     "@platforms//cpu:aarch64": [
-        "-I/usr/include/aarch64-linux-gnu/qt5",
-        "-I/usr/include/aarch64-linux-gnu/qt5/QtGui",
-        "-I/usr/include/aarch64-linux-gnu/qt5/QtWidgets",
-        "-I/usr/include/aarch64-linux-gnu/qt5/QtCore",
+        "-I/usr/include/x86_64-linux-gnu/qt5",
+        "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
+        "-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+        "-I/usr/include/x86_64-linux-gnu/qt5/QtCore",
     ],
 })
 
