@@ -191,7 +191,7 @@ To automatically apply fixes suggested by Clang-Tidy, follow these steps:
     Use the following command to find all relevant C++ source files in the project.
 
     ```bash
-    find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.hxx"" | xargs clang-tidy -p ./compile_commands.json
+    find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.hxx" | xargs clang-tidy -p ./compile_commands.json
     ```
 
 3. To automatically apply any fixes, use the following commands:
