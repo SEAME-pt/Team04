@@ -1,6 +1,7 @@
 bazel_dep(name = "googletest", version = "1.15.2")
 bazel_dep(name = "buildifier_prebuilt", version = "7.3.1")
-bazel_dep(name = "rules_python", version = "1.0.0")
+bazel_dep(name = "rules_python", version = "1.1.0")
+bazel_dep(name = "rules_cc", version = "0.0.17")
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
