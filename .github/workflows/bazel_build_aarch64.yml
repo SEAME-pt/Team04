@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
     branches: ['*']
 
 jobs:
-  build:
+  build_aarch64:
     runs-on: ubuntu-latest
     container:
       image: dtors/base-cpp:latest
@@ -63,8 +63,8 @@ jobs:
       - name: Build affected targets
         if: env.targets != ''
         run: |
-          echo "Building targets: $targets"
-          bazelisk build $targets
+          echo "Building targets for aarch64: $targets"
+          bazelisk build $targets --platforms=//bazel/platforms:aarch64_linux
         shell: bash
 
       - name: No targets to build
