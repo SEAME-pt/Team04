@@ -182,6 +182,8 @@ To automatically apply fixes suggested by Clang-Tidy, follow these steps:
 
     This ensures that the compile_commands.json file is up-to-date and reflects the latest build settings.
 
+    If this command fails, clean the cache with `bazel clean` and delete an existing `build` directory before trying again.
+
 2. Run Clang-Tidy Analysis:
 
     ```bash
