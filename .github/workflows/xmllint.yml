@@ -1,0 +1,70 @@
+# yamllint disable rule:line-length
+---
+name: Lint
+on:  # yamllint disable-line rule:truthy
+  push:
+    paths:
+      - '**/*.xml'
+      - '**/*.ui'
+  pull_request:
+    paths:
+      - '**/*.xml'
+      - '**/*.ui'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    container:
+      image: dtors/base-cpp:latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure Git Safe Directory
+        run: |
+          git config --global --add safe.directory "$(pwd)"
+
+      - name: Find affected files
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          git diff --diff-filter=ACM --name-only origin/${{ github.base_ref }} > affected_files.txt
+          echo "Affected files:"
+          cat affected_files.txt
+
+      - name: Find affected XML and UI files
+        run: |
+          > affected_xml_files.txt
+
+          while IFS= read -r file; do
+          if [[ "$file" == *.xml || "$file" == *.ui ]]; then
+              echo "$file" >> affected_xml_files.txt
+          fi
+          done < affected_files.txt
+
+          sort -u affected_xml_files.txt -o affected_xml_files.txt
+          echo "Affected XML/UI files:"
+          cat affected_xml_files.txt
+
+          echo "xml_files=$(cat affected_xml_files.txt | tr '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Lint XML and UI files
+        if: env.xml_files != ''
+        run: |-
+            echo "$xml_files" | xargs -d ' ' xmllint --noout
+        shell: bash
+
+      - name: No XML or UI files affected
+        if: env.xml_files == ''
+        run: echo "No affected XML or UI files found. Skipping xmllint."
+
+      - name: Show failure message
+        if: failure()
+        run: |-
+            echo "To automatically apply suggested fixes, run the following command:"
+            echo "=================================================================="
+            echo "1. Run xmllint:"
+            echo "   xmllint --format <file> --output <file>"
+            echo "==================================================================="
+        shell: bash
