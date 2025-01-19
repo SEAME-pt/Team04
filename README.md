@@ -19,6 +19,7 @@
   - [2.5. Bazel Buildifier](#25-bazel-buildifier)
     - [How to Run](#251-how-to-run)
   - [2.6. Sanitizers](#26-sanitizers)
+  - [2.7. Coverage](#27-coverage)
 
 ## 1. Development Environment
 
@@ -293,3 +294,34 @@ bazel run //examples/cpp:bin --features=tsan
 ```
 
 **Note**: TSAN needs to run separatly from ASAN because `-fsanitize=address` is incompatible with `-fsanitize=thread`.
+
+### 2.7. Coverage
+
+The current coverage implementation uses the `bazel coverage` command to generate coverage reports. Follow the steps below to create a coverage report locally or understand how to integrate your tests into the CI.
+
+#### 2.7.1. Generate a Coverage Report Locally
+
+Run the following command to create a coverage report for a specific test target:
+
+```bash
+bazel run //tools/coverage:lcov -- -t <test_target>
+```
+
+#### 2.7.2. Coverage in GitHub Actions
+
+The GitHub Action for coverage runs the tests defined in the `unit_tests` test suite, in the `BUILD` file located at the root of the project. The coverage report is generated with the following command:
+
+```bash
+  bazel run //tools/coverage:lcov -- -t :unit_tests
+```
+
+##### Adding Tests to the Coverage Suite
+
+To include a new test target in the coverage calculation, add your test suite target to the `unit_tests` suite and make sure to adhere to the following best practices:
+
+**Organize Tests by Directory**: Each directory should have its own BUILD file defining the relevant test targets for that directory. Avoid adding test targets directly to the `unit_tests` suite in the root `BUILD` file.
+For a reference implementation, see the test setup in `//examples:unit_test`. This example demonstrates how to organize and integrate test targets within the coverage framework.
+
+#### 2.7.3. ToDo - Baseline
+
+A baseline mechanism for coverage is not yet implemented but will be added in the future.
