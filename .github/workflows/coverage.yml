@@ -16,5 +16,5 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Coverage Script
-        run: bazelisk run //tools/coverage:lcov --platforms=//bazel/platforms:x86_64_linux -- -t //examples/cpp:test
+        run: bazelisk run //tools/coverage:lcov --platforms=//bazel/platforms:x86_64_linux -- -t :unit_tests
         shell: bash
