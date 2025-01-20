@@ -24,6 +24,10 @@ RUN apt-get update && apt-get install -y \
     file \
     mesa-common-dev \
     mesa-utils \
+    autoconf \
+    automake \
+    libtool \
+    pkg-config \
     libvulkan-dev \
     libxkbcommon-x11-0 \
     libxkbcommon-dev \
@@ -43,9 +47,24 @@ RUN apt-get update && apt-get install -y \
     libxcb-cursor0 \
     locales \
     qtbase5-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up GCC for cross-compilation
+RUN apt-get update && apt-get install -y \
     gcc-aarch64-linux-gnu \
     g++-aarch64-linux-gnu \
     && rm -rf /var/lib/apt/lists/*
+
+# Build zmq from source for aarch64
+RUN git clone https://github.com/zeromq/libzmq.git /libzmq && \
+    cd /libzmq && \
+    export CC=aarch64-linux-gnu-gcc && \
+    export CXX=aarch64-linux-gnu-g++ && \
+    ./autogen.sh && \
+    ./configure  --host=aarch64-linux-gnu --build=x86_64-linux-gnu --prefix=/usr/aarch64-linux-gnu && \
+    make -j$(nproc) && \
+    make install && \
+    rm -rf /libzmq
 
 # Add LLVM repository and install LLVM/Clang tools
 RUN wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc && \
@@ -88,10 +107,10 @@ RUN wget ${QT_RELEASE_URL}/qt-${QT_VERSION}-aarch64-cross-compile-gcc-5.tar.gz -
     tar -xzf /tmp/qt-aarch64-binary.tar.gz -C /opt/qt && \
     rm /tmp/qt-aarch64-binary.tar.gz && \
     mv /opt/qt/qt-${QT_VERSION}-aarch64/lib/* /usr/lib/aarch64-linux-gnu && \
-    cp /usr/aarch64-linux-gnu/lib/* /lib/aarch64-linux-gnu && \
-    cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib
+    cp -r /usr/aarch64-linux-gnu/lib/* /lib/aarch64-linux-gnu && \
+    cp -r /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib
 
-# Install libzmq3-dev
+# Install libzmq3-dev for x86
 RUN echo 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_22.04/ /' | \
     tee /etc/apt/sources.list.d/network:messaging:zeromq:release-stable.list && \
     curl -fsSL https://download.opensuse.org/repositories/network:messaging:zeromq:release-stable/xUbuntu_22.04/Release.key | \
