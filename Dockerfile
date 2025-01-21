@@ -8,6 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     QT_RELEASE_URL=https://github.com/parker-int64/qt-aarch64-binary/releases/download/5.15.5 \
     BAZELISK_URL=https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 \
     BUILDIFIER_URL=https://github.com/bazelbuild/buildtools/releases/latest/download/buildifier-linux-amd64 \
+    PIGPIO_URL=https://github.com/joan2937/pigpio \
     HOME=/root
 
 # Update and install base dependencies
@@ -45,6 +46,7 @@ RUN apt-get update && apt-get install -y \
     qtbase5-dev \
     gcc-aarch64-linux-gnu \
     g++-aarch64-linux-gnu \
+    libsdl2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Add LLVM repository and install LLVM/Clang tools
@@ -91,13 +93,21 @@ RUN wget ${QT_RELEASE_URL}/qt-${QT_VERSION}-aarch64-cross-compile-gcc-5.tar.gz -
     cp /usr/aarch64-linux-gnu/lib/* /lib/aarch64-linux-gnu && \
     cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib
 
-# Install libzmq3-dev
+# Install libzmq3-dev for x86
 RUN echo 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_22.04/ /' | \
     tee /etc/apt/sources.list.d/network:messaging:zeromq:release-stable.list && \
     curl -fsSL https://download.opensuse.org/repositories/network:messaging:zeromq:release-stable/xUbuntu_22.04/Release.key | \
     gpg --dearmor | tee /etc/apt/trusted.gpg.d/network_messaging_zeromq_release-stable.gpg > /dev/null && \
     apt-get update && apt-get install -y libzmq3-dev && \
     rm -rf /var/lib/apt/lists/*
+
+# Install pigpio for x86
+RUN git clone ${PIGPIO_URL}.git && \
+    cd pigpio && \
+    git checkout v79 && \
+    make && \
+    make install && \
+    rm -rf pigpio
 
 # Install Bazelisk
 RUN wget ${BAZELISK_URL} && \
