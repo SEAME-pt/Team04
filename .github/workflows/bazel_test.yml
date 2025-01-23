@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: dtors/base-cpp:latest
+      image: t4seame/app:latest
 
     steps:
       - name: Checkout code
