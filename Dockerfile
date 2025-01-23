@@ -93,12 +93,20 @@ RUN wget ${QT_RELEASE_URL}/qt-${QT_VERSION}-aarch64-cross-compile-gcc-5.tar.gz -
     cp /usr/aarch64-linux-gnu/lib/* /lib/aarch64-linux-gnu && \
     cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib
 
-# Install libzmq3-dev for x86
+# Replace ubuntu.sources config file
+COPY config/ubuntu.sources /tmp/ubuntu.sources
+RUN cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak && \ 
+    mv /tmp/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources
+
+# Adding foreign architecture to 
+RUN dpkg --add-architecture arm64
+
+# Install libzmq3-dev
 RUN echo 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_22.04/ /' | \
     tee /etc/apt/sources.list.d/network:messaging:zeromq:release-stable.list && \
     curl -fsSL https://download.opensuse.org/repositories/network:messaging:zeromq:release-stable/xUbuntu_22.04/Release.key | \
     gpg --dearmor | tee /etc/apt/trusted.gpg.d/network_messaging_zeromq_release-stable.gpg > /dev/null && \
-    apt-get update && apt-get install -y libzmq3-dev && \
+    apt-get update && apt-get install -y libzmq3-dev && apt-get install -y libzmq3-dev:arm64 && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pigpio for x86
