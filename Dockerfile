@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
     LLVM_VERSION=18 \
-    GCC_VERSION=14 \
+    GCC_VERSION=12 \
     QT_VERSION=5.15.5 \
     QT_RELEASE_URL=https://github.com/parker-int64/qt-aarch64-binary/releases/download/5.15.5 \
     BAZELISK_URL=https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 \
@@ -44,8 +44,8 @@ RUN apt-get update && apt-get install -y \
     libxcb-cursor0 \
     locales \
     qtbase5-dev \
-    gcc-aarch64-linux-gnu \
-    g++-aarch64-linux-gnu \
+    gcc-${GCC_VERSION}-aarch64-linux-gnu \
+    g++-${GCC_VERSION}-aarch64-linux-gnu \
     libsdl2-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -78,7 +78,9 @@ RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VER
     update-alternatives --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-${LLVM_VERSION} 100 && \
     update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-${LLVM_VERSION} 100 && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} 100
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} 100 && \
+    update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-{GCC_VERSION} 100 && \
+    update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu-gcc /usr/bin/x86_64-linux-gnu-gcc-{GCC_VERSION} 100
 
 # Install Arduino lint, yamllint, and gitlint
 RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/etc/install.sh | sh && \
