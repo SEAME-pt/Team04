@@ -245,9 +245,13 @@ def _impl(ctx):
         features = features,
         cxx_builtin_include_directories = [
             "/usr/include",
+            "/usr/lib/x86_64-linux-gnu",
             "/usr/aarch64-linux-gnu",
             "/usr/lib/aarch64-linux-gnu",
             "/usr/lib/gcc-cross/aarch64-linux-gnu",
+            "/opt/qt6/pi",
+            "/opt/qt6/pi/include",
+            "/opt/qt6/pi/lib",
         ],
         toolchain_identifier = "aarch64_linux-toolchain",
         host_system_name = "local",
