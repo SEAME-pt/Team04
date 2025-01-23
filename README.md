@@ -21,6 +21,7 @@
     - [How to Run](#251-how-to-run)
   - [2.6. Sanitizers](#26-sanitizers)
   - [2.7. Coverage](#27-coverage)
+- [3. Releases](#3-releases)
 
 ## 1. Development Environment
 
@@ -334,3 +335,19 @@ For a reference implementation, see the test setup in `//examples:unit_test`. Th
 #### 2.7.3. ToDo - Baseline
 
 A baseline mechanism for coverage is not yet implemented but will be added in the future.
+
+## 3. Releases
+
+A new release is automatically created for every push to a tag that matches the pattern `v*`."
+
+To create a tag use the command:
+
+```bash
+git tag v<release version>
+```
+
+After creating the tag locally, push it to the remote repo.
+
+```bash
+git push origin v<release version>
+```
