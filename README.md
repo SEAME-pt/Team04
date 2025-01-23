@@ -5,8 +5,9 @@
 - [1. Development Environment](#1-development-environment)
   - [1.1. Install Docker](#11-install-docker)
   - [1.2. Build the Docker Image](#12-build-the-docker-image)
-  - [1.3. Run Docker Container](#13-run-docker-container)
-  - [1.4. Common Issues](#14-common-issues)
+  - [1.3. Pull Docker Image Used on CI](#13-pull-docker-image-used-on-ci)
+  - [1.4. Run Docker Container](#14-run-docker-container)
+  - [1.5. Common Issues](#15-common-issues)
 - [2. Tooling](#2-tooling)
   - [2.1. Bazel](#21-bazel)
   - [2.2. Toolchains And Cross-Compilation](#22-toolchains-and-cross-compilation)
@@ -47,7 +48,15 @@ Explanation:
 - `-t team04_docker`: This flags the built image with the name team04_docker. You can choose a different name if needed.
 - `.`: The dot (.) at the end specifies the current directory as the build context. Docker will use the Dockerfile in this directory to build the image.
 
-### 1.3. Run Docker Container
+### 1.3. Pull Docker Image Used on CI
+
+To get the same image used by the github actions, run the following command:
+
+```bash
+sudo docker pull t4seame/app
+```
+
+### 1.4. Run Docker Container
 
 To run the Docker container with the image and necessary volumes mounted, use the following command:
 
@@ -68,7 +77,7 @@ Explanation of flags used:
 - `--volume="$HOME/.Xauthority:/root/.Xauthority:rw"`: Allows access to the X server on the host, which is required for running GUI applications inside the container.
 - `-it`: Runs the container interactively with a terminal.
 
-### 1.4. Common Issues
+### 1.5. Common Issues
 
 If you encounter an error similar to the following when trying to run Qt applications:
 
