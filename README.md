@@ -8,6 +8,7 @@
   - [1.3. Pull Docker Image Used on CI](#13-pull-docker-image-used-on-ci)
   - [1.4. Run Docker Container](#14-run-docker-container)
   - [1.5. Common Issues](#15-common-issues)
+  - [1.6. Copy Files from Docker](#16-copy-files-from-docker)
 - [2. Tooling](#2-tooling)
   - [2.1. Bazel](#21-bazel)
   - [2.2. Toolchains And Cross-Compilation](#22-toolchains-and-cross-compilation)
@@ -100,6 +101,20 @@ xhost +local:docker
 ```
 
 This command allows local Docker containers to connect to the X server and use graphical interfaces.
+
+### 1.6. Copy Files from Docker
+
+Use the following command to copy files from the docker container to your environment:
+
+```bash
+sudo docker cp <container_id>:<input_path> <output_path>
+```
+
+To find all the `container id` use the command:
+
+```bash
+sudo docker ps
+```
 
 ## 2. Tooling
 
