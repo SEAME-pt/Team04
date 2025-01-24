@@ -338,7 +338,7 @@ A baseline mechanism for coverage is not yet implemented but will be added in th
 
 ## 3. Releases
 
-A new release is automatically created for every push to a tag that matches the pattern `v*`."
+A new release is automatically created for every push to a tag that matches the pattern `v*`.
 
 To create a tag use the command:
 
