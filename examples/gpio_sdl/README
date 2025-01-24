@@ -1,0 +1,13 @@
+# How to Run
+
+Run the following command to compile for x86:
+
+```bash
+bazel build //examples/gpio_sdl:bin
+```
+
+Run the following command to compile for aarch64:
+
+```bash
+bazel build //examples/gpio_sdl:bin --platforms=//bazel/platforms:aarch64_linux
+```
