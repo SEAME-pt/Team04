@@ -243,6 +243,7 @@ def _impl(ctx):
         features = features,
         cxx_builtin_include_directories = [
             "/usr/include",
+            "/usr/local/include",
             "/usr/lib/x86_64-linux-gnu",
             "/usr/lib/gcc/x86_64-linux-gnu",
         ],

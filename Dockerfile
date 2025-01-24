@@ -121,13 +121,43 @@ RUN apt-get update && apt-get install -y \
     qt6-base-dev:arm64 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pigpio for x86
-RUN git clone ${PIGPIO_URL}.git && \
-    cd pigpio && \
+# Install SDL2 for x86 and arm64
+RUN apt-get update && apt-get install -y \
+    qemu-user-static \
+    libsdl2-dev \
+    libsdl2-dev:arm64 \
+    && rm -rf /var/lib/apt/lists/*
+
+# BUILD pigpio from source and install for arm64
+RUN git clone ${PIGPIO_URL}.git
+
+COPY tools/cross_compilation/pigpio/makefile pigpio
+RUN cd pigpio && \
     git checkout v79 && \
-    make && \
-    make install \
-    && rm -rf pigpio
+    make CROSS_PREFIX=aarch64-linux-gnu && \
+    make install && \
+    make clean && \
+    rm -rf pigpio
+
+RUN find /usr/opt/lib -name "*pigpio*" -exec mv {} /usr/lib/aarch64-linux-gnu/ \;
+
+RUN find /usr/opt/include -name "*pigpio*" -exec mv {} /usr/include/aarch64-linux-gnu/ \;
+
+RUN find /usr/opt/bin -name "*pigpio*" -exec mv {} /usr/aarch64-linux-gnu/bin/ \;
+
+# BUILD pigpio from source and install for x86
+COPY tools/cross_compilation/pigpio/makefile pigpio
+RUN cd pigpio && \
+    git checkout v79 && \
+    make CROSS_PREFIX=x86_64-linux-gnu && \
+    make install && \
+    rm -rf pigpio
+
+RUN find /usr/opt/lib -name "*pigpio*" -exec mv {} /usr/lib/x86_64-linux-gnu/ \;
+
+RUN find /usr/opt/include -name "*pigpio*" -exec mv {} /usr/include/x86_64-linux-gnu/ \;
+
+RUN find /usr/opt/bin -name "*pigpio*" -exec mv {} /usr/x86_64-linux-gnu/bin/ \;
 
 # Install Bazelisk
 RUN wget ${BAZELISK_URL} && \
