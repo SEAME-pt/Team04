@@ -8,40 +8,47 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 QT_INCLUDE_PATHS = select({
     "@platforms//cpu:x86_64": [
-        "-I/usr/include/x86_64-linux-gnu/qt5",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtCore",
+        "-I/usr/include/x86_64-linux-gnu/qt6",
+        "-I/usr/include/x86_64-linux-gnu/qt6/QtGui",
+        "-I/usr/include/x86_64-linux-gnu/qt6/QtWidgets",
+        "-I/usr/include/x86_64-linux-gnu/qt6/QtCore",
     ],
     "@platforms//cpu:aarch64": [
-        "-I/usr/include/x86_64-linux-gnu/qt5",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtGui",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
-        "-I/usr/include/x86_64-linux-gnu/qt5/QtCore",
+        "-I/usr/include/aarch64-linux-gnu/qt6",
+        "-I/usr/include/aarch64-linux-gnu/qt6/QtGui",
+        "-I/usr/include/aarch64-linux-gnu/qt6/QtWidgets",
+        "-I/usr/include/aarch64-linux-gnu/qt6/QtCore",
     ],
 })
 
-QT_LINK_PATHS = [
-    "-lQt5Widgets",
-    "-lQt5Core",
-    "-lQt5Gui",
-]
+QT_LINK_PATHS = select({
+    "@platforms//cpu:x86_64": [
+        "-lQt6Widgets",
+        "-lQt6Core",
+        "-lQt6Gui",
+    ],
+    "@platforms//cpu:aarch64": [
+        "-lQt6Widgets",
+        "-lQt6Core",
+        "-lQt6Gui",
+    ],
+})
 
 qt_plugin_data = select({
-    "@platforms//cpu:x86_64": ["/usr/lib/x86_64-linux-gnu", "/usr/lib/x86_64-linux-gnu/plugins", "/usr/lib/x86_64-linux-gnu/qml"],
-    "@platforms//cpu:aarch64": ["/usr/lib/aarch64-linux-gnu", "/usr/lib/aarch64-linux-gnu/plugins", "/usr/lib/aarch64-linux-gnu/qml"],
+    "@platforms//cpu:x86_64": ["/usr/lib/x86_64-linux-gnu", "/usr/lib/x86_64-linux-gnu/qt6/plugins", "/usr/lib/x86_64-linux-gnu/qt6/qml"],
+    "@platforms//cpu:aarch64": ["/usr/lib/aarch64-linux-gnu", "/usr/lib/x86_64-linux-gnu/qt6/plugins", "/usr/lib/aarch64-linux-gnu/qt6/qml"],
 })
 
 x86_64_env = {
-    "QT_PLUGIN_PATH": "/usr/lib/x86_64-linux-gnu/plugins",
-    "QT_QPA_PLATFORM_PLUGIN_PATH": "/usr/lib/x86_64-linux-gnu/plugins/platforms",
-    "QML2_IMPORT_PATH": "/usr/lib/x86_64-linux-gnu/qml",
+    "QT_PLUGIN_PATH": "/usr/lib/x86_64-linux-gnu/qt6/plugins",
+    "QT_QPA_PLATFORM_PLUGIN_PATH": "/usr/lib/x86_64-linux-gnu/qt6/plugins/platforms",
+    "QML2_IMPORT_PATH": "/usr/lib/x86_64-linux-gnu/qt6/qml",
 }
 
 aarch64_env = {
-    "QT_PLUGIN_PATH": "/usr/lib/aarch64-linux-gnu/plugins",
-    "QT_QPA_PLATFORM_PLUGIN_PATH": "/usr/lib/aarch64-linux-gnu/plugins/platforms",
-    "QML2_IMPORT_PATH": "/usr/lib/aarch64-linux-gnu/qml",
+    "QT_PLUGIN_PATH": "/usr/lib/aarch64-linux-gnu/qt6/plugins",
+    "QT_QPA_PLATFORM_PLUGIN_PATH": "/usr/lib/aarch64-linux-gnu/qt6/plugins/platforms",
+    "QML2_IMPORT_PATH": "/usr/lib/aarch64-linux-gnu/qt6/qml",
 }
 
 def update_dict(source, env):
@@ -67,7 +74,7 @@ def qt_ui_library(name, ui, deps = None, **kwargs):
         name = "%s_uic" % name,
         srcs = [ui],
         outs = ["ui_%s.h" % ui.split(".")[0]],
-        cmd = "echo 'Running uic command: uic $(location %s) -o $@' && uic $(location %s) -o $@" % (ui, ui),
+        cmd = "echo 'Running uic command: /usr/lib/qt6/libexec/uic $(location %s) -o $@' && /usr/lib/qt6/libexec/uic $(location %s) -o $@" % (ui, ui),
     )
 
     hdr = ":%s_uic" % name
@@ -105,7 +112,7 @@ def qt_cc_library(name, srcs, hdrs, copts = [], linkopts = [], deps = [], **kwar
             name = moc_name,
             srcs = [hdr],
             outs = [moc_name + ".cpp"],
-            cmd = "echo 'Running moc command: /usr/bin/moc $(location %s) -o $@ -f \"%s\"' && /usr/bin/moc $(location %s) -o $@ -f \"%s\"" % (hdr, header_path, hdr, header_path),
+            cmd = "echo 'Running moc command: /usr/lib/qt6/libexec/moc $(location %s) -o $@ -f \"%s\"' && /usr/lib/qt6/libexec/moc $(location %s) -o $@ -f \"%s\"" % (hdr, header_path, hdr, header_path),
         )
 
         _moc_srcs.append(":" + moc_name)
@@ -144,13 +151,13 @@ def qt_cc_binary(name, srcs, deps = None, copts = [], data = [], env = {}, **kwa
         outs = ["qt_env.ini"],
         cmd = select({
             "@platforms//cpu:x86_64": "echo $$\"LD_LIBRARY_PATH: /usr/lib/x86_64-linux-gnu\" > $@ \
-                    $$\"\r\nQT_QPA_PLATFORM_PLUGIN_PATH: /usr/lib/x86_64-linux-gnu/qt5/plugins/platforms\" > $@ \
-                    $$\"\r\nQML2_IMPORT_PATH: /usr/lib/x86_64-linux-gnu/qt5/qml\" > $@ \
-                    $$\"\r\nQT_PLUGIN_PATH: /usr/lib/x86_64-linux-gnu/qt5/plugins\" > $@",
+                    $$\"\r\nQT_QPA_PLATFORM_PLUGIN_PATH: /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms\" > $@ \
+                    $$\"\r\nQML2_IMPORT_PATH: /usr/lib/x86_64-linux-gnu/qt6/qml\" > $@ \
+                    $$\"\r\nQT_PLUGIN_PATH: /usr/lib/x86_64-linux-gnu/qt6/plugins\" > $@",
             "@platforms//cpu:aarch64": "echo $$\"LD_LIBRARY_PATH: /usr/lib/aarch64-linux-gnu\" > $@ \
-                    $$\"\r\nQT_QPA_PLATFORM_PLUGIN_PATH: /usr/lib/aarch64-linux-gnu/qt5/plugins/platforms\" > $@ \
-                    $$\"\r\nQML2_IMPORT_PATH: /usr/lib/aarch64-linux-gnu/qt5/qml\" > $@ \
-                    $$\"\r\nQT_PLUGIN_PATH: /usr/lib/aarch64-linux-gnu/qt5/plugins\" > $@",
+                    $$\"\r\nQT_QPA_PLATFORM_PLUGIN_PATH: /usr/lib/aarch64-linux-gnu/qt6/plugins/platforms\" > $@ \
+                    $$\"\r\nQML2_IMPORT_PATH: /usr/lib/aarch64-linux-gnu/qt6/qml\" > $@ \
+                    $$\"\r\nQT_PLUGIN_PATH: /usr/lib/aarch64-linux-gnu/qt6/plugins\" > $@",
         }),
     )
     env_file.append("qt_env.ini")
