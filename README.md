@@ -42,6 +42,12 @@ sudo apt-get install docker.io
 Once Docker is installed, build the image with:
 
 ```bash
+sudo docker build -t <container_name> .
+```
+
+#### Example
+
+```bash
 sudo docker build -t team04_docker .
 ```
 
@@ -68,7 +74,18 @@ sudo docker run -t -i \
 --net=host \
 --env="DISPLAY" \
 --volume="$HOME/.Xauthority:/root/.Xauthority:rw" \
--it team04_docker bash
+-it <container_name> bash
+```
+
+#### Example
+
+```bash
+sudo docker run -t -i \
+-v "$(pwd)":/Team04 \
+--net=host \
+--env="DISPLAY" \
+--volume="$HOME/.Xauthority:/root/.Xauthority:rw" \
+-it t4seame/app bash
 ```
 
 Explanation of flags used:
@@ -130,7 +147,7 @@ You can run a simple "Hello World" example by executing the following command:
 bazel run //examples/cpp:bin
 ```
 
-This will build and run the bin target from the examples/cpp directory.
+This will build and run the bin target from the `examples/cpp` directory.
 
 ### 2.2. Toolchains And Cross-Compilation
 
@@ -148,11 +165,10 @@ To compile for the `aarch64` (ARM64), use the following command:
 bazel build <bazel_target> --platforms=//bazel/platforms:aarch64_linux
 ```
 
-#### Examples
+#### Bazel Cache
 
-```bash
-bazel build //examples/cpp:bin --platforms=//bazel/platforms:x86_64_linux
-```
+By default, Bazel creates a build cache in the root directory of the project.
+The compiled binaries can be found in the `bazel-out/k8-fastbuild/bin` directory.
 
 #### Toolchain Features
 
@@ -261,19 +277,19 @@ find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -ina
 To automatically fix the formatting of your code based on the predefined style, you can use the following command. It will rewrite the files in-place according to Clang-Format's rules.
 
 ```bash
-clang-format <filepath> -fix -fix-errors
+clang-format <filepath> -i
 ```
 
 To run for all relevant C++ source files:
 
 ```bash
-find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.hxx" | xargs clang-format -fix -fix-errors
+find . -iname "*.c" -o -iname "*.cc" -o -iname "*.cpp" -o -iname "*.cxx" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.hxx" | xargs clang-format -i
 ```
 
 For intended file:
 
 ```bash
-clang-format -fix -fix-errors
+clang-format -i
 ```
 
 ### 2.5. Bazel Buildifier
