@@ -4,14 +4,14 @@
 
 #include "gpio_sdl.h"
 
-#define GPIO_BUTTON 17
+constexpr uint8_t gpio_button = 17;
 
-int main() {
+auto main() -> int {
     if (!initGPIO()) {
         return -1;
     }
-    gpioSetMode(GPIO_BUTTON, PI_INPUT);
-    gpioSetPullUpDown(GPIO_BUTTON, PI_PUD_UP);
+    gpioSetMode(gpio_button, PI_INPUT);
+    gpioSetPullUpDown(gpio_button, PI_PUD_UP);
 
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
@@ -29,12 +29,12 @@ int main() {
             }
         }
 
-        int buttonState = readButtonState(GPIO_BUTTON);
+        int button_state = readButtonState(gpio_button);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        if (buttonState == 0) {
+        if (button_state == 0) {
             SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         } else {
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);

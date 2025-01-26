@@ -10,11 +10,11 @@ joystick::joystick(carMove& car) : gameController(nullptr) {
 
     // Abrir o primeiro controlador de jogo disponível
     for (int i = 0; i < SDL_NumJoysticks(); ++i) {
-        if (SDL_IsGameController(i) != 0u) {
+        if (SDL_IsGameController(i) != 0U) {
             gameController = SDL_GameControllerOpen(i);
             if (gameController != nullptr) {
                 std::cout << "GameController connected: " << SDL_GameControllerName(gameController)
-                          << std::endl;
+                          << '\n';
                 setPS4AxisMapping(car);
                 break;
             }
@@ -42,7 +42,7 @@ void joystick::setAxisAction(int axis, std::function<void(int)> action) {
 }
 
 void joystick::setPS4AxisMapping(carMove& car) {
-    std::cout << "Mapping PS4 controller axes to car actions." << std::endl;
+    std::cout << "Mapping PS4 controller axes to car actions." << '\n';
     // Left stick X-axis controls the servo (steering)
     setAxisAction(1, [&car](int value) {
         // Normalize SDL axis value (-32768 to 32767) to angle range (-45 to 45 degrees)
@@ -60,17 +60,17 @@ void joystick::setPS4AxisMapping(carMove& car) {
 
 void joystick::processEvent(const SDL_Event& event) {
     if (event.type == SDL_CONTROLLERBUTTONDOWN || event.type == SDL_CONTROLLERBUTTONUP) {
-        bool isPressed = (event.type == SDL_CONTROLLERBUTTONDOWN);
+        bool is_pressed = (event.type == SDL_CONTROLLERBUTTONDOWN);
         int button = event.cbutton.button;
 
         if (static_cast<std::size_t>(button) < buttonStates.size()) {
-            buttonStates[button] = isPressed;
+            buttonStates[button] = is_pressed;
             if (buttonActions.find(button) != buttonActions.end()) {
-                if (isPressed) {
-                    std::cout << "Button " << button << " pressed." << std::endl;
+                if (is_pressed) {
+                    std::cout << "Button " << button << " pressed." << '\n';
                     buttonActions[button].onPress();
                 } else {
-                    std::cout << "Button " << button << " released." << std::endl;
+                    std::cout << "Button " << button << " released." << '\n';
                     buttonActions[button].onRelease();
                 }
             }
@@ -79,13 +79,13 @@ void joystick::processEvent(const SDL_Event& event) {
         int axis = event.caxis.axis;
         int value = event.caxis.value;
 
-        std::cout << "Axis " << axis << " moved to " << value << "." << std::endl;
+        std::cout << "Axis " << axis << " moved to " << value << "." << '\n';
         if (axisActions.find(axis) != axisActions.end()) {
             axisActions[axis](value);
         }
     } else if (event.type == SDL_CONTROLLERDEVICEREMOVED) {
         // Handle the disconnection of the game controller
-        std::cout << "Game controller disconnected." << std::endl;
+        std::cout << "Game controller disconnected." << '\n';
 
         // Close the controller and set to nullptr
         if (gameController != nullptr) {
@@ -93,7 +93,7 @@ void joystick::processEvent(const SDL_Event& event) {
             gameController = nullptr;
         }
 
-        std::cout << "Exiting the program due to controller disconnection." << std::endl;
+        std::cout << "Exiting the program due to controller disconnection." << '\n';
         exit(1);
     }
 }
@@ -109,12 +109,12 @@ void joystick::listen() {
         }
         // If no controller is connected, break the loop or handle accordingly
         if (gameController == nullptr) {
-            std::cout << "No controller connected, stopping listen." << std::endl;
+            std::cout << "No controller connected, stopping listen." << '\n';
             break;
         }
 
         if (gameController == nullptr) {
-            std::cout << "No controller connected, stopping listen." << std::endl;
+            std::cout << "No controller connected, stopping listen." << '\n';
             break;
         }
         SDL_Delay(10);
