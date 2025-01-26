@@ -7,11 +7,11 @@ carMove car;
 // Function to handle left stick horizontal axis movements (steering)
 void moveLeftandRight(int value) {
     float fvalue = value * 1.0;  // Raw value
-    std::cout << "Before normalization: " << fvalue << std::endl;
+    std::cout << "Before normalization: " << fvalue << '\n';
 
     // Normalize to a 45-degree range
     fvalue = fvalue / 32000.0 * 45;
-    std::cout << "Servo angle moved to: " << fvalue << " degrees" << std::endl;
+    std::cout << "Servo angle moved to: " << fvalue << " degrees" << '\n';
 
     car.setServoAngle(fvalue);
 }
@@ -21,7 +21,7 @@ void moveForwardandBackward(int value) {
     value -= 16319;              // Adjust for neutral position
     value = (value / 165) * -1;  // Normalize and invert for correct direction
 
-    std::cout << "Engine speed moved to: " << value << std::endl;
+    std::cout << "Engine speed moved to: " << value << '\n';
     car.setMotorSpeed(value);
 }
 
@@ -39,7 +39,7 @@ auto main() -> int {
         controller.listen();
 
     } catch (const std::runtime_error &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << '\n';
     }
 
     return 0;
