@@ -3,11 +3,11 @@
 Run the following command to compile for x86:
 
 ```bash
-bazel run //examples/qt:bin
+bazel run //examples/qt/ui:bin
 ```
 
 Run the following command to compile for aarch64:
 
 ```bash
-bazel build //examples/qt:bin --platforms=//bazel/platforms:aarch64_linux
+bazel build //examples/qt/ui:bin --platforms=//bazel/platforms:aarch64_linux
 ```

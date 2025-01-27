@@ -6,7 +6,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
 
-#include "examples/qt/ui_mainwindow.h"
+#include "examples/qt/ui/ui_mainwindow.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
