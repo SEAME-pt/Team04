@@ -12,31 +12,41 @@ QT_INCLUDE_PATHS = select({
         "-I/usr/include/x86_64-linux-gnu/qt6/QtGui",
         "-I/usr/include/x86_64-linux-gnu/qt6/QtWidgets",
         "-I/usr/include/x86_64-linux-gnu/qt6/QtCore",
+        "-I/usr/include/x86_64-linux-gnu/qt6/QtQml",
+        "-I/usr/include/x86_64-linux-gnu/qt6/QtQuick",
     ],
     "@platforms//cpu:aarch64": [
         "-I/usr/include/aarch64-linux-gnu/qt6",
         "-I/usr/include/aarch64-linux-gnu/qt6/QtGui",
         "-I/usr/include/aarch64-linux-gnu/qt6/QtWidgets",
         "-I/usr/include/aarch64-linux-gnu/qt6/QtCore",
+        "-I/usr/include/aarch64-linux-gnu/qt6/QtQml",
+        "-I/usr/include/aarch64-linux-gnu/qt6/QtQuick",
     ],
 })
 
 QT_LINK_PATHS = select({
     "@platforms//cpu:x86_64": [
+        "-L/usr/lib/x86_64-linux-gnu",
         "-lQt6Widgets",
         "-lQt6Core",
         "-lQt6Gui",
+        "-lQt6Qml",
+        "-lQt6Quick",
     ],
     "@platforms//cpu:aarch64": [
+        "-L/usr/lib/aarch64-linux-gnu",
         "-lQt6Widgets",
         "-lQt6Core",
         "-lQt6Gui",
+        "-lQt6Qml",
+        "-lQt6Quick",
     ],
 })
 
 qt_plugin_data = select({
     "@platforms//cpu:x86_64": ["/usr/lib/x86_64-linux-gnu", "/usr/lib/x86_64-linux-gnu/qt6/plugins", "/usr/lib/x86_64-linux-gnu/qt6/qml"],
-    "@platforms//cpu:aarch64": ["/usr/lib/aarch64-linux-gnu", "/usr/lib/x86_64-linux-gnu/qt6/plugins", "/usr/lib/aarch64-linux-gnu/qt6/qml"],
+    "@platforms//cpu:aarch64": ["/usr/lib/aarch64-linux-gnu", "/usr/lib/aarch64-linux-gnu/qt6/plugins", "/usr/lib/aarch64-linux-gnu/qt6/qml"],
 })
 
 x86_64_env = {
@@ -171,5 +181,88 @@ def qt_cc_binary(name, srcs, deps = None, copts = [], data = [], env = {}, **kwa
             "@platforms//cpu:x86_64": x86_64_env_data,
             "@platforms//cpu:aarch64": aarch64_env_data,
         }),
+        **kwargs
+    )
+
+def _gencpp(ctx):
+    resource_files = [(f, ctx.actions.declare_file(f.path)) for f in ctx.files.files]
+    for target_file, output in resource_files:
+        ctx.actions.symlink(
+            output = output,
+            target_file = target_file,
+        )
+
+    args = ["--name", ctx.attr.resource_name, "--output", ctx.outputs.cpp.path, ctx.file.qrc.path]
+    ctx.actions.run(
+        inputs = [resource for _, resource in resource_files] + [ctx.file.qrc],
+        outputs = [ctx.outputs.cpp],
+        arguments = args,
+        executable = "/usr/lib/qt6/libexec/rcc",
+    )
+    return [OutputGroupInfo(cpp = depset([ctx.outputs.cpp]))]
+
+gencpp = rule(
+    implementation = _gencpp,
+    attrs = {
+        "resource_name": attr.string(),
+        "files": attr.label_list(allow_files = True, mandatory = False),
+        "qrc": attr.label(allow_single_file = True, mandatory = True),
+        "cpp": attr.output(),
+    },
+)
+
+# generate a qrc file that lists each of the input files.
+def _genqrc(ctx):
+    qrc_output = ctx.outputs.qrc
+    qrc_content = "<RCC>\n  <qresource prefix=\\\"/\\\">"
+    for f in ctx.files.files:
+        qrc_content += "\n    <file>%s</file>" % f.path
+    qrc_content += "\n  </qresource>\n</RCC>"
+    cmd = ["echo", "\"%s\"" % qrc_content, ">", qrc_output.path]
+    ctx.actions.run_shell(
+        command = " ".join(cmd),
+        outputs = [qrc_output],
+    )
+    return [OutputGroupInfo(qrc = depset([qrc_output]))]
+
+genqrc = rule(
+    implementation = _genqrc,
+    attrs = {
+        "files": attr.label_list(allow_files = True, mandatory = True),
+        "qrc": attr.output(),
+    },
+)
+
+def qt_resource(name, files, copts = [], linkopts = [], **kwargs):
+    """Creates a cc_library containing the contents of all input files using qt's `rcc` tool.
+
+    Args:
+        name: rule name
+        files: a list of files to be included in the resource bundle
+        copts (list): Additional compiler options.
+        linkopts (list): Additional linker options.
+        **kwargs: Additional keyword arguments for `cc_library`.
+    """
+    qrc_file = name + "_qrc.qrc"
+    genqrc(name = name + "_qrc", files = files, qrc = qrc_file)
+
+    # every resource cc_library that is linked into the same binary needs a
+    # unique 'name'.
+    rsrc_name = native.package_name().replace("/", "_") + "_" + name
+
+    outfile = name + "_gen.cpp"
+    gencpp(
+        name = name + "_gen",
+        resource_name = rsrc_name,
+        files = files,
+        qrc = qrc_file,
+        cpp = outfile,
+    )
+    cc_library(
+        name = name,
+        srcs = [outfile],
+        alwayslink = 1,
+        copts = copts + QT_INCLUDE_PATHS,
+        linkopts = linkopts + QT_LINK_PATHS,
         **kwargs
     )
