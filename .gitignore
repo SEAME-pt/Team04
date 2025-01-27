@@ -10,7 +10,8 @@ bazel-*
 # Ignore IDE files and project-specific settings
 .idea/            # JetBrains IDE (e.g., IntelliJ, PyCharm)
 .idea
-.vscode/          # Visual Studio Code settings
+.vscode/*
+!.vscode/settings.json
 *.sublime-workspace
 *.sublime-project
 *.kate-swp

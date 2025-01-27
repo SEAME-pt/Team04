@@ -24,3 +24,6 @@ register_toolchains(
     "//toolchain/x86_64_linux",
     "//toolchain/aarch64_linux",
 )
+
+# cppzmq (header only)
+bazel_dep(name = "cppzmq", version = "4.10.0")
