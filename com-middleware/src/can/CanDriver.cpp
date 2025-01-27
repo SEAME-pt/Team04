@@ -9,14 +9,22 @@
 #include <cstring>
 #include <iostream>
 
-#include "com-middleware/exceptions/CanCloseException.hpp"
-#include "com-middleware/exceptions/CanInitException.hpp"
+#include "com-middleware/src/exceptions/CanCloseException.hpp"
+#include "com-middleware/src/exceptions/CanInitException.hpp"
 
 namespace candriver {
 
 CanDriver::CanDriver(std::string can_interface, int32_t timeout_s)
     : m_canInterface(std::move(can_interface)), m_timeout_s(timeout_s) {
     initializeCan();
+};
+
+CanDriver::~CanDriver() {
+    try {
+        uninitializeCan();
+    } catch (const std::exception &exception) {
+        std::cout << exception.what() << "\n";
+    }
 };
 
 void CanDriver::initializeCan() {
@@ -38,6 +46,7 @@ void CanDriver::initializeCan() {
     // Setting the can interface
     strcpy(ifr.ifr_name, m_canInterface.c_str());
     // To determine the interface index an appropriate ioctl() has to be used (0 for all)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
     ioctl(m_can_socket_fd, SIOCGIFINDEX, &ifr);
 
     memset(&addr, 0, sizeof(addr));
@@ -63,7 +72,7 @@ void CanDriver::uninitializeCan() const {
     }
 }
 
-auto CanDriver::readMessage(void *buffer) const -> int32_t {
-    return static_cast<int32_t>(read(m_can_socket_fd, buffer, sizeof(struct can_frame)));
+auto CanDriver::receive(can_frame *frame) const -> int32_t {
+    return static_cast<int32_t>(::read(m_can_socket_fd, frame, sizeof(can_frame)));
 }
 }  // namespace candriver

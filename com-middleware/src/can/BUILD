@@ -1,8 +1,8 @@
 cc_library(
     name = "can",
-    srcs = ["CanDriver.cpp"],
-    hdrs = ["CanDriver.hpp"],
+    srcs = glob(["*.cpp"]),
+    hdrs = glob(["*.hpp"]),
     features = ["warnings_critical_code_gcc"],
     visibility = ["//visibility:public"],
-    deps = ["//com-middleware/exceptions"],
+    deps = ["//com-middleware/src/exceptions"],
 )

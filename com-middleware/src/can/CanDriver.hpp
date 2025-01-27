@@ -1,11 +1,15 @@
 #ifndef CAN_DRIVER_HPP
 #define CAN_DRIVER_HPP
 
+#include <linux/can.h>
+
 #include <string>
+
+#include "ICanDriver.hpp"
 
 namespace candriver {
 
-class CanDriver {
+class CanDriver : public ICanDriver {
    private:
     std::string m_canInterface;
     int32_t m_timeout_s;
@@ -13,7 +17,12 @@ class CanDriver {
 
    public:
     CanDriver(std::string can_interface, int32_t timeout_s);
-    virtual ~CanDriver() noexcept(false) { uninitializeCan(); }
+    ~CanDriver() override;
+    CanDriver() = delete;
+    CanDriver(const CanDriver&) = default;
+    auto operator=(const CanDriver&) -> CanDriver& = default;
+    CanDriver(CanDriver&&) = default;
+    auto operator=(CanDriver&&) -> CanDriver& = default;
 
    private:
     /**
@@ -28,7 +37,7 @@ class CanDriver {
     void uninitializeCan() const;
 
    public:
-    auto readMessage(void* buffer) const -> int32_t;
+    auto receive(can_frame* frame) const -> int32_t override;
 };
 }  // namespace candriver
 
