@@ -118,7 +118,11 @@ RUN echo 'deb http://download.opensuse.org/repositories/network:/messaging:/zero
 # Install Qt6 for x86 and arm64
 RUN apt-get update && apt-get install -y \
     qt6-base-dev \
+    qt6-declarative-dev \
+    qml6-* \
     qt6-base-dev:arm64 \
+    qt6-declarative-dev:arm64 \
+    qml6-*:arm64 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install SDL2 for x86 and arm64
