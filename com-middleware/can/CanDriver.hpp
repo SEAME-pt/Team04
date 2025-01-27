@@ -8,11 +8,14 @@ namespace candriver {
 class CanDriver {
    private:
     std::string m_canInterface;
-    int32_t m_timeout;
+    int32_t m_timeout_s;
+    int32_t m_can_socket_fd{};
 
    public:
-    CanDriver(std::string can_interface, int32_t timeout);
+    CanDriver(std::string can_interface, int32_t timeout_s);
+    virtual ~CanDriver() noexcept(false) { uninitializeCan(); }
 
+   private:
     /**
      * @brief Initializes CAN socket
      *
@@ -22,6 +25,10 @@ class CanDriver {
      * @throws CanInitException if it fails to initialize
      */
     void initializeCan();
+    void uninitializeCan() const;
+
+   public:
+    auto readMessage(void* buffer) const -> int32_t;
 };
 }  // namespace candriver
 
