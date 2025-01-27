@@ -14,28 +14,30 @@
 #include <zmq.hpp>
 
 #include "can/CanDriver.hpp"
+#include "mq/ZeroMQPublisher.hpp"
 
 namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 volatile std::sig_atomic_t interrupted{0};
 }  // namespace
 
-void signal_handler(int signum) {
+void signalHandler(int signum) {
     (void)signum;  // ignore unused variable
     interrupted = 1;
 }
 
-void catch_signals() {
-    (void)std::signal(SIGINT, signal_handler);
-    (void)std::signal(SIGTERM, signal_handler);
-    (void)std::signal(SIGSEGV, signal_handler);
-    (void)std::signal(SIGABRT, signal_handler);
+void catchSignals() {
+    (void)std::signal(SIGINT, signalHandler);
+    (void)std::signal(SIGTERM, signalHandler);
+    (void)std::signal(SIGSEGV, signalHandler);
+    (void)std::signal(SIGABRT, signalHandler);
 }
 
 auto main(int argc, char **argv) -> int {
     int opt{};
     std::string interface = "can0";
 
+    // NOLINTNEXTLINE(concurrency-mt-unsafe)
     while ((opt = getopt(argc, argv, "i:")) != -1) {  // "i:" means -i takes an argument
         switch (opt) {
             case 'i':
@@ -52,25 +54,28 @@ auto main(int argc, char **argv) -> int {
     std::unique_ptr<candriver::CanDriver> can;
     try {
         can = std::make_unique<candriver::CanDriver>(interface, 5);
-    } catch (const std::exception &myCustomException) {
-        std::cout << myCustomException.what() << std::endl;
+    } catch (const std::exception &exception) {
+        std::cout << exception.what() << "\n";
         return 1;
     }
 
     struct can_frame frame {};  // Classical can frame
-    int32_t numBytes{};
+    int32_t num_bytes{};
+
     // Connect to zmq
-    zmq::context_t ctx(1);
-    zmq::socket_t publisher(ctx, zmq::socket_type::pub);
-    publisher.bind("ipc:///tmp/speed.ipc");
+    zmq::context_t context(1);
+    std::unique_ptr<zmq::socket_t> pub_socket =
+        std::make_unique<zmq::socket_t>(context, zmq::socket_type::pub);
+    mq::ZeroMQPublisher publisher{std::move(pub_socket)};
+    publisher.subscribe("ipc:///tmp/speed.ipc");
 
-    catch_signals();
+    catchSignals();
     while (true) {
-        numBytes = can->readMessage(&frame);
+        num_bytes = can->receive(&frame);
 
-        if (numBytes < 0) {
+        if (num_bytes < 0) {
             if (errno == EINTR) {
-                std::cout << "interrupt received, exiting gracefully..." << std::endl;
+                std::cout << "interrupt received, exiting gracefully..." << "\n";
                 break;
             }
             if (errno != EAGAIN) {
@@ -81,19 +86,21 @@ auto main(int argc, char **argv) -> int {
 
         // The len element contains the payload length in bytes and should be used instead of
         // can_dlc
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
         printf("0x%03X [%d] ", frame.can_id, frame.len);
 
         for (int i = 0; i < frame.len; i++) {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
             std::cout << printf("%02X ", frame.data[i]);
         }
 
         std::cout << "\n";
 
-        zmq::message_t msg{static_cast<size_t>(numBytes)};
-        memcpy(msg.data(), frame.data, static_cast<size_t>(numBytes));
+        std::vector<uint8_t> message(frame.len);
+        memcpy(message.data(), frame.data, static_cast<size_t>(num_bytes));
 
         try {
-            publisher.send(msg, zmq::send_flags::none);
+            publisher.publish(message);
         } catch (zmq::error_t &e) {
             std::cout << "interrupt received, proceeding...\n";
         }
@@ -103,12 +110,6 @@ auto main(int argc, char **argv) -> int {
             break;
         }
     }
-
-    // Closing ZeroMQ
-    std::cout << "Closing publisher\n";
-    publisher.close();
-    std::cout << "Closing context\n";
-    ctx.close();
 
     return 0;
 }
