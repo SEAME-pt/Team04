@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <zmq.hpp>
 
@@ -35,15 +36,6 @@ auto main(int argc, char **argv) -> int {
     int opt{};
     std::string interface = "can0";
 
-    try {
-        candriver::CanDriver can{interface, 1};
-        can.initializeCan();
-    } catch (const std::exception &myCustomException) {
-        std::cout << myCustomException.what() << std::endl;
-    }
-
-    return 0;
-
     while ((opt = getopt(argc, argv, "i:")) != -1) {  // "i:" means -i takes an argument
         switch (opt) {
             case 'i':
@@ -57,45 +49,16 @@ auto main(int argc, char **argv) -> int {
         }
     }
 
-    int can_socket{};
-    int numBytes{};
-    struct sockaddr_can addr {};
-    struct ifreq ifr {};        // interface
+    std::unique_ptr<candriver::CanDriver> can;
+    try {
+        can = std::make_unique<candriver::CanDriver>(interface, 5);
+    } catch (const std::exception &myCustomException) {
+        std::cout << myCustomException.what() << std::endl;
+        return 1;
+    }
+
     struct can_frame frame {};  // Classical can frame
-
-    std::cout << "CAN Sockets Receive Demo\r\n";
-
-    // opening a socket for communicating over a CAN network
-    // Since SocketCAN implements a new protocol family, we pass PF_CAN as the first argument to the
-    // socket(2) system call there are two CAN protocols to choose from, the raw socket protocol
-    // (SOCK_RAW) and the broadcast manager (CAN_BCM)
-    can_socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-    if (can_socket < 0) {
-        perror("Error connecting to Socket");
-        return 1;
-    }
-
-    // Setting the can interface
-    strcpy(ifr.ifr_name, interface.c_str());
-    // To determine the interface index an appropriate ioctl() has to be used (0 for all)
-    ioctl(can_socket, SIOCGIFINDEX, &ifr);
-
-    memset(&addr, 0, sizeof(addr));
-    addr.can_family = AF_CAN;
-    addr.can_ifindex = ifr.ifr_ifindex;
-
-    // Timeout for read blocking
-    struct timeval timeout {};
-    timeout.tv_sec = 5;   // Timeout in seconds
-    timeout.tv_usec = 0;  // Microseconds
-    setsockopt(can_socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char *>(&timeout),
-               sizeof(struct timeval));
-
-    if (bind(can_socket, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) < 0) {
-        perror("Error Binding");
-        return 1;
-    }
-
+    int32_t numBytes{};
     // Connect to zmq
     zmq::context_t ctx(1);
     zmq::socket_t publisher(ctx, zmq::socket_type::pub);
@@ -103,7 +66,7 @@ auto main(int argc, char **argv) -> int {
 
     catch_signals();
     while (true) {
-        numBytes = static_cast<int>(read(can_socket, &frame, sizeof(struct can_frame)));
+        numBytes = can->readMessage(&frame);
 
         if (numBytes < 0) {
             if (errno == EINTR) {
@@ -146,12 +109,6 @@ auto main(int argc, char **argv) -> int {
     publisher.close();
     std::cout << "Closing context\n";
     ctx.close();
-
-    std::cout << "Closing socket\n";
-    if (close(can_socket) < 0) {
-        perror("Error closing can socket");
-        return 1;
-    }
 
     return 0;
 }
