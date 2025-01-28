@@ -1,11 +1,5 @@
 #include "carMove.hpp"
 
-#include <unistd.h>
-
-#include <algorithm>  // For std::max, std::min
-#include <cmath>      // For std::abs, std::floor, etc.
-#include <stdexcept>  // For std::runtime_error
-
 void carMove::setPWM(int device_handle, int channel, int on_value, int off_value) {
     int reg_base = 0x06 + (channel * 4);
     i2cWriteByteData(device_handle, reg_base, on_value & 0xFF);

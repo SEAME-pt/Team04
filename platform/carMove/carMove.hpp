@@ -2,7 +2,9 @@
 #define CAR_MOVE_HPP
 
 #include <pigpio.h>
+#include <unistd.h>
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
@@ -22,17 +24,17 @@ class carMove {
 
     static void setPWM(int device_handle, int channel, int on_value, int off_value);
 
-    // Constantes
+    // Constants
     static const int SERVO_ADDR = 0x40;
     static const int MOTOR_ADDR = 0x60;
     static const int STEERING_CHANNEL = 0;
 
-    // A constante MAX_ANGLE é 'constexpr' para permitir uso direto em tempo de compilação
-    static constexpr int MAX_ANGLE = 45;
+    // The constant MAX_ANGLE is 'constexpr' to allow direct use at compile time
+    static constexpr int MAX_ANGLE = 80;
 
-    static const int SERVO_LEFT_PWM = 205;  // Adjust as needed >> TEST!!
+    static const int SERVO_LEFT_PWM = 180;  // Adjust as needed >> TEST!!
     static const int SERVO_CENTER_PWM = 307;
-    static const int SERVO_RIGHT_PWM = 410;
+    static const int SERVO_RIGHT_PWM = 435;
 };
 
 #endif
