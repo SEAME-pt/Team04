@@ -1,21 +1,19 @@
 #include "joystick.hpp"
 
-#include <utility>
-
 joystick::joystick(carMove& car) : gameController(nullptr) {
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0) {
         throw std::runtime_error("Failed to initialize SDL2 GameController: " +
                                  std::string(SDL_GetError()));
     }
 
-    // Abrir o primeiro controlador de jogo disponível
     for (int i = 0; i < SDL_NumJoysticks(); ++i) {
         if (SDL_IsGameController(i) != 0U) {
             gameController = SDL_GameControllerOpen(i);
             if (gameController != nullptr) {
                 std::cout << "GameController connected: " << SDL_GameControllerName(gameController)
                           << '\n';
-                setPS4AxisMapping(car);
+                setAxisMapping(car);
+                printButtonStates();
                 break;
             }
         }
@@ -41,20 +39,22 @@ void joystick::setAxisAction(int axis, std::function<void(int)> action) {
     axisActions[axis] = std::move(action);
 }
 
-void joystick::setPS4AxisMapping(carMove& car) {
-    std::cout << "Mapping PS4 controller axes to car actions." << '\n';
+void joystick::setAxisMapping(carMove& car) {
     // Left stick X-axis controls the servo (steering)
-    setAxisAction(1, [&car](int value) {
-        // Normalize SDL axis value (-32768 to 32767) to angle range (-45 to 45 degrees)
-        int angle = static_cast<int>(value / 32767.0 * 45);
-        car.setServoAngle(angle);
+    setAxisAction(0, [&car](int value) {
+        float fvalue = value * 1.0;  // Raw value
+
+        // Normalize to a 45-degree range
+        fvalue = fvalue / 32000.0 * 55;
+        car.setServoAngle(fvalue);
     });
 
     // Right stick Y-axis controls the motor speed
     setAxisAction(5, [&car](int value) {
         // Normalize SDL axis value (-32768 to 32767) to speed percentage (-100% to 100%)
-        int speed = static_cast<int>(value / 32767.0 * 100);
-        car.setMotorSpeed(speed);  // Invert to match joystick forward/backward direction
+        value -= 16319;  // Adjust for neutral position
+        value = (value / 165) * -1;
+        car.setMotorSpeed(value);  // Invert to match joystick forward/backward direction
     });
 }
 
@@ -67,10 +67,8 @@ void joystick::processEvent(const SDL_Event& event) {
             buttonStates[button] = is_pressed;
             if (buttonActions.find(button) != buttonActions.end()) {
                 if (is_pressed) {
-                    std::cout << "Button " << button << " pressed." << '\n';
                     buttonActions[button].onPress();
                 } else {
-                    std::cout << "Button " << button << " released." << '\n';
                     buttonActions[button].onRelease();
                 }
             }
@@ -79,7 +77,6 @@ void joystick::processEvent(const SDL_Event& event) {
         int axis = event.caxis.axis;
         int value = event.caxis.value;
 
-        std::cout << "Axis " << axis << " moved to " << value << "." << '\n';
         if (axisActions.find(axis) != axisActions.end()) {
             axisActions[axis](value);
         }
@@ -119,4 +116,24 @@ void joystick::listen() {
         }
         SDL_Delay(10);
     }
+}
+
+void joystick::printButtonStates() {
+    setButtonAction(0, Actions{[]() {}, []() {}});
+    setButtonAction(1, Actions{[]() {}, []() {}});
+    setButtonAction(2, Actions{[]() {}, []() {}});
+    setButtonAction(3, Actions{[]() {}, []() {}});
+    setButtonAction(4, Actions{[]() {}, []() {}});
+    setButtonAction(5, Actions{[]() {}, []() {}});
+    setButtonAction(6, Actions{[]() {}, []() {}});
+    setButtonAction(7, Actions{[]() {}, []() {}});
+    setButtonAction(8, Actions{[]() {}, []() {}});
+    setButtonAction(9, Actions{[]() {}, []() {}});
+    setButtonAction(10, Actions{[]() {}, []() {}});
+    setButtonAction(11, Actions{[]() {}, []() {}});
+    setButtonAction(12, Actions{[]() {}, []() {}});
+    setButtonAction(13, Actions{[]() {}, []() {}});
+    setButtonAction(14, Actions{[]() {}, []() {}});
+    setButtonAction(15, Actions{[]() {}, []() {}});
+    setButtonAction(16, Actions{[]() {}, []() {}});
 }
