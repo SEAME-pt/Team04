@@ -8,20 +8,20 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 QT_INCLUDE_PATHS = select({
     "@platforms//cpu:x86_64": [
-        "-I/usr/include/x86_64-linux-gnu/qt6",
-        "-I/usr/include/x86_64-linux-gnu/qt6/QtGui",
-        "-I/usr/include/x86_64-linux-gnu/qt6/QtWidgets",
-        "-I/usr/include/x86_64-linux-gnu/qt6/QtCore",
-        "-I/usr/include/x86_64-linux-gnu/qt6/QtQml",
-        "-I/usr/include/x86_64-linux-gnu/qt6/QtQuick",
+        "-isystem/usr/include/x86_64-linux-gnu/qt6",
+        "-isystem/usr/include/x86_64-linux-gnu/qt6/QtGui",
+        "-isystem/usr/include/x86_64-linux-gnu/qt6/QtWidgets",
+        "-isystem/usr/include/x86_64-linux-gnu/qt6/QtCore",
+        "-isystem/usr/include/x86_64-linux-gnu/qt6/QtQml",
+        "-isystem/usr/include/x86_64-linux-gnu/qt6/QtQuick",
     ],
     "@platforms//cpu:aarch64": [
-        "-I/usr/include/aarch64-linux-gnu/qt6",
-        "-I/usr/include/aarch64-linux-gnu/qt6/QtGui",
-        "-I/usr/include/aarch64-linux-gnu/qt6/QtWidgets",
-        "-I/usr/include/aarch64-linux-gnu/qt6/QtCore",
-        "-I/usr/include/aarch64-linux-gnu/qt6/QtQml",
-        "-I/usr/include/aarch64-linux-gnu/qt6/QtQuick",
+        "-isystem/usr/include/aarch64-linux-gnu/qt6",
+        "-isystem/usr/include/aarch64-linux-gnu/qt6/QtGui",
+        "-isystem/usr/include/aarch64-linux-gnu/qt6/QtWidgets",
+        "-isystem/usr/include/aarch64-linux-gnu/qt6/QtCore",
+        "-isystem/usr/include/aarch64-linux-gnu/qt6/QtQml",
+        "-isystem/usr/include/aarch64-linux-gnu/qt6/QtQuick",
     ],
 })
 
@@ -97,7 +97,7 @@ def qt_ui_library(name, ui, deps = None, **kwargs):
         **kwargs
     )
 
-def qt_cc_library(name, srcs, hdrs, copts = [], linkopts = [], deps = [], **kwargs):
+def qt_cc_library(name, srcs, hdrs, features = [], copts = [], linkopts = [], deps = [], **kwargs):
     """
     Creates a cc_library for a Qt component.
 
@@ -131,13 +131,14 @@ def qt_cc_library(name, srcs, hdrs, copts = [], linkopts = [], deps = [], **kwar
         name = name,
         srcs = srcs + _moc_srcs,
         hdrs = hdrs,
+        features = features,
         deps = deps,
         copts = copts + QT_INCLUDE_PATHS,
         linkopts = linkopts + QT_LINK_PATHS,
         **kwargs
     )
 
-def qt_cc_binary(name, srcs, deps = None, copts = [], data = [], env = {}, **kwargs):
+def qt_cc_binary(name, srcs, features = [], deps = None, copts = [], data = [], env = {}, **kwargs):
     """
     Creates a cc_binary for a Qt application.
 
@@ -174,6 +175,7 @@ def qt_cc_binary(name, srcs, deps = None, copts = [], data = [], env = {}, **kwa
     cc_binary(
         name = name,
         srcs = srcs,
+        features = features,
         deps = deps,
         copts = copts + QT_INCLUDE_PATHS,
         data = env_file + data,
