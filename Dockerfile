@@ -55,8 +55,8 @@ RUN apt-get update && apt-get install -y \
 
 # Install other dependencies
 RUN apt-get update && apt-get install -y \
-    libsdl2-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libsdl2-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # Add LLVM repository and install LLVM/Clang tools
 RUN wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc && \
