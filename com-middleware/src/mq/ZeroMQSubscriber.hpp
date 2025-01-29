@@ -19,7 +19,7 @@ class ZeroMQSubscriber : public IMQSubscriber {
     auto operator=(ZeroMQSubscriber&&) -> ZeroMQSubscriber& = default;
 
    public:
-    ~ZeroMQSubscriber();
+    ~ZeroMQSubscriber() override;
     explicit ZeroMQSubscriber(const std::shared_ptr<zmq::context_t>& context);
     ZeroMQSubscriber(const ZeroMQSubscriber&) = delete;
     auto operator=(const ZeroMQSubscriber&) -> ZeroMQSubscriber& = delete;
