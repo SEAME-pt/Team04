@@ -16,5 +16,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Coverage Script
-        run: bazelisk run //tools/coverage:lcov --platforms=//bazel/platforms:x86_64_linux -- -t :unit_tests
+        run: |
+          BAZEL_BIN=$(bazel info bazel-bin)
+          TEST_LOGS=$(bazel info bazel-testlogs)
+
+          echo "Bazel bin directory: $BAZEL_BIN"
+          echo "Test logs directory: $TEST_LOGS"
+
+          bazelisk run //tools/coverage:lcov \
+            --platforms=//bazel/platforms:x86_64_linux -- \
+            -b //... \
+            -t //:unit_tests \
+            -c "$BAZEL_BIN" \
+            -d "$TEST_LOGS" \
+            -s
         shell: bash
