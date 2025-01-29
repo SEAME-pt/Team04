@@ -9,6 +9,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIGPIO_URL=https://github.com/joan2937/pigpio \
     HOME=/root
 
+# Replace ubuntu.sources config file
+COPY config/ubuntu.sources /tmp/ubuntu.sources
+RUN cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak && \
+    mv /tmp/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources
+
+# Add arm64 architecture
+RUN dpkg --add-architecture arm64
+
 # Install base dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -24,7 +32,7 @@ RUN apt-get update && apt-get install -y \
     file \
     && rm -rf /var/lib/apt/lists/*
 
-# Install recommended Qt6 dependencies
+# Install recommended Qt6 dependencies for x86
 RUN apt-get update && apt-get install -y \
     libfontconfig1-dev \
     libfreetype-dev \
@@ -90,20 +98,13 @@ RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VER
     update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-${LLVM_VERSION} 100 && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 100 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} 100 && \
+    update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} 100 && \
     update-alternatives --install /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc-${GCC_VERSION} 100 && \
     update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu-gcc /usr/bin/x86_64-linux-gnu-gcc-${GCC_VERSION} 100
 
 # Install Arduino lint, yamllint, and gitlint
 RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/main/etc/install.sh | sh && \
     pip install --break-system-packages yamllint gitlint
-
-# Replace ubuntu.sources config file
-COPY config/ubuntu.sources /tmp/ubuntu.sources
-RUN cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak && \
-    mv /tmp/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources
-
-# Add arm64 architecture
-RUN dpkg --add-architecture arm64
 
 # Install libzmq3-dev for x86 and arm64
 RUN echo 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-stable/xUbuntu_22.04/ /' | \
