@@ -1,5 +1,9 @@
 #include "ZMQSubscriber.hpp"
 
+#include <QApplication>
+#include <QtCore/QDebug>
+#include <QtCore/QThread>
+#include <csignal>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -7,17 +11,56 @@
 
 ZmqSubscriber::ZmqSubscriber(const std::string &socketAddress, QObject *parent)
     : QObject(parent), context(1), subscriber(context, zmq::socket_type::sub) {
+    qDebug() << "ZmqSubscriber::init";
     subscriber.connect(socketAddress);
     subscriber.set(zmq::sockopt::subscribe, "");
 }
 
-ZmqSubscriber::~ZmqSubscriber() { subscriber.close(); }
+ZmqSubscriber::~ZmqSubscriber() {
+    qDebug() << "ZmqSubscriber::closing socket";
+    subscriber.close();
+    qDebug() << "ZmqSubscriber::closing context";
+    context.close();
+}
+
+int interrupted{0};
+
+void signalHandler(int _) {
+    (void)_;  // ignore unused variable
+    interrupted = 1;
+}
+
+void catchSignals() {
+    std::signal(SIGINT, signalHandler);
+    std::signal(SIGTERM, signalHandler);
+    std::signal(SIGSEGV, signalHandler);
+    std::signal(SIGABRT, signalHandler);
+}
 
 void ZmqSubscriber::checkForMessages() {
+    qDebug() << "ZmqSubscriber::checkForMessages";
     zmq::message_t message;
-    while (subscriber.recv(message, zmq::recv_flags::dontwait)) {
+    zmq::recv_result_t size;
+
+    catchSignals();
+    while (true) {
+        try {
+            size = subscriber.recv(message, zmq::recv_flags::dontwait);
+        } catch (zmq::error_t &e) {
+            qDebug() << "interrupt received";
+        }
+
+        if (interrupted) {
+            qDebug() << "interrupt received, killing program...";
+            break;
+        }
+
+        if (!size.has_value()) {
+            continue;
+        }
         decodeMessage(message);
     }
+    qDebug() << "stopped receiving messages";
 }
 
 void ZmqSubscriber::decodeMessage(const zmq::message_t &message) {

@@ -6,6 +6,7 @@ Check out https://doc.qt.io/qtcreator/creator-quick-ui-forms.html for details on
 */
 import QtQuick
 import QtQuick.Controls
+import DataManager 1.0
 
 Rectangle {
     id: rectangle
@@ -25,6 +26,9 @@ Rectangle {
         }
     ]
 
+    DataManager {
+        id: dataManager
+    }
     Button {
         id: button
         anchors.horizontalCenter: parent.horizontalCenter
@@ -79,7 +83,7 @@ Rectangle {
             anchors.fill: parent
             font.pixelSize: 64
             horizontalAlignment: Text.AlignHCenter
-            text: qsTr("0")
+            text: dataManager.speed
             verticalAlignment: Text.AlignVCenter
         }
     }
@@ -99,7 +103,7 @@ Rectangle {
             anchors.fill: parent
             font.pixelSize: 64
             horizontalAlignment: Text.AlignHCenter
-            text: qsTr("0")
+            text: dataManager.rpm
             verticalAlignment: Text.AlignVCenter
         }
     }
