@@ -1,0 +1,68 @@
+# yamllint disable rule:line-length
+---
+name: Coverage
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    container:
+      image: t4seame/app:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create coverage directory
+        run: |
+          mkdir -p "./lcov_report/gcno_gcda"
+
+      - name: Generate coverage report
+        run: |
+          PLATFORM_TARGETS=$(bazel query 'kind("cc_binary|cc_library", //platform/...) except kind(.*test, //...)')
+          MIDDLEWARE_TARGETS=$(bazel query 'kind("cc_binary|cc_library", //com-middleware/...) except kind(.*test, //...)')
+          ALL_TARGETS=$(echo "$PLATFORM_TARGETS $MIDDLEWARE_TARGETS" | tr '\n' ' ')
+
+          echo "All Targets: $ALL_TARGETS"
+
+          BAZEL_BIN=$(bazel info bazel-bin)
+          TEST_LOGS=$(bazel info bazel-testlogs)
+
+          echo "Bazel bin directory: $BAZEL_BIN"
+          echo "Test logs directory: $TEST_LOGS"
+
+          bazelisk run //tools/coverage:lcov \
+            --platforms=//bazel/platforms:x86_64_linux -- \
+            -b "$ALL_TARGETS" \
+            -t //:unit_tests \
+            -c "$BAZEL_BIN" \
+            -d "$TEST_LOGS" \
+            -o "./lcov_report"
+        shell: bash
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './lcov_report'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

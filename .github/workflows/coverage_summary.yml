@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
     branches: ['*']
 
 jobs:
-  lcov:
+  summary:
     runs-on: ubuntu-latest
     container:
       image: t4seame/app:latest
@@ -15,8 +15,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Coverage Script
+      - name: Get coverage summary
         run: |
+          PLATFORM_TARGETS=$(bazel query 'kind("cc_binary|cc_library", //platform/...) except kind(.*test, //...)')
+          MIDDLEWARE_TARGETS=$(bazel query 'kind("cc_binary|cc_library", //com-middleware/...) except kind(.*test, //...)')
+          ALL_TARGETS=$(echo "$PLATFORM_TARGETS $MIDDLEWARE_TARGETS" | tr '\n' ' ')
+
+          echo "All Targets: $ALL_TARGETS"
+
           BAZEL_BIN=$(bazel info bazel-bin)
           TEST_LOGS=$(bazel info bazel-testlogs)
 
@@ -25,7 +31,7 @@ jobs:
 
           bazelisk run //tools/coverage:lcov \
             --platforms=//bazel/platforms:x86_64_linux -- \
-            -b //... \
+            -b "$ALL_TARGETS" \
             -t //:unit_tests \
             -c "$BAZEL_BIN" \
             -d "$TEST_LOGS" \
