@@ -4,14 +4,25 @@ set -euo pipefail
 set -o noglob
 
 usage() {
-    echo "  -b TARGET_BASELINE      The target used to collect the baseline"
-    echo "  -t TARGET_TESTS         The test target"
-    echo "  -c CACHE                The path to the bazel cache"
+    echo "Usage:"
+    echo "  -b TARGET_BASELINE      The target used to collect the baseline (-b \"target_1 target_2\")"
+    echo "  -t TARGET_TESTS         The test target (-t \"target_1 target_2\")"
+    echo "  -c GCNO_DIR             The path to the gcno files"
+    echo "  -d GCDA_DIR             The path to the gcda files"
     echo "  -s SKIP_HTML_REPORT     Skip generation of HTML coverage report (default: false)."
     echo "  -o OUTPUT_DIR           Directory for output (default is temp directory)"
     echo "  -h                      Display this help message"
 }
 
+create_directory() {
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
+        echo "INFO: Creating directory: $dir"
+        mkdir -p "$dir"
+    fi
+}
+
+# Parse options
 while getopts "b:t:c:d:o:sh" option; do
     case "${option}" in
     b) TARGET_BASELINE=${OPTARG} ;;
@@ -27,121 +38,144 @@ while getopts "b:t:c:d:o:sh" option; do
     esac
 done
 
-if [[ -z "${TARGET_TESTS+x}" ]]; then
+# Validate required arguments
+if [[ -z "${TARGET_TESTS+x}" || -z "${GCNO_DIR+x}" || -z "${GCDA_DIR+x}" ]]; then
     echo "ERROR: Missing required arguments."
     usage
     exit 1
 fi
 
-if [[ -z "${GCNO_DIR+x}" || -z "${GCDA_DIR+x}" ]]; then
-    echo "ERROR: Missing required directories for .gcno or .gcda files."
-    usage
-    exit 1
-fi
-
+# Set defaults
 SKIP_HTML_REPORT="${SKIP_HTML_REPORT:-false}"
-EXCLUDE_PATTERN="external/*|*gtest/*|/usr/*"
+EXCLUDE_PATTERN="external|gtest|/usr"
 TARGET_BASELINE="${TARGET_BASELINE:-"${TARGET_TESTS}"}"
 OUTPUT_DIR="${OUTPUT_DIR:-"$(mktemp -d)/cov_report"}"
-TARGET_DIR="${OUTPUT_DIR}/gcno_gcda"
-mkdir -p "${TARGET_DIR}"
+
+create_directory "$OUTPUT_DIR"
 
 echo "INFO: Baseline target: ${TARGET_BASELINE}"
-echo "INFO: Tests target: ${TARGET_TESTS}"
+echo "INFO: Test target: ${TARGET_TESTS}"
 echo "INFO: Output directory: ${OUTPUT_DIR}"
 
 readonly WORKSPACE=$(cd "$(dirname "$(readlink -f "${0}")")" && bazel info workspace)
 
-function run_baseline() {
-    echo "\nINFO: Build baseline"
-    echo "Baseline target: ${TARGET_BASELINE}"
+run_baseline() {
+    echo -e "\nINFO: Building baseline target: ${TARGET_BASELINE}"
     bazel build \
         --collect_code_coverage \
         --experimental_fetch_all_coverage_outputs \
+        --cxxopt="-O0" \
         -- ${TARGET_BASELINE}
 }
 
-function run_coverage_tests() {
-    echo "\nINFO: Run test"
-    echo "Test target: ${TARGET_TESTS}"
+run_coverage_tests() {
+    echo -e "\nINFO: Running test target: ${TARGET_TESTS}"
     bazel coverage \
         --nocache_test_results \
         --experimental_fetch_all_coverage_outputs \
         --cxxopt="-O0" \
+        --instrumentation_filter="[/:]" \
         -- ${TARGET_TESTS}
 }
 
-function generate_hashed_name() {
+delete_coverage_files() {
+    echo -e "\nINFO: Cleaning old .gcno and .gcda files"
+    local directories=("${GCNO_DIR}" "${GCDA_DIR}")
+    for dir in "${directories[@]}"; do
+        find "$dir" -type f \( -name "*.gcno" -o -name "*.gcda" \) -exec chmod +w {} \; -exec rm -f {} \; || true
+    done
+}
+
+generate_hashed_name() {
     local file_path="$1"
-    local extension="${file_path##*.}"                                    # Get the file extension (e.g., .gcno or .gcda)
-    local path_no_extension="${file_path%".$extension"}"                  # Remove extension
-    path_in_root=$(echo "$path_no_extension" | sed 's/.*\(bin\/.*\)/\1/') # Get file name from bin
-    local hash=$(echo -n "$path_in_root" | sha256sum | awk '{print $1}')  # Apply hash
-    echo "$hash.$extension"                                               # Return the hashed name with the original extension
+    local extension="${file_path##*.}"
+    local path_no_extension="${file_path%.$extension}"
+    local path_in_bin=$(echo "$path_no_extension" | awk -F"bin" "{print substr(\$0, length(\$1\"bin\") + 1)}")
+    local hash=$(echo -n "$path_in_bin" | sha256sum | awk "{print \$1}")
+    echo "$hash.$extension"
 }
 
-function delete_coverage_files() {
-    echo "\nINFO: Clean old .gcno and .gcda files"
-    echo "Input directory: $TARGET_DIR"
-    find "$TARGET_DIR" -name "*.gcno" -exec rm -f {} \;
-    find "$TARGET_DIR" -name "*.gcda" -exec rm -f {} \;
-}
-
-function collect_coverage_data() {
-    echo "\nINFO: Copy hashed .gcno and .gcda files"
-    echo "Input gcno directory: $GCNO_DIR"
-    echo "Input gcda directory: $GCDA_DIR"
-    echo "Output dir: $TARGET_DIR"
+copy_coverage_files() {
+    echo -e "\nINFO: Copy hashed .gcno and .gcda files"
+    echo "Input directory: $1"
+    echo "Output dir: $2"
     echo "Exclude pattern: $EXCLUDE_PATTERN"
 
-    find "$GCDA_DIR" -name "*.gcda" ! -path "$EXCLUDE_PATTERN" | while read -r file; do
-        new_name=$(generate_hashed_name "$file" "$GCDA_DIR")
-        cp "$file" "$TARGET_DIR/$new_name"
-        echo "Copied gcda: $file -> $TARGET_DIR/$new_name"
-    done
+    mkdir -p "$2"
 
-    find "$GCNO_DIR" -name "*.gcno" ! -path "$EXCLUDE_PATTERN" | while read -r file; do
-        new_name=$(generate_hashed_name "$file" "$GCNO_DIR")
-        cp "$file" "$TARGET_DIR/$new_name"
-        echo "Copied gcno: $file -> $TARGET_DIR/$new_name"
+    find "$1" -type f \( -name "*.gcda" -o -name "*.gcno" \) ! -path "*/external/*" ! -path "*gtest*" ! -path "*test*" | while IFS= read -r file; do
+        new_name=$(generate_hashed_name "$file" "$1")
+        cp "$file" "$2/$new_name"
+        echo "Copied: $file -> $2/$new_name"
     done
 }
 
-function calculate_coverage() {
-    echo "\nINFO: Generate coverage data"
-    echo "Output directory: $OUTPUT_DIR"
-    lcov --directory "$TARGET_DIR" \
+main() {
+    pushd "${WORKSPACE}" || return
+
+    bazel clean
+    delete_coverage_files
+
+    run_baseline
+    echo -e "\nINFO: Create baseline.info"
+    lcov \
+        --directory "${GCNO_DIR}" \
+        --capture \
+        -i \
+        --output-file "${OUTPUT_DIR}/baseline.info"
+
+    echo -e "\nINFO: Filter baseline.info"
+    lcov \
+        --directory "${GCNO_DIR}" \
+        --remove "${OUTPUT_DIR}/baseline.info" \
+        '/usr/*' \
+        '*external/*' \
+        '*gtest*' \
+        --ignore-errors unused \
+        --ignore-errors empty \
+        --output-file "${OUTPUT_DIR}/baseline_filtered.info"
+
+    run_coverage_tests
+    echo -e "\nINFO: Create tests.info"
+    lcov \
+        --directory "${GCDA_DIR}" \
         --capture \
         --ignore-errors source \
-        --output-file "${OUTPUT_DIR}/coverage.info"
-    lcov --remove "${OUTPUT_DIR}/coverage.info" \
+        --output-file "${OUTPUT_DIR}/tests.info"
+
+    echo -e "\nINFO: Filter tests.info"
+    lcov \
+        --directory "${GCDA_DIR}" \
+        --remove "${OUTPUT_DIR}/tests.info" \
         '/usr/*' \
         'external/*' \
         '*gtest*' \
         --ignore-errors unused \
         --ignore-errors source \
-        --output-file "${OUTPUT_DIR}/coverage_filtered.info"
-    sed -i 's|/proc/self/cwd/||g' "${OUTPUT_DIR}/coverage_filtered.info" # Remove file prefix
+        --output-file "${OUTPUT_DIR}/tests_filtered.info"
+
+    echo -e "\nINFO: Merge baseline and tests coverage report"
+    lcov \
+        -a "${OUTPUT_DIR}/baseline_filtered.info" \
+        -a "${OUTPUT_DIR}/tests_filtered.info" \
+        -o "${OUTPUT_DIR}/coverage.info"
 
     if [ "${SKIP_HTML_REPORT}" = false ]; then
-        echo "\nINFO: Generate HTML coverage report"
-        genhtml "${OUTPUT_DIR}/coverage_filtered.info" \
+        echo -e "\nINFO: Generating HTML coverage report"
+        genhtml \
+            "${OUTPUT_DIR}/coverage.info" \
+            --function-coverage \
+            --branch-coverage \
+            --prefix "/proc/self/cwd" \
             --ignore-errors source \
-            --output-directory "$OUTPUT_DIR"
+            --output-directory "${OUTPUT_DIR}"
     else
-        echo "\nINFO: Generate coverage summary"
-        lcov --summary "${OUTPUT_DIR}/coverage_filtered.info"
+        echo -e "\nINFO: Generating coverage summary"
+        lcov \
+            --summary "${OUTPUT_DIR}/coverage.info"
     fi
-}
 
-function main() {
-    pushd "${WORKSPACE}" || return
-    run_baseline
-    run_coverage_tests
-    delete_coverage_files
-    collect_coverage_data
-    calculate_coverage
-    popd || return
+    popd &>/dev/null || true
 }
 
 main
