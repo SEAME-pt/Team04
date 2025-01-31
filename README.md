@@ -353,8 +353,10 @@ bazel run //tools/coverage:lcov -- -t <test_target>
 The GitHub Action for coverage runs the tests defined in the `unit_tests` test suite, in the `BUILD` file located at the root of the project. The coverage report is generated with the following command:
 
 ```bash
-  bazel run //tools/coverage:lcov -- -t :unit_tests
+bazel run //tools/coverage:lcov -- -t <test_target> -b <baseline_target> -o <output_dir> -c $(bazel info bazel-bin) -d $(bazel info bazel-testlogs)
 ```
+
+[See more details in coverage README](tools/coverage/README.md)
 
 ##### Adding Tests to the Coverage Suite
 
@@ -363,9 +365,11 @@ To include a new test target in the coverage calculation, add your test suite ta
 **Organize Tests by Directory**: Each directory should have its own BUILD file defining the relevant test targets for that directory. Avoid adding test targets directly to the `unit_tests` suite in the root `BUILD` file.
 For a reference implementation, see the test setup in `//examples:unit_test`. This example demonstrates how to organize and integrate test targets within the coverage framework.
 
-#### 2.7.3. ToDo - Baseline
+#### 2.7.3. Coverage Report
 
-A baseline mechanism for coverage is not yet implemented but will be added in the future.
+The HTML coverage report is automatically uploaded to a GitHub Page via GitHub Actions whenever changes are merged into the `main` branch.
+
+You can access the coverage report at: <https://seame-pt.github.io/Team04/>
 
 ## 3. Releases
 
