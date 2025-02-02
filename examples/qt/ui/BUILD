@@ -15,5 +15,6 @@ qt_cc_library(
 qt_cc_binary(
     name = "bin",
     srcs = ["main.cpp"],
+    visibility = ["//examples:__pkg__"],
     deps = [":lib"],
 )

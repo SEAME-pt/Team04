@@ -9,6 +9,7 @@ cc_binary(
     name = "bin",
     srcs = ["main.cpp"],
     features = ["warnings_critical_code_gcc"],
+    visibility = ["//examples:__pkg__"],
     deps = [
         ":lib",
     ],
