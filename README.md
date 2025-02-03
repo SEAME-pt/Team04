@@ -386,3 +386,5 @@ After creating the tag locally, push it to the remote repo.
 ```bash
 git push origin v<release version>
 ```
+
+The release includes a `tar.gz` archive containing all `cc_binaries` from `//:release_bins`.
