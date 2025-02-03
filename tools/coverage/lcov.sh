@@ -122,6 +122,7 @@ main() {
         --directory "${GCNO_DIR}" \
         --capture \
         -i \
+        --ignore-errors source \
         --output-file "${OUTPUT_DIR}/baseline.info"
 
     echo -e "\nINFO: Filter baseline.info"
@@ -133,6 +134,7 @@ main() {
         '*gtest*' \
         --ignore-errors unused \
         --ignore-errors empty \
+        --ignore-errors source \
         --output-file "${OUTPUT_DIR}/baseline_filtered.info"
 
     run_coverage_tests
