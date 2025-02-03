@@ -108,6 +108,7 @@ def qt_cc_library(name, srcs, hdrs, features = [], copts = [], linkopts = [], de
         name (str): The name of the library.
         srcs (list): A list of source files.
         hdrs (list): A list of header files to process with moc.
+        features (list): A list of features to enable for this target.
         copts (list): Additional compiler options.
         linkopts (list): Additional linker options.
         deps (list): A list of dependencies for the library.
@@ -148,6 +149,7 @@ def qt_cc_binary(name, srcs, features = [], deps = None, copts = [], data = [], 
     Args:
         name (str): The name of the binary.
         srcs (list): A list of source files for the binary.
+        features (list): A list of features to enable for this target.
         deps (list): A list of dependencies for the binary.
         copts (list): Additional compiler options.
         data (list): Data files to include with the binary.
