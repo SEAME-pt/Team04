@@ -1,3 +1,4 @@
+# yamllint disable rule:line-length
 ---
 name: Release
 on:  # yamllint disable-line rule:truthy
@@ -20,9 +21,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Bazel
-        run: bazel build //:release_bins
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -36,13 +34,28 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: Build for aarch64
+        run: bazel build //:release_bins --platforms=//bazel/platforms:aarch64_linux
+
+      - name: Upload Release arm64 bins
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: bazel-out/k8-fastbuild/bin/release_bins.tar.gz
-          asset_name: release_bins.tar.gz
+          asset_name: aarch64_bins.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Build for x86_64
+        run: bazel build //:release_bins --platforms=//bazel/platforms:x86_64_linux
+
+      - name: Upload Release arm64 bins
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bazel-out/k8-fastbuild/bin/release_bins.tar.gz
+          asset_name: x86_64_bins.tar.gz
           asset_content_type: application/gzip
