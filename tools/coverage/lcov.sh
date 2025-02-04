@@ -161,7 +161,17 @@ main() {
     lcov \
         -a "${OUTPUT_DIR}/baseline_filtered.info" \
         -a "${OUTPUT_DIR}/tests_filtered.info" \
-        -o "${OUTPUT_DIR}/coverage.info"
+        -o "${OUTPUT_DIR}/merge.info"
+
+    echo -e "\nINFO: Filter merge.info"
+    echo -e "\nINFO: Exclude generated files."
+    lcov \
+        --directory "${GCDA_DIR}" \
+        --remove "${OUTPUT_DIR}/merge.info" \
+        "*bazel-out/k8-fastbuild/bin/*" \
+        --ignore-errors unused \
+        --ignore-errors source \
+        --output-file "${OUTPUT_DIR}/coverage.info"
 
     if [ "${SKIP_HTML_REPORT}" = false ]; then
         echo -e "\nINFO: Generating HTML coverage report"
