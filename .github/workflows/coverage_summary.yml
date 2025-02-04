@@ -17,11 +17,9 @@ jobs:
 
       - name: Get coverage summary
         run: |
-          PLATFORM_TARGETS=$(bazel query 'kind("cc_binary|cc_library", //platform/...) except kind(.*test, //...)')
-          MIDDLEWARE_TARGETS=$(bazel query 'kind("cc_binary|cc_library", //com-middleware/...) except kind(.*test, //...)')
-          ALL_TARGETS=$(echo "$PLATFORM_TARGETS $MIDDLEWARE_TARGETS" | tr '\n' ' ')
-
-          echo "All Targets: $ALL_TARGETS"
+          TARGETS=$(bazel query 'kind("(cc_binary|cc_library)", deps(//:release_bins_filegroup)) except kind(".*test", deps(//:release_bins_filegroup)) intersect filter("^//", deps(//:release_bins_filegroup))')
+          TARGETS_STR=$(echo "$TARGETS" | tr '\n' ' ')
+          echo "Targets used for coverage baseline: $TARGETS_STR"
 
           BAZEL_BIN=$(bazel info bazel-bin)
           TEST_LOGS=$(bazel info bazel-testlogs)
@@ -31,7 +29,7 @@ jobs:
 
           bazelisk run //tools/coverage:lcov \
             --platforms=//bazel/platforms:x86_64_linux -- \
-            -b "$ALL_TARGETS" \
+            -b "$TARGETS_STR" \
             -t //:unit_tests \
             -c "$BAZEL_BIN" \
             -d "$TEST_LOGS" \
