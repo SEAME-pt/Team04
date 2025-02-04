@@ -9,6 +9,7 @@ class ZeroMQSocket : public IMQSocket {
    public:
     ZeroMQSocket(zmq::context_t& context, zmq::socket_type type) : m_socket(context, type) {}
     ~ZeroMQSocket() override = default;
+    ZeroMQSocket(ZeroMQSocket&&) = default;
 
     auto connect(const std::string& endpoint) -> bool override;
     auto bind(const std::string& endpoint) -> bool override;

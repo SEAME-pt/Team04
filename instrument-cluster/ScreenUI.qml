@@ -17,31 +17,6 @@ Rectangle {
     states: []
     width: Constants.width
 
-    // Image {
-    //     id: image
-    //     anchors.horizontalCenter: parent.horizontalCenter
-    //     anchors.verticalCenter: parent.verticalCenter
-    //     source: "images/warning-light.png"
-    // }
-    // ClusterWidget {
-    //     id: speedWidget
-    //     anchors.left: parent.left
-    //     anchors.leftMargin: 200
-    //     anchors.verticalCenter: parent.verticalCenter
-    //     description: qsTr("km/h")
-    //     fontColor: "#ffffff"
-    //     size: 300
-    //     value: dataManager.speed
-    // }
-    // ClusterWidget {
-    //     id: rpmWidget
-    //     anchors.right: parent.right
-    //     anchors.rightMargin: 200
-    //     anchors.verticalCenter: parent.verticalCenter
-    //     description: qsTr("rpm")
-    //     size: 300
-    //     value: dataManager.rpm
-    // }
     Speedometer {
         id: speedometer
         anchors.left: parent.left

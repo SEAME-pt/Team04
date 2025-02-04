@@ -38,6 +38,7 @@ class DataManager : public QObject {
     uint16_t m_rpm = 0;
     QThread* thread;
     ZmqSubscriber* worker;
+    zmq::context_t context;
 };
 
 #endif

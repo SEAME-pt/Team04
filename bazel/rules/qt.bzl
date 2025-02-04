@@ -151,7 +151,6 @@ def qt_cc_binary(name, srcs, features = [], deps = None, copts = [], data = [], 
         srcs (list): A list of source files for the binary.
         features (list): A list of features to enable for this target.
         deps (list): A list of dependencies for the binary.
-        features (list): features
         copts (list): Additional compiler options.
         data (list): Data files to include with the binary.
         env (dict): Additional environment variables for the binary.
