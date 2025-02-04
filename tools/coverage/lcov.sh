@@ -143,6 +143,7 @@ main() {
         --directory "${GCDA_DIR}" \
         --capture \
         --ignore-errors source \
+        --ignore-errors mismatch \
         --output-file "${OUTPUT_DIR}/tests.info"
 
     echo -e "\nINFO: Filter tests.info"
