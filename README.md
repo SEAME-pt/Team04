@@ -387,4 +387,5 @@ After creating the tag locally, push it to the remote repo.
 git push origin v<release version>
 ```
 
-The release includes a `tar.gz` archive containing all `cc_binaries` cross-compiled for arm64 from `//:release_bins`.
+The release includes a `tar.gz` archive containing the `binaries` compiled for arm64, defined in `//:release_bins_filegroup` target.
+Add a new `cc_binary` to the filegroup to include the binary into the next release.
