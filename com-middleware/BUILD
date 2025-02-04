@@ -10,7 +10,7 @@ cc_binary(
     deps = [
         "//com-middleware/src/can",
         "//com-middleware/src/exceptions",
-        "//com-middleware/src/mq",
+        "//mq",
         "@cppzmq",
     ],
 )
