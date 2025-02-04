@@ -20,7 +20,9 @@
 				"BazelBuild.vscode-bazel",
 				"llvm-vs-code-extensions.vscode-clangd",
 				"ms-azuretools.vscode-docker",
-				"cschlosser.doxdocgen"
+				"cschlosser.doxdocgen",
+				"bbenoist.QML",
+				"Delgan.qml-format"
 			],
 			"settings": {
 				"remote.autoForwardPorts": false

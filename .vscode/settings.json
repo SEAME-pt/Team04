@@ -74,5 +74,13 @@
         "--header-insertion=never",
         "--compile-commands-dir=${workspaceFolder}/",
         "--query-driver=**"
+    ],
+    // You can specify the path toward the "qmlformat" executable,
+    // if it's not available by default in your PATH.
+    "qmlFormat.command": "/usr/lib/qt6/bin/qmlformat",
+    // You can specify additional arguments that will be passed
+    // to the "qmlformat" command while formatting a file.
+    "qmlFormat.extraArguments": [
+        "--normalize"
     ]
 }
