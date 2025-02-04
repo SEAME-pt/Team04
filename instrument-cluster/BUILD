@@ -5,8 +5,6 @@ qt_resource(
     files = [
         "Main.qml",
         "ScreenUI.qml",
-        "fonts/HelveticaNeue.ttf",
-        "images/warning-light.png",
     ],
 )
 
@@ -20,7 +18,6 @@ qt_cc_binary(
     ],
     deps = [
         ":qrc",
-        "//instrument-cluster/mq",
         "//instrument-cluster/qml/ClusterData:backend",
         "//instrument-cluster/qml/Components:components",
         "//instrument-cluster/qml/Constants:constants",

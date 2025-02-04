@@ -4,12 +4,14 @@
 #include <QtCore/QObject>
 #include <zmq.hpp>
 
+#include "mq/src/ZeroMQSocket.hpp"
+
 class ZmqSubscriber : public QObject {
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)
     Q_OBJECT
 
    public:
-    explicit ZmqSubscriber(const std::string &socketAddress, QObject *parent = nullptr);
+    explicit ZmqSubscriber(std::unique_ptr<MQ::ZeroMQSocket> socket, QObject *parent = nullptr);
     ~ZmqSubscriber() override;
 
    signals:
@@ -19,9 +21,8 @@ class ZmqSubscriber : public QObject {
     void checkForMessages();
 
    private:
-    void decodeMessage(const zmq::message_t &message);
-    zmq::context_t context;
-    zmq::socket_t subscriber;
+    void decodeMessage(const std::vector<uint8_t> &message);
+    std::unique_ptr<MQ::ZeroMQSocket> subscriber;
 };
 
 #endif  // ZMQSUBSCRIBER_H

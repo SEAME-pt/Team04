@@ -2,11 +2,14 @@
 
 #include "instrument-cluster/mq/ZMQSubscriber.hpp"
 
-DataManager::DataManager(QObject* parent) : QObject{parent} {
+DataManager::DataManager(QObject* parent) : QObject{parent}, context(1) {
     // ZeroMQ setup (in a separate thread)
     // move the task object to the thread BEFORE connecting any signal/slots
     thread = new QThread(this);
-    worker = new ZmqSubscriber("ipc:///tmp/speed.ipc");
+    std::unique_ptr<MQ::ZeroMQSocket> sub_socket =
+        std::make_unique<MQ::ZeroMQSocket>(context, zmq::socket_type::sub);
+    sub_socket->connect("ipc:///tmp/speed.ipc");
+    worker = new ZmqSubscriber(std::move(sub_socket));
     worker->moveToThread(thread);
 
     connect(this, &DataManager::startZeroMQ, worker, &ZmqSubscriber::checkForMessages);
@@ -22,10 +25,15 @@ DataManager::DataManager(QObject* parent) : QObject{parent} {
 }
 
 DataManager::~DataManager() {
-    qDebug() << "DataManager::closing threads";
+    qDebug() << "DataManager::shutting down context";
+    context.shutdown();
+    qDebug() << "DataManager::quitting thread";
     thread->quit();
+    qDebug() << "DataManager::waiting thread finishes";
     thread->wait();  // Ensure thread finishes
-    qDebug() << "DataManager::quitting";
+    qDebug() << "DataManager::closing context";
+    context.close();
+    qDebug() << "DataManager::finished";
 }
 
 void DataManager::setSpeed(uint8_t speed) {
