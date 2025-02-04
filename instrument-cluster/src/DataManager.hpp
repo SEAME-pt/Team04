@@ -6,7 +6,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QThread>
 
-#include "mq/ZMQSubscriber.hpp"
+#include "instrument-cluster/mq/ZMQSubscriber.hpp"
 
 class DataManager : public QObject {
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)

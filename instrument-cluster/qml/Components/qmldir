@@ -1,0 +1,6 @@
+module Components
+
+ClusterWidget 1.0 ClusterWidget.qml
+CircularSlider 1.0 CircularSlider.qml
+Speedometer 1.0 Speedometer.qml
+Tachometer 1.0 Tachometer.qml
