@@ -16,6 +16,7 @@ qt_cc_binary(
     linkopts = [
         "-lzmq",
     ],
+    visibility = ["//:__pkg__"],
     deps = [
         ":qrc",
         "//instrument-cluster/qml/ClusterData:backend",
