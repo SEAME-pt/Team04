@@ -20,6 +20,7 @@ class IMQSocket {
 
    public:
     virtual ~IMQSocket() = default;
+    virtual auto connect(const std::string& endpoint) -> bool = 0;
     virtual auto bind(const std::string& endpoint) -> bool = 0;
     virtual auto send(const std::vector<uint8_t>& data) -> bool = 0;
     virtual auto receive() -> std::vector<uint8_t> = 0;

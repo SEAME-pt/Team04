@@ -12,8 +12,12 @@ cc_library(
 cc_test(
     name = "test",
     srcs = glob(["test/*.cpp"]),
+    linkopts = [
+        "-lzmq",
+    ],
     deps = [
         ":mq",
+        "@cppzmq",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
