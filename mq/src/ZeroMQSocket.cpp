@@ -10,8 +10,24 @@ void ZeroMQSocket::close() {
 
 auto ZeroMQSocket::bind(const std::string& endpoint) -> bool {
     std::cout << "Binding to " << endpoint << "\n";
-    m_socket.bind(endpoint);
-    return true;
+    try {
+        m_socket.bind(endpoint);
+        return true;
+    } catch (const zmq::error_t& e) {
+        std::cout << "Error binding to " << endpoint << "\n";
+        return false;
+    }
+}
+
+auto ZeroMQSocket::connect(const std::string& endpoint) -> bool {
+    std::cout << "Connecting to " << endpoint << "\n";
+    try {
+        m_socket.connect(endpoint);
+        return true;
+    } catch (const zmq::error_t& e) {
+        std::cout << "Error connecting to " << endpoint << "\n";
+        return false;
+    }
 }
 
 auto ZeroMQSocket::send(const std::vector<uint8_t>& data) -> bool {
