@@ -1,5 +1,3 @@
-load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_files")
-
 cc_binary(
     name = "bin",
     srcs = ["src/main.cpp"],
@@ -7,24 +5,11 @@ cc_binary(
     linkopts = [
         "-lzmq",
     ],
+    visibility = ["//:__pkg__"],
     deps = [
         "//com-middleware/src/can",
         "//com-middleware/src/exceptions",
         "//mq",
         "@cppzmq",
     ],
-)
-
-pkg_files(
-    name = "pkg_files",
-    srcs = [
-        ":bin",
-    ],
-    attributes = pkg_attributes(
-        group = "root",
-        mode = "0755",
-        owner = "root",
-    ),
-    strip_prefix = "/",
-    visibility = ["//:__pkg__"],
 )

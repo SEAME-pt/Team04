@@ -1,18 +1,33 @@
-load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_files")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 
-pkg_filegroup(
-    name = "release_pkg_filegroup",
+filegroup(
+    name = "release_bins_filegroup",
     srcs = [
-        "//com-middleware:pkg_files",
-        "//examples:pkg_files",
+        "//com-middleware:bin",
+        "//examples:bins_filegroup",
+        "//instrument-cluster:bin",
     ],
+)
+
+pkg_files(
+    name = "pkg_files",
+    srcs = [
+        ":release_bins_filegroup",
+    ],
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0755",
+        owner = "root",
+    ),
+    strip_prefix = "/",
+    visibility = ["//:__pkg__"],
 )
 
 pkg_tar(
     name = "release_bins",
     srcs = [
-        ":release_pkg_filegroup",
+        ":pkg_files",
     ],
     extension = "tar.gz",
 )
