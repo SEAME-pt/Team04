@@ -6,105 +6,69 @@ Check out https://doc.qt.io/qtcreator/creator-quick-ui-forms.html for details on
 */
 import QtQuick
 import QtQuick.Controls
-import DataManager 1.0
+import Constants
+import Components
+import ClusterData
 
 Rectangle {
     id: rectangle
-    color: "white"
-    height: 400
-    width: 1280
+    color: Constants.backgroundColor
+    height: Constants.height
+    states: []
+    width: Constants.width
 
-    states: [
-        State {
-            name: "clicked"
-            when: button.checked
-
-            PropertyChanges {
-                target: label
-                text: qsTr("Button Checked")
-            }
-        }
-    ]
-
-    DataManager {
-        id: dataManager
-    }
-    Button {
-        id: button
-        anchors.horizontalCenter: parent.horizontalCenter
+    // Image {
+    //     id: image
+    //     anchors.horizontalCenter: parent.horizontalCenter
+    //     anchors.verticalCenter: parent.verticalCenter
+    //     source: "images/warning-light.png"
+    // }
+    // ClusterWidget {
+    //     id: speedWidget
+    //     anchors.left: parent.left
+    //     anchors.leftMargin: 200
+    //     anchors.verticalCenter: parent.verticalCenter
+    //     description: qsTr("km/h")
+    //     fontColor: "#ffffff"
+    //     size: 300
+    //     value: dataManager.speed
+    // }
+    // ClusterWidget {
+    //     id: rpmWidget
+    //     anchors.right: parent.right
+    //     anchors.rightMargin: 200
+    //     anchors.verticalCenter: parent.verticalCenter
+    //     description: qsTr("rpm")
+    //     size: 300
+    //     value: dataManager.rpm
+    // }
+    Speedometer {
+        id: speedometer
+        anchors.left: parent.left
+        anchors.leftMargin: 160
         anchors.verticalCenter: parent.verticalCenter
-        checkable: true
-        text: qsTr("Press me")
-
-        Connections {
-            target: button
-
-            onClicked: animation.start()
-        }
+        battery: Backend.battery
+        height: 300
+        speed: Backend.speedComputed
+        width: 300
+    }
+    Tachometer {
+        id: tachometer
+        anchors.right: parent.right
+        anchors.rightMargin: 160
+        anchors.verticalCenter: parent.verticalCenter
+        height: 300
+        rpm: Backend.rpm
+        temperature: Backend.temperature
+        width: 300
     }
     Text {
-        id: label
+        id: currentTime
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: button.bottom
-        anchors.topMargin: 45
-        text: qsTr("Hello Instrument Cluster")
-
-        SequentialAnimation {
-            id: animation
-            ColorAnimation {
-                id: colorAnimation1
-                from: parent.backgroundColor
-                property: "color"
-                target: rectangle
-                to: "#2294c6"
-            }
-            ColorAnimation {
-                id: colorAnimation2
-                from: "#2294c6"
-                property: "color"
-                target: rectangle
-                to: parent.backgroundColor
-            }
-        }
-    }
-    Rectangle {
-        id: speedWrapper
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 64
-        anchors.left: parent.left
-        anchors.leftMargin: 64
         anchors.top: parent.top
-        anchors.topMargin: 64
+        anchors.topMargin: 16
         color: "#ffffff"
-        width: 300
-
-        Text {
-            id: speed
-            anchors.fill: parent
-            font.pixelSize: 64
-            horizontalAlignment: Text.AlignHCenter
-            text: dataManager.speed
-            verticalAlignment: Text.AlignVCenter
-        }
-    }
-    Rectangle {
-        id: rpmWrapper
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 64
-        anchors.right: parent.right
-        anchors.rightMargin: 64
-        anchors.top: parent.top
-        anchors.topMargin: 64
-        color: "#ffffff"
-        width: 300
-
-        Text {
-            id: rpm
-            anchors.fill: parent
-            font.pixelSize: 64
-            horizontalAlignment: Text.AlignHCenter
-            text: dataManager.rpm
-            verticalAlignment: Text.AlignVCenter
-        }
+        font.pixelSize: 14
+        text: Backend.hours + qsTr(":") + Backend.minutes
     }
 }

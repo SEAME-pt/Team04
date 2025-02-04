@@ -1,11 +1,12 @@
 import QtQuick
 import QtQuick.Controls
+import Constants
 
 ApplicationWindow {
-    height: mainScreen.height
+    height: Constants.height
     title: qsTr("Instrument Cluster")
     visible: true
-    width: mainScreen.width
+    width: Constants.width
 
     ScreenUI {
         id: mainScreen
