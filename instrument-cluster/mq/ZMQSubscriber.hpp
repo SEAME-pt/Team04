@@ -5,6 +5,7 @@
 #include <zmq.hpp>
 
 class ZmqSubscriber : public QObject {
+    // NOLINTNEXTLINE(modernize-use-trailing-return-type)
     Q_OBJECT
 
    public:
@@ -19,7 +20,6 @@ class ZmqSubscriber : public QObject {
 
    private:
     void decodeMessage(const zmq::message_t &message);
-
     zmq::context_t context;
     zmq::socket_t subscriber;
 };
