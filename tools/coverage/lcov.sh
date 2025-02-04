@@ -131,7 +131,7 @@ main() {
         --remove "${OUTPUT_DIR}/baseline.info" \
         '/usr/*' \
         '*external/*' \
-        '*gtest*' \
+        '*test*' \
         --ignore-errors unused \
         --ignore-errors empty \
         --ignore-errors source \
@@ -151,7 +151,7 @@ main() {
         --remove "${OUTPUT_DIR}/tests.info" \
         '/usr/*' \
         'external/*' \
-        '*gtest*' \
+        '*test*' \
         --ignore-errors unused \
         --ignore-errors source \
         --output-file "${OUTPUT_DIR}/tests_filtered.info"
