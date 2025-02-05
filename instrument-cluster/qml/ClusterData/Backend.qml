@@ -87,9 +87,9 @@ Item {
     property bool metricSystem: true
     property int minutes: 0
     readonly property real ratioKMtoM: 0.62137
-    property real rpm: 0
+    property real rpm: SIMULATION_MODE ? 0 : dataManager.rpm
     property int seconds: 0
-    property real speed: 0
+    property real speed: SIMULATION_MODE ? 0 : dataManager.speed
     property real speedComputed: backend.metricSystem ? (backend.speed * backend.ratioKMtoM) : backend.speed
     property real temperature: 0
     property string time: ""

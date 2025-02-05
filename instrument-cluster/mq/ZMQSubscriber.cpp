@@ -11,8 +11,6 @@
 ZmqSubscriber::ZmqSubscriber(std::unique_ptr<MQ::ZeroMQSocket> socket, QObject *parent)
     : QObject(parent), subscriber(std::move(socket)) {
     qDebug() << "ZmqSubscriber::init";
-    // subscriber.connect(socketAddress);
-    // subscriber.set(zmq::sockopt::subscribe, "");
 }
 
 ZmqSubscriber::~ZmqSubscriber() {
@@ -23,6 +21,7 @@ ZmqSubscriber::~ZmqSubscriber() {
 
 void ZmqSubscriber::checkForMessages() {
     qDebug() << "ZmqSubscriber::checkForMessages";
+    subscriber->subscribe("");
     std::optional<std::vector<uint8_t>> message;
 
     while (true) {
@@ -30,7 +29,9 @@ void ZmqSubscriber::checkForMessages() {
             message = subscriber->receive();
         } catch (zmq::error_t &e) {
             qDebug() << e.what();
-            break;
+            if (ETERM == e.num()) {
+                break;
+            }
         }
 
         if (!message.has_value()) {

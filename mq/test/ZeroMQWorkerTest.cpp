@@ -13,6 +13,8 @@ class MockMQSocket : public MQ::IMQSocket {  // Create a Mock Class
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)
     MOCK_METHOD(bool, connect, (const std::string &), (override));
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)
+    MOCK_METHOD(bool, subscribe, (const std::string &), (override));
+    // NOLINTNEXTLINE(modernize-use-trailing-return-type)
     MOCK_METHOD(bool, send, (const std::vector<uint8_t> &), (override));
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)
     MOCK_METHOD(std::optional<std::vector<uint8_t>>, receive, (), (override));

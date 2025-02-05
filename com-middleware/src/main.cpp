@@ -103,7 +103,9 @@ auto main(int argc, char **argv) -> int {
         try {
             publisher.publish(message);
         } catch (zmq::error_t &e) {
-            std::cout << "interrupt received, proceeding...\n";
+            if (ETERM == e.num()) {
+                break;
+            }
         }
 
         if (static_cast<bool>(interrupted)) {
