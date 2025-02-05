@@ -1,5 +1,6 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlContext>
 #include <csignal>
 
 #include "src/DataManager.hpp"
@@ -27,6 +28,13 @@ auto main(int argc, char *argv[]) -> int {
 
     // Registering C++ objects as QML types
     qmlRegisterType<DataManager>("DataManager", 1, 0, "DataManager");
+
+#ifdef SIMULATION_MODE
+    engine.rootContext()->setContextProperty("SIMULATION_MODE", QVariant(true));
+#else
+    engine.rootContext()->setContextProperty("SIMULATION_MODE", QVariant(false));
+#endif
+
     engine.load(QUrl(QStringLiteral("qrc:/instrument-cluster/Main.qml")));
 
     std::signal(SIGINT, sigHandler);
