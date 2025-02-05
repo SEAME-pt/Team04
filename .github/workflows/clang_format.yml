@@ -14,10 +14,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for rebase
 
       - name: Configure Git Safe Directory
         run: |
           git config --global --add safe.directory $(pwd)
+
+      - name: Fetch main branch
+        run: |
+          git fetch origin main
+
+      - name: Rebase PR branch onto main
+        run: |
+          git rebase origin/main || (git rebase --abort && exit 1)
 
       - name: Find affected files
         run: |
