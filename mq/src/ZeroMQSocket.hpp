@@ -15,6 +15,7 @@ class ZeroMQSocket : public IMQSocket {
     ZeroMQSocket(ZeroMQSocket&&) = default;
 
     auto connect(const std::string& endpoint) -> bool override;
+    auto subscribe(const std::string& topic) -> bool override;
     auto bind(const std::string& endpoint) -> bool override;
     auto send(const std::vector<uint8_t>& data) -> bool override;
     auto receive() -> std::optional<std::vector<uint8_t>> override;

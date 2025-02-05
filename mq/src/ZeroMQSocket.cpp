@@ -19,6 +19,17 @@ auto ZeroMQSocket::bind(const std::string& endpoint) -> bool {
     }
 }
 
+auto ZeroMQSocket::subscribe(const std::string& topic) -> bool {
+    std::cout << "Subscribing to \"" << topic << "\"\n";
+    try {
+        m_socket.set(zmq::sockopt::subscribe, topic);
+        return true;
+    } catch (const zmq::error_t& e) {
+        std::cout << "Error subscribing to " << topic << "\n";
+        return false;
+    }
+}
+
 auto ZeroMQSocket::connect(const std::string& endpoint) -> bool {
     std::cout << "Connecting to " << endpoint << "\n";
     try {
@@ -46,7 +57,6 @@ auto ZeroMQSocket::receive() -> std::optional<std::vector<uint8_t>> {
     if (!m_socket.recv(msg, zmq::recv_flags::none)) {
         return {};
     }
-
     std::vector<uint8_t> data(msg.size());
     memcpy(data.data(), msg.data(), msg.size());
     return data;
