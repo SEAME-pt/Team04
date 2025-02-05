@@ -15,7 +15,7 @@ class MockMQSocket : public MQ::IMQSocket {  // Create a Mock Class
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)
     MOCK_METHOD(bool, send, (const std::vector<uint8_t> &), (override));
     // NOLINTNEXTLINE(modernize-use-trailing-return-type)
-    MOCK_METHOD(std::vector<uint8_t>, receive, (), (override));
+    MOCK_METHOD(std::optional<std::vector<uint8_t>>, receive, (), (override));
     MOCK_METHOD(void, close, (), (override));
 };
 
@@ -37,10 +37,9 @@ TEST(ZeroMQTest, PublisherSendTestSuccessReturnsTrue) { testSendPublisher(true);
 
 TEST(ZeroMQTest, PublisherSendTestFailReturnFalse) { testSendPublisher(false); }
 
-void testSendSubscriber(std::vector<uint8_t> result) {
+void testSendSubscriber(std::optional<std::vector<uint8_t>> result) {
     auto mock = std::make_unique<MockMQSocket>();
 
-    std::vector<uint8_t> expected_result{1, 2, 3};
     // mocking methods
     EXPECT_CALL(*mock, bind(testing::_)).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mock, close()).Times(1);
@@ -52,7 +51,8 @@ void testSendSubscriber(std::vector<uint8_t> result) {
 }
 
 TEST(ZeroMQTest, SubscriberReceiveTestSuccessReturnsVector) {
-    std::vector<uint8_t> expected_result{1, 2, 3};
+    std::optional<std::vector<uint8_t>> expected_result =
+        std::make_optional<std::vector<uint8_t>>({1, 2, 3});
     testSendSubscriber(expected_result);
 }
 

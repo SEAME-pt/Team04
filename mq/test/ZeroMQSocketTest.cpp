@@ -17,8 +17,10 @@ TEST(ZeroMQSocketTest, SendAndReceive) {
     std::vector<uint8_t> data{1, 2, 3};
     ASSERT_TRUE(sender.send(data));
 
-    std::vector<uint8_t> received_message = receiver.receive();
-    ASSERT_EQ(data, received_message);
+    std::optional<std::vector<uint8_t>> received_message = receiver.receive();
+    ASSERT_TRUE(received_message.has_value());
+
+    ASSERT_EQ(data, received_message.value());
 
     sender.close();
     receiver.close();

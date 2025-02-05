@@ -19,5 +19,5 @@ auto ZeroMQWorker::publish(const std::vector<uint8_t>& data) -> bool {
     return m_socket->send(data);
 }
 
-auto ZeroMQWorker::receive() -> std::vector<uint8_t> { return m_socket->receive(); }
+auto ZeroMQWorker::receive() -> std::optional<std::vector<uint8_t>> { return m_socket->receive(); }
 }  // namespace MQ

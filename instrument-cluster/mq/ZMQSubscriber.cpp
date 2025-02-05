@@ -21,25 +21,10 @@ ZmqSubscriber::~ZmqSubscriber() {
     qDebug() << "ZmqSubscriber::finished";
 }
 
-int interrupted{0};
-
-void signalHandler(int _) {
-    (void)_;  // ignore unused variable
-    interrupted = 1;
-}
-
-void catchSignals() {
-    std::signal(SIGINT, signalHandler);
-    std::signal(SIGTERM, signalHandler);
-    std::signal(SIGSEGV, signalHandler);
-    std::signal(SIGABRT, signalHandler);
-}
-
 void ZmqSubscriber::checkForMessages() {
     qDebug() << "ZmqSubscriber::checkForMessages";
-    std::vector<uint8_t> message;
+    std::optional<std::vector<uint8_t>> message;
 
-    catchSignals();
     while (true) {
         try {
             message = subscriber->receive();
@@ -48,15 +33,10 @@ void ZmqSubscriber::checkForMessages() {
             break;
         }
 
-        if (interrupted) {
-            qDebug() << "interrupt received, killing program...";
-            break;
-        }
-
-        if (message.empty()) {
+        if (!message.has_value()) {
             continue;
         }
-        decodeMessage(message);
+        decodeMessage(message.value());
     }
     qDebug() << "stopped receiving messages";
 }

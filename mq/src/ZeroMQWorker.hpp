@@ -24,7 +24,7 @@ class ZeroMQWorker {
     ZeroMQWorker(const ZeroMQWorker&) = delete;
     auto operator=(const ZeroMQWorker&) -> ZeroMQWorker& = delete;
     void subscribe(const std::string& topic);
-    auto receive() -> std::vector<uint8_t>;
+    auto receive() -> std::optional<std::vector<uint8_t>>;
     auto publish(const std::vector<uint8_t>& data) -> bool;
 
    private:
