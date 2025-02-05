@@ -7,7 +7,7 @@ Item {
 
     property SequentialAnimation __anim01: SequentialAnimation {
         loops: -1
-        running: true
+        running: SIMULATION_MODE ? true : false
 
         PropertyAnimation {
             duration: 5000
@@ -26,7 +26,7 @@ Item {
     }
     property SequentialAnimation __anim02: SequentialAnimation {
         loops: -1
-        running: true
+        running: SIMULATION_MODE ? true : false
 
         PropertyAnimation {
             duration: 50000
@@ -45,7 +45,7 @@ Item {
     }
     property SequentialAnimation __anim03: SequentialAnimation {
         loops: -1
-        running: true
+        running: SIMULATION_MODE ? true : false
 
         PropertyAnimation {
             duration: 5000
@@ -64,7 +64,7 @@ Item {
     }
     property SequentialAnimation __anim04: SequentialAnimation {
         loops: -1
-        running: true
+        running: SIMULATION_MODE ? true : false
 
         PropertyAnimation {
             duration: 5000

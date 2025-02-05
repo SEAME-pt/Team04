@@ -25,3 +25,23 @@ qt_cc_binary(
         "//instrument-cluster/src",
     ],
 )
+
+qt_cc_binary(
+    name = "sim",
+    srcs = [
+        "main.cpp",
+    ],
+    copts = [
+        "-DSIMULATION_MODE",
+    ],
+    linkopts = [
+        "-lzmq",
+    ],
+    deps = [
+        ":qrc",
+        "//instrument-cluster/qml/ClusterData:backend",
+        "//instrument-cluster/qml/Components:components",
+        "//instrument-cluster/qml/Constants:constants",
+        "//instrument-cluster/src",
+    ],
+)

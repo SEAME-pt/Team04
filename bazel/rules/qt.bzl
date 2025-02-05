@@ -161,7 +161,7 @@ def qt_cc_binary(name, srcs, features = [], deps = None, copts = [], data = [], 
     env_file = []
     native.genrule(
         name = name + "_env",
-        outs = ["qt_env.ini"],
+        outs = [name + "_qt_env.ini"],
         cmd = select({
             "@platforms//cpu:x86_64": "echo $$\"LD_LIBRARY_PATH: /usr/lib/x86_64-linux-gnu\" > $@ \
                     $$\"\r\nQT_QPA_PLATFORM_PLUGIN_PATH: /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms\" > $@ \
@@ -173,7 +173,7 @@ def qt_cc_binary(name, srcs, features = [], deps = None, copts = [], data = [], 
                     $$\"\r\nQT_PLUGIN_PATH: /usr/lib/aarch64-linux-gnu/qt6/plugins\" > $@",
         }),
     )
-    env_file.append("qt_env.ini")
+    env_file.append(name + "_qt_env.ini")
     cc_binary(
         name = name,
         srcs = srcs,

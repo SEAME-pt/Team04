@@ -44,6 +44,6 @@ Rectangle {
         anchors.topMargin: 16
         color: "#ffffff"
         font.pixelSize: 14
-        text: Backend.hours + qsTr(":") + Backend.minutes
+        text: Backend.time
     }
 }
