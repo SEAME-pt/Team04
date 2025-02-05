@@ -1,7 +1,13 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
+#include <csignal>
 
 #include "src/DataManager.hpp"
+
+void sigHandler(int s) {
+    std::signal(s, SIG_DFL);
+    qApp->quit();
+}
 
 auto main(int argc, char *argv[]) -> int {
     QGuiApplication app(argc, argv);
@@ -22,5 +28,10 @@ auto main(int argc, char *argv[]) -> int {
     // Registering C++ objects as QML types
     qmlRegisterType<DataManager>("DataManager", 1, 0, "DataManager");
     engine.load(QUrl(QStringLiteral("qrc:/instrument-cluster/Main.qml")));
+
+    std::signal(SIGINT, sigHandler);
+    std::signal(SIGTERM, sigHandler);
+    std::signal(SIGSEGV, sigHandler);
+    std::signal(SIGABRT, sigHandler);
     return QGuiApplication::exec();
 }

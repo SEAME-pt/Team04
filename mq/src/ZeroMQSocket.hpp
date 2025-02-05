@@ -1,3 +1,6 @@
+#ifndef ZERO_MQ_SOCKET_HPP
+#define ZERO_MQ_SOCKET_HPP
+
 #include "IMQSocket.hpp"
 #include "zmq.hpp"
 
@@ -14,7 +17,9 @@ class ZeroMQSocket : public IMQSocket {
     auto connect(const std::string& endpoint) -> bool override;
     auto bind(const std::string& endpoint) -> bool override;
     auto send(const std::vector<uint8_t>& data) -> bool override;
-    auto receive() -> std::vector<uint8_t> override;
+    auto receive() -> std::optional<std::vector<uint8_t>> override;
     void close() override;
 };
 }  // namespace MQ
+
+#endif

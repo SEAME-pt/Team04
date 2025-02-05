@@ -41,7 +41,7 @@ auto ZeroMQSocket::send(const std::vector<uint8_t>& data) -> bool {
     return false;
 }
 
-auto ZeroMQSocket::receive() -> std::vector<uint8_t> {
+auto ZeroMQSocket::receive() -> std::optional<std::vector<uint8_t>> {
     zmq::message_t msg;
     if (!m_socket.recv(msg, zmq::recv_flags::none)) {
         return {};
