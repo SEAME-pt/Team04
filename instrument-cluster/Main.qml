@@ -5,6 +5,7 @@ import Constants
 ApplicationWindow {
     height: Constants.height
     title: qsTr("Instrument Cluster")
+    visibility: "FullScreen"
     visible: true
     width: Constants.width
 

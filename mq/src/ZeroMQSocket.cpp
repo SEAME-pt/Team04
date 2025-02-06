@@ -11,10 +11,11 @@ void ZeroMQSocket::close() {
 auto ZeroMQSocket::bind(const std::string& endpoint) -> bool {
     std::cout << "Binding to " << endpoint << "\n";
     try {
+        m_socket.set(zmq::sockopt::linger, 0);
         m_socket.bind(endpoint);
         return true;
     } catch (const zmq::error_t& e) {
-        std::cout << "Error binding to " << endpoint << "\n";
+        std::cout << "Error binding to " << endpoint << ": " << e.what() << "\n";
         return false;
     }
 }
@@ -25,7 +26,7 @@ auto ZeroMQSocket::subscribe(const std::string& topic) -> bool {
         m_socket.set(zmq::sockopt::subscribe, topic);
         return true;
     } catch (const zmq::error_t& e) {
-        std::cout << "Error subscribing to " << topic << "\n";
+        std::cout << "Error subscribing to " << topic << ": " << e.what() << "\n";
         return false;
     }
 }
@@ -33,10 +34,11 @@ auto ZeroMQSocket::subscribe(const std::string& topic) -> bool {
 auto ZeroMQSocket::connect(const std::string& endpoint) -> bool {
     std::cout << "Connecting to " << endpoint << "\n";
     try {
+        m_socket.set(zmq::sockopt::linger, 0);
         m_socket.connect(endpoint);
         return true;
     } catch (const zmq::error_t& e) {
-        std::cout << "Error connecting to " << endpoint << "\n";
+        std::cout << "Error connecting to " << endpoint << ": " << e.what() << "\n";
         return false;
     }
 }

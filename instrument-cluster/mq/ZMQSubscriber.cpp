@@ -50,7 +50,6 @@ void ZmqSubscriber::decodeMessage(const std::vector<uint8_t> &message) {
 
     switch (message[0]) {
         case 1: {
-            qDebug() << "Speed";
             uint8_t const speed_value = message[1];
             uint8_t const rpm_low_byte = message[3];
             uint8_t const rpm_high_byte = message[4];
@@ -59,13 +58,11 @@ void ZmqSubscriber::decodeMessage(const std::vector<uint8_t> &message) {
             break;
         }
         case 2: {
-            qDebug() << "Battery";
             uint8_t const battery = message[1];
             emit batteryMessageReceived(battery);
             break;
         }
         case 3: {
-            qDebug() << "Temperature";
             uint8_t const temperature = message[1];
             emit temperatureMessageReceived(temperature);
             break;

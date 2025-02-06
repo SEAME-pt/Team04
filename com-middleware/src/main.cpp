@@ -65,7 +65,9 @@ auto main(int argc, char **argv) -> int {
     // Connect to zmq
     zmq::context_t context(1);
     MQ::ZeroMQSocket publisher{context, zmq::socket_type::pub};
-    publisher.bind("ipc:///tmp/speed.ipc");
+    if (!publisher.connect("ipc:///tmp/speed.ipc")) {
+        return 1;
+    }
 
     catchSignals();
     while (true) {

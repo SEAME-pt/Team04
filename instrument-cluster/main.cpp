@@ -1,3 +1,4 @@
+#include <QtGui/QCursor>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
@@ -41,5 +42,6 @@ auto main(int argc, char *argv[]) -> int {
     std::signal(SIGTERM, sigHandler);
     std::signal(SIGSEGV, sigHandler);
     std::signal(SIGABRT, sigHandler);
+    QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     return QGuiApplication::exec();
 }
