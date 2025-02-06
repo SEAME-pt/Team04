@@ -97,8 +97,9 @@ auto main(int argc, char **argv) -> int {
 
         std::cout << "\n";
 
-        std::vector<uint8_t> message(frame.len);
-        memcpy(message.data(), frame.data, static_cast<size_t>(num_bytes));
+        std::vector<uint8_t> message(frame.len + 1);
+        message[0] = static_cast<uint8_t>(frame.can_id);
+        memcpy(message.data() + 1, frame.data, static_cast<size_t>(num_bytes));
 
         try {
             publisher.publish(message);
