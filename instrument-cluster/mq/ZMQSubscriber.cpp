@@ -43,16 +43,34 @@ void ZmqSubscriber::checkForMessages() {
 }
 
 void ZmqSubscriber::decodeMessage(const std::vector<uint8_t> &message) {
-    if (message.size() < 4) {
+    if (message.empty()) {
         std::cerr << "Error: Invalid message - size is too small.\n";
         return;
     }
 
-    uint8_t const speed_value = message[0];
-    uint8_t const rpm_low_byte = message[2];
-    uint8_t const rpm_high_byte = message[3];
-
-    uint16_t const rpm = (rpm_high_byte << 8) | rpm_low_byte;
-
-    emit messageReceived(speed_value, rpm);
+    switch (message[0]) {
+        case 1: {
+            qDebug() << "Speed";
+            uint8_t const speed_value = message[1];
+            uint8_t const rpm_low_byte = message[3];
+            uint8_t const rpm_high_byte = message[4];
+            uint16_t const rpm = (rpm_high_byte << 8) | rpm_low_byte;
+            emit messageReceived(speed_value, rpm);
+            break;
+        }
+        case 2: {
+            qDebug() << "Battery";
+            uint8_t const battery = message[1];
+            emit batteryMessageReceived(battery);
+            break;
+        }
+        case 3: {
+            qDebug() << "Temperature";
+            uint8_t const temperature = message[1];
+            emit temperatureMessageReceived(temperature);
+            break;
+        }
+        default:
+            qDebug() << "No message definition";
+    }
 }
