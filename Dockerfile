@@ -144,6 +144,12 @@ RUN cd pigpio && \
     make clean && \
     rm -rf pigpio
 
+# Install OpenCV for x86 and arm64
+RUN apt-get update && apt-get install -y \
+    libopencv-dev \
+    libopencv-dev:arm64 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN find /usr/opt/lib -name "*pigpio*" -exec mv {} /usr/lib/aarch64-linux-gnu/ \;
 
 RUN find /usr/opt/include -name "*pigpio*" -exec mv {} /usr/include/aarch64-linux-gnu/ \;
