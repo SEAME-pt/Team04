@@ -8,7 +8,7 @@ DataManager::DataManager(QObject* parent) : QObject{parent}, context(1) {
     thread = new QThread(this);
     std::unique_ptr<MQ::ZeroMQSocket> sub_socket =
         std::make_unique<MQ::ZeroMQSocket>(context, zmq::socket_type::sub);
-    sub_socket->connect("ipc:///tmp/speed.ipc");
+    sub_socket->bind("ipc:///tmp/speed.ipc");
     worker = new ZmqSubscriber(std::move(sub_socket));
     worker->moveToThread(thread);
 
