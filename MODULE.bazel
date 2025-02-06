@@ -13,6 +13,14 @@ python.toolchain(
     python_version = "3.12",
 )
 
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "py_deps",
+    python_version = "3.12",
+    requirements_lock = "//third_party/python:requirements.txt",
+)
+use_repo(pip, "py_deps")
+
 # Compile commands
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 git_override(
