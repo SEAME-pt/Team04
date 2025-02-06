@@ -1,3 +1,4 @@
+# yamllint disable rule:line-length
 ---
 name: Docker
 on:  # yamllint disable-line rule:truthy
@@ -19,6 +20,11 @@ jobs:
       - name: Configure Git Safe Directory
         run: |
           git config --global --add safe.directory $(pwd)
+
+      - name: Set Git user identity
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions"
 
       - name: Fetch main branch
         run: |
