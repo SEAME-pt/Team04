@@ -82,7 +82,7 @@ Item {
         }
     }
     property date __currentTime: new Date()
-    property real battery: 0
+    property real battery: SIMULATION_MODE ? 0 : dataManager.battery
     property int hours: 0
     property bool metricSystem: true
     property int minutes: 0
@@ -91,7 +91,7 @@ Item {
     property int seconds: 0
     property real speed: SIMULATION_MODE ? 0 : dataManager.speed
     property real speedComputed: backend.metricSystem ? (backend.speed * backend.ratioKMtoM) : backend.speed
-    property real temperature: 0
+    property real temperature: SIMULATION_MODE ? 0 : dataManager.temperature
     property string time: ""
 
     signal reset

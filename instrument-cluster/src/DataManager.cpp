@@ -14,6 +14,8 @@ DataManager::DataManager(QObject* parent) : QObject{parent}, context(1) {
 
     connect(this, &DataManager::startZeroMQ, worker, &ZmqSubscriber::checkForMessages);
     connect(worker, &ZmqSubscriber::messageReceived, this, &DataManager::updateData);
+    connect(worker, &ZmqSubscriber::batteryMessageReceived, this, &DataManager::setBattery);
+    connect(worker, &ZmqSubscriber::temperatureMessageReceived, this, &DataManager::setTemperature);
 
     // automatically delete thread and task object when work is done:
     connect(thread, &QThread::finished, worker, &DataManager::deleteLater);  // Clean up
@@ -47,6 +49,20 @@ void DataManager::setRpm(uint16_t rpm) {
     if (m_rpm != rpm) {
         m_rpm = rpm;
         emit rpmChanged();
+    }
+}
+
+void DataManager::setBattery(uint8_t battery) {
+    if (m_battery != battery) {
+        m_battery = battery;
+        emit batteryChanged();
+    }
+}
+
+void DataManager::setTemperature(uint8_t temperature) {
+    if (m_temperature != temperature) {
+        m_temperature = temperature;
+        emit temperatureChanged();
     }
 }
 

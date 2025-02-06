@@ -13,7 +13,7 @@ ZeroMQWorker::~ZeroMQWorker() {
     }
 }
 
-void ZeroMQWorker::subscribe(const std::string& topic) { m_socket->bind(topic); }
+void ZeroMQWorker::bind(const std::string& endpoint) { m_socket->bind(endpoint); }
 
 auto ZeroMQWorker::publish(const std::vector<uint8_t>& data) -> bool {
     return m_socket->send(data);

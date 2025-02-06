@@ -31,7 +31,7 @@ void testSendPublisher(bool sendReturn) {
     EXPECT_CALL(*mock, send(test_argument)).Times(1).WillOnce(Return(sendReturn));
 
     MQ::ZeroMQWorker publisher{std::move(mock)};
-    publisher.subscribe("mock");
+    publisher.bind("mock");
     EXPECT_EQ(publisher.publish(test_argument), sendReturn);
 }
 
@@ -48,7 +48,7 @@ void testSendSubscriber(std::optional<std::vector<uint8_t>> result) {
     EXPECT_CALL(*mock, receive()).Times(1).WillOnce(Return(result));
 
     MQ::ZeroMQWorker subscriber{std::move(mock)};
-    subscriber.subscribe("mock");
+    subscriber.bind("mock");
     EXPECT_EQ(subscriber.receive(), result);
 }
 
