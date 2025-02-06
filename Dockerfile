@@ -129,7 +129,6 @@ RUN apt-get update && apt-get install -y \
 # Install SDL2 for x86 and arm64
 RUN apt-get update && apt-get install -y \
     qemu-user-static \
-    libsdl2-dev \
     libsdl2-dev:arm64 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -143,6 +142,12 @@ RUN cd pigpio && \
     make install && \
     make clean && \
     rm -rf pigpio
+
+# Install OpenCV for x86 and arm64
+RUN apt-get update && apt-get install -y \
+    libopencv-dev \
+    libopencv-dev:arm64 \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN find /usr/opt/lib -name "*pigpio*" -exec mv {} /usr/lib/aarch64-linux-gnu/ \;
 
