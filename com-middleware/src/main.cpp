@@ -15,7 +15,6 @@
 
 #include "can/CanDriver.hpp"
 #include "mq/src/ZeroMQSocket.hpp"
-#include "mq/src/ZeroMQWorker.hpp"
 
 namespace {
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
@@ -65,10 +64,8 @@ auto main(int argc, char **argv) -> int {
 
     // Connect to zmq
     zmq::context_t context(1);
-    std::unique_ptr<MQ::ZeroMQSocket> pub_socket =
-        std::make_unique<MQ::ZeroMQSocket>(context, zmq::socket_type::pub);
-    MQ::ZeroMQWorker publisher{std::move(pub_socket)};
-    publisher.subscribe("ipc:///tmp/speed.ipc");
+    MQ::ZeroMQSocket publisher{context, zmq::socket_type::pub};
+    publisher.bind("ipc:///tmp/speed.ipc");
 
     catchSignals();
     while (true) {
@@ -102,7 +99,7 @@ auto main(int argc, char **argv) -> int {
         memcpy(message.data() + 1, frame.data, static_cast<size_t>(num_bytes));
 
         try {
-            publisher.publish(message);
+            publisher.send(message);
         } catch (zmq::error_t &e) {
             if (ETERM == e.num()) {
                 break;

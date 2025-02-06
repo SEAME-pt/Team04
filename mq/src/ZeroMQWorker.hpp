@@ -23,7 +23,7 @@ class ZeroMQWorker {
     explicit ZeroMQWorker(std::unique_ptr<IMQSocket> socket);
     ZeroMQWorker(const ZeroMQWorker&) = delete;
     auto operator=(const ZeroMQWorker&) -> ZeroMQWorker& = delete;
-    void subscribe(const std::string& topic);
+    void bind(const std::string& endpoint);
     auto receive() -> std::optional<std::vector<uint8_t>>;
     auto publish(const std::vector<uint8_t>& data) -> bool;
 
