@@ -5,7 +5,7 @@ cc_binary(
     linkopts = [
         "-lzmq",
     ],
-    visibility = ["//:__pkg__"],
+    visibility = ["//platform:__pkg__"],
     deps = [
         "//mq",
         "@cppzmq",
