@@ -7,6 +7,7 @@ filegroup(
         "//com-middleware:bin",
         "//examples:bins_filegroup",
         "//instrument-cluster:bin",
+        "//platform:bins_filegroup",
     ],
 )
 
