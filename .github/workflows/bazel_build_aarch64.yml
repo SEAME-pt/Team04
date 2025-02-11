@@ -79,6 +79,19 @@ jobs:
           echo "targets=$(cat affected_targets.txt | tr -s '\n' ' ' | sed 's/^[ \t]*//;s/[ \t]*$//')" >> $GITHUB_ENV
         shell: bash
 
+      - name: Build affected targets
+        run: |
+          if [ -n "$bazel_files" ]; then
+            echo "Building all targets for aarch64"
+            bazelisk build //... --platforms=//bazel/platforms:aarch64_linux
+          elif [ -n "$targets" ]; then
+            echo "Building targets for aarch64: $targets"
+            bazelisk build $targets --platforms=//bazel/platforms:aarch64_linux
+          else
+            echo "No targets to build"
+          fi
+        shell: bash
+
       - name: Setup bazel cache
         if: env.targets != ''
         uses: actions/cache@v4
@@ -91,16 +104,3 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-development
-
-      - name: Build affected targets
-        run: |
-          if [ -n "$BAZEL_FILES" ]; then
-            echo "Building all targets for aarch64"
-            bazelisk build //... --platforms=//bazel/platforms:aarch64_linux
-          elif [ -n "$targets" ]; then
-            echo "Building targets for aarch64: $targets"
-            bazelisk build $targets --platforms=//bazel/platforms:aarch64_linux
-          else
-            echo "No targets to build"
-          fi
-        shell: bash
