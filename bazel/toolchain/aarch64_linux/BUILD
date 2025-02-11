@@ -1,4 +1,4 @@
-load("//toolchain/aarch64_linux:cc_toolchain_config.bzl", "cc_toolchain_config")
+load("//bazel/toolchain/aarch64_linux:cc_toolchain_config.bzl", "cc_toolchain_config")
 
 package(default_visibility = ["//visibility:public"])
 
