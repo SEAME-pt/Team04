@@ -138,16 +138,32 @@ jobs:
             echo "Compare report does not exist"
           fi
 
-      - name: Read coverage file and post comment
+      - name: Find Bot coverage comment
+        id: find_comment
         if: env.CONTENT != ''
-        uses: actions/github-script@v6
+        uses: peter-evans/find-comment@v3
         with:
-          script: |
-            const prNumber = context.issue.number;
-            const content = process.env.CONTENT;
-            const comment = `Coverage for impacted relevant source files:\n\n${content}`;
-            await github.rest.issues.createComment({
-              ...context.repo,
-              issue_number: prNumber,
-              body: comment,
-            });
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Coverage for impacted relevant source files
+
+      - name: Post new comment
+        if: env.CONTENT != '' && steps.find_comment.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Coverage for impacted relevant source files:
+
+            ${{ env.CONTENT }}
+
+      - name: Update comment
+        if: env.CONTENT != '' && steps.find_comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          body: |
+            Coverage for impacted relevant source files:
+
+            ${{ env.CONTENT }}
+          edit-mode: replace
