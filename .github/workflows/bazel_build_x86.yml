@@ -94,7 +94,7 @@ jobs:
 
       - name: Build affected targets
         run: |
-          if [ -n "$BAZEL_FILES" ]; then
+          if [ -n "$bazel_files" ]; then
             echo "Building all targets for x86_64"
             bazelisk build //... --platforms=//bazel/platforms:x86_64_linux
           elif [ -n "$targets" ]; then
