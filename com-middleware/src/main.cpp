@@ -86,16 +86,6 @@ auto main(int argc, char **argv) -> int {
 
         // The len element contains the payload length in bytes and should be used instead of
         // can_dlc
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-        printf("0x%03X [%d] ", frame.can_id, frame.len);
-
-        for (int i = 0; i < frame.len; i++) {
-            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-            std::cout << printf("%02X ", frame.data[i]);
-        }
-
-        std::cout << "\n";
-
         std::vector<uint8_t> message(frame.len + 1);
         message[0] = static_cast<uint8_t>(frame.can_id);
         memcpy(message.data() + 1, frame.data, static_cast<size_t>(num_bytes));

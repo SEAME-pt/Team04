@@ -34,6 +34,7 @@ auto main(int argc, char *argv[]) -> int {
     engine.rootContext()->setContextProperty("SIMULATION_MODE", QVariant(true));
 #else
     engine.rootContext()->setContextProperty("SIMULATION_MODE", QVariant(false));
+    QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
 #endif
 
     engine.load(QUrl(QStringLiteral("qrc:/instrument-cluster/Main.qml")));
@@ -42,6 +43,5 @@ auto main(int argc, char *argv[]) -> int {
     std::signal(SIGTERM, sigHandler);
     std::signal(SIGSEGV, sigHandler);
     std::signal(SIGABRT, sigHandler);
-    QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     return QGuiApplication::exec();
 }

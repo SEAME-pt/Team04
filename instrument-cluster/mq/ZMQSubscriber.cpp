@@ -50,11 +50,11 @@ void ZmqSubscriber::decodeMessage(const std::vector<uint8_t> &message) {
 
     switch (message[0]) {
         case 1: {
-            uint8_t const speed_value = message[1];
-            uint8_t const rpm_low_byte = message[3];
-            uint8_t const rpm_high_byte = message[4];
-            uint16_t const rpm = (rpm_high_byte << 8) | rpm_low_byte;
-            emit messageReceived(speed_value, rpm);
+            float speed;
+            float rpm;
+            memcpy(&speed, message.data() + 1, sizeof(speed));  // Retrieve speed
+            memcpy(&rpm, message.data() + 5, sizeof(rpm));      // Retrieve rpm (offset by 5)
+            emit messageReceived(speed, rpm);
             break;
         }
         case 2: {

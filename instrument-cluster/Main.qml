@@ -5,7 +5,7 @@ import Constants
 ApplicationWindow {
     height: Constants.height
     title: qsTr("Instrument Cluster")
-    visibility: "FullScreen"
+    visibility: SIMULATION_MODE ? "AutomaticVisibility" : "FullScreen"
     visible: true
     width: Constants.width
 

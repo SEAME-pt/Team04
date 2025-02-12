@@ -15,7 +15,7 @@ class ZmqSubscriber : public QObject {
     ~ZmqSubscriber() override;
 
    signals:
-    void messageReceived(uint8_t speed, uint16_t rpm);
+    void messageReceived(float speed, float rpm);
     void batteryMessageReceived(uint8_t battery);
     void temperatureMessageReceived(uint8_t temperature);
 
