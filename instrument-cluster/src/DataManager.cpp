@@ -38,14 +38,14 @@ DataManager::~DataManager() {
     qDebug() << "DataManager::finished";
 }
 
-void DataManager::setSpeed(uint8_t speed) {
+void DataManager::setSpeed(float speed) {
     if (m_speed != speed) {
         m_speed = speed;
         emit speedChanged();
     }
 }
 
-void DataManager::setRpm(uint16_t rpm) {
+void DataManager::setRpm(float rpm) {
     if (m_rpm != rpm) {
         m_rpm = rpm;
         emit rpmChanged();
@@ -66,7 +66,7 @@ void DataManager::setTemperature(uint8_t temperature) {
     }
 }
 
-void DataManager::updateData(uint8_t speed, uint16_t rpm) {
+void DataManager::updateData(float speed, float rpm) {
     setSpeed(speed);
     setRpm(rpm);
 }

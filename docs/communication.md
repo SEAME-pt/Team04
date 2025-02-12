@@ -4,18 +4,17 @@
 
 ID: 0x01
 
-Data: Speed on byte 0, Unit on byte 1, RPM on bytes 2 and 3 (stored in little endian)
+Data: Speed on bytes 0 through 4 (float), RPM on bytes 5 through 8 (float), both stored in little endian
 
 Example: 
 
     ID: 0x01
-    Length: 4
-    Data: 0x01 0x00 0x2C 0x01 0x00 0x00 0x00 0x00
+    Length: 8
+    Data: 0x40 0x90 0x00 0x00 0x43 0xad 0x00 0x00
 
     which translates to:
-    - Speed: 1
-    - Unit: 0x00 (km/h)
-    - RPM: 300
+    - Speed: 4.5
+    - RPM: 346
 
 ### 🔧 Settings Change Message
 

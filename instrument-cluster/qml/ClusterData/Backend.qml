@@ -82,15 +82,15 @@ Item {
         }
     }
     property date __currentTime: new Date()
-    property real battery: SIMULATION_MODE ? 0 : dataManager.battery
+    property real battery: SIMULATION_MODE ? 0.0 : dataManager.battery
     property int hours: 0
     property bool metricSystem: true
     property int minutes: 0
     readonly property real ratioKMtoM: 0.62137
-    property real rpm: SIMULATION_MODE ? 0 : dataManager.rpm
+    property real rpm: SIMULATION_MODE ? 0.0 : dataManager.rpm
     property int seconds: 0
     property real speed: SIMULATION_MODE ? 0 : dataManager.speed
-    property real speedComputed: backend.metricSystem ? (backend.speed * backend.ratioKMtoM) : backend.speed
+    property real speedComputed: backend.metricSystem ? speed : (speed * backend.ratioKMtoM)
     property real temperature: SIMULATION_MODE ? 0 : dataManager.temperature
     property string time: ""
 

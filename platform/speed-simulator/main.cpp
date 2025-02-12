@@ -30,12 +30,18 @@ auto main() -> int {
         return 1;
     }
 
-    uint8_t temperature = 0;
+    float speed = 0;
+    float rpm = 0;
+
+    std::vector<uint8_t> message(9);
+    message[0] = static_cast<uint8_t>(1);
 
     catchSignals();
-    while (temperature < 110) {
+    while (speed < 15) {
+        std::memcpy(message.data() + 1, &speed, sizeof(speed));
+        std::memcpy(message.data() + 1 + sizeof(float), &rpm, sizeof(rpm));
         try {
-            publisher.send({3, temperature++});
+            publisher.send(message);
         } catch (zmq::error_t &e) {
             if (ETERM == e.num()) {
                 break;
@@ -46,7 +52,9 @@ auto main() -> int {
             std::cout << "interrupt received, killing program...\n";
             break;
         }
-        sleep(10);
+        speed += 0.2F;
+        rpm += 20.2F;
+        usleep(100000);
     }
 
     return 0;

@@ -30,12 +30,12 @@ auto main() -> int {
         return 1;
     }
 
-    uint8_t battery = 0;
+    uint8_t battery = 100;
 
     catchSignals();
-    while (true) {
+    while (battery > 0) {
         try {
-            publisher.send({2, battery++});
+            publisher.send({2, battery--});
         } catch (zmq::error_t &e) {
             if (ETERM == e.num()) {
                 break;
@@ -46,7 +46,7 @@ auto main() -> int {
             std::cout << "interrupt received, killing program...\n";
             break;
         }
-        sleep(1);
+        sleep(10);
     }
 
     return 0;

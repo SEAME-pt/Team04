@@ -47,11 +47,7 @@ auto ZeroMQSocket::send(const std::vector<uint8_t>& data) -> bool {
     zmq::message_t msg(data.size());
     memcpy(msg.data(), data.data(), data.size());
     auto res = m_socket.send(msg, zmq::send_flags::none);
-    if (res.has_value()) {
-        std::cout << "!sent\n";
-        return true;
-    }
-    return false;
+    return res.has_value();
 }
 
 auto ZeroMQSocket::receive() -> std::optional<std::vector<uint8_t>> {
