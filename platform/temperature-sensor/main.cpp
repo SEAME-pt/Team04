@@ -1,6 +1,8 @@
 #include <csignal>
 #include <cstdint>
+#include <fstream>
 #include <iostream>
+#include <string>
 #include <zmq.hpp>
 
 #include "mq/src/ZeroMQSocket.hpp"
@@ -22,6 +24,27 @@ void catchSignals() {
     (void)std::signal(SIGABRT, signalHandler);
 }
 
+auto getCPUTemperature() -> float {
+    std::ifstream temp_file("/sys/class/thermal/thermal_zone0/temp");
+    if (temp_file.is_open()) {
+        std::string temp_string;
+        std::getline(temp_file, temp_string);
+        temp_file.close();
+
+        try {
+            // The value is in millidegrees Celsius. Divide by 1000 for degrees C.
+            float temperature = std::stof(temp_string) / 1000.0F;
+            return temperature;
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << "\n";
+            return -1.0F;  // Indicate an error
+        }
+    } else {
+        std::cerr << "Error: Could not open temperature file." << "\n";
+        return -1.0F;  // Indicate an error
+    }
+}
+
 auto main() -> int {
     // Connect to zmq
     zmq::context_t context(1);
@@ -33,10 +56,14 @@ auto main() -> int {
     uint8_t temperature = 0;
 
     catchSignals();
-    while (temperature < 110) {
+    while (true) {
         try {
-            publisher.send({3, temperature++});
-        } catch (zmq::error_t &e) {
+            temperature = static_cast<uint8_t>(getCPUTemperature());
+
+            if (temperature != -1.0F) {
+                publisher.send({3, temperature});
+            }
+        } catch (zmq::error_t& e) {
             if (ETERM == e.num()) {
                 break;
             }
