@@ -11,3 +11,16 @@ py_library(
         requirement("numpy"),
     ],
 )
+
+py_library(
+    name = "mpc_lib",
+    srcs = [
+        "__init__.py",
+        "mpc.py",
+    ],
+    imports = ["."],
+    deps = [
+        requirement("numpy"),
+        requirement("scipy"),
+    ],
+)
