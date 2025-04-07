@@ -1,0 +1,14 @@
+filegroup(
+    name = "images",
+    srcs = glob(
+        [
+            "*.png",
+            "*.jpg",
+            "*.jpeg",
+        ],
+        allow_empty = True,
+    ),
+    visibility = [
+        "//lane-detector:__subpackages__",
+    ],
+)
