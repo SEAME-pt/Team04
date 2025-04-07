@@ -1,0 +1,10 @@
+filegroup(
+    name = "models",
+    srcs = glob(
+        ["*.onnx"],
+        allow_empty = True,
+    ),
+    visibility = [
+        "//lane-detector:__subpackages__",
+    ],
+)
