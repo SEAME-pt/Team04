@@ -1,13 +1,14 @@
 #include <opencv2/opencv.hpp>
 //#include "/usr/include/opencv4"
 
-
 std::string gstreamer_pipeline (int capture_width, int capture_height, int display_width, int display_height, int framerate, int flip_method) {
-    return "nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)" + std::to_string(capture_width) + ", height=(int)" +
-           std::to_string(capture_height) + ", framerate=(fraction)" + std::to_string(framerate) +
-           "/1 ! nvvidconv flip-method=" + std::to_string(flip_method) + " ! video/x-raw, width=(int)" + std::to_string(display_width) + ", height=(int)" +
-           std::to_string(display_height) + ", format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
+        return "nvarguscamerasrc ! video/x-raw(memory:NVMM), width=640, height=360, "
+                               "format=(string)NV12, framerate=30/1 ! nvvidconv ! video/x-raw, format=BGRx ! "
+                               "videoconvert ! video/x-raw, format=BGR ! appsink drop=1 max-buffers=1";
 }
+    
+
+
 
 int main()
 {
