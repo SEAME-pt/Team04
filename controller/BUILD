@@ -7,6 +7,7 @@ py_library(
         "coordinate_transformer.py",
     ],
     imports = ["."],
+    visibility = ["//controller:__subpackages__"],
     deps = [
         requirement("numpy"),
     ],
@@ -19,6 +20,7 @@ py_library(
         "mpc.py",
     ],
     imports = ["."],
+    visibility = ["//controller:__subpackages__"],
     deps = [
         requirement("numpy"),
         requirement("scipy"),

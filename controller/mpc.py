@@ -14,16 +14,16 @@ class MPC:
         self.dt = dt
         # Model
         self.wheelbase = 0.1  # m
-        self.max_steering_angle = 0.5  # rad, around 30 degrees
+        self.max_steering_angle = 1.0  # rad, around 30 degrees
         self.max_acceleration = 3.0  # m/s^2
         self.max_deceleration = -3.0  # m/s^2
         # Weights
         self.weight_path = 1.0
-        self.weight_heading = 0.5
+        self.weight_heading = 0.6
         self.weight_velocity = 0.1
         self.weight_acceleration_smoothness = 0.05
         self.weight_steering_angle_smoothness = 0.1
-        self.weight_lane_center = 1.2
+        self.weight_lane_center = 1.5
         # State
         self.x = 0.0
         self.y = 0.0
@@ -188,4 +188,4 @@ class MPC:
 
     @staticmethod
     def normalize(point: float, min_val: float, max_val: float) -> float:
-        return (point - min_val) / (max_val - min_val)
+        return ((2*(point - min_val)) / (max_val - min_val)) - 1
