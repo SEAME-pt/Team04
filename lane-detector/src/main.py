@@ -1,5 +1,8 @@
 import cv2 
 import numpy as np
+import time
+import zmq
+import struct
 import argparse
 from models import UltraFastLaneDetectionV2
 
@@ -33,6 +36,19 @@ def get_lane_center_x(lane_points, image_width):
     x_coords, _ = zip(*lane_points)
     return sum(x_coords) / len(x_coords)
 
+def get_controls(lanes):
+    if not lanes:
+        return None
+    
+    acceleration = -0.3
+    steering = 0.56
+    return acceleration, steering
+
+def send_controls(publisher, acceleration, steering):
+    message_to_send = struct.pack("ff", acceleration, steering) 
+    publisher.send(message_to_send)
+    print(f"Sent controls: {acceleration}, {steering} as bytes: {message_to_send.hex()}")
+
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--imgpath", type=str, default='lane-detector/images/5.jpg', help="image path")
@@ -47,6 +63,36 @@ if __name__=='__main__':
         print(f"OpenCV CUDA is enabled and found {cuda_available} device(s).")
     else:
         print("OpenCV CUDA is NOT enabled. DNN module will run on CPU.")
+
+    # ZeroMQ Publisher Initialization
+    context = zmq.Context()
+    publisher = context.socket(zmq.PUB)
+    publisher.setsockopt(zmq.LINGER, 0) 
+    publisher.bind("tcp://*:5555")
+
+    print("Controls publisher started. Press Ctrl+C to stop...")
+    try:
+        while True:
+            controls = get_controls([3])
+
+            if controls is not None:
+                acceleration, steering = controls
+                send_controls(publisher, acceleration, steering)
+            time.sleep(1)  # Publish every 1 second
+    except KeyboardInterrupt:
+        print("\nInterrupt received, shutting down publisher...")
+    finally:
+        publisher.close()
+        context.term()
+        print("Publisher resources closed.")
+
+    # INFERENCE
+    coords = net.detect(srcimg)
+    for lane in coords:
+        for coord in lane:
+            cv2.circle(srcimg, coord, 3, (0, 255, 0), -1)
+
+    cv2.imwrite("/workspaces/Team04/lane-detector/test.jpg", srcimg)
 
     # num_runs=1000
     # start_time = time.time()
@@ -75,11 +121,3 @@ if __name__=='__main__':
     # elif len(coords) > 0:
     #     for lane in coords:
     #         fit_and_draw_polynomial(srcimg, lane, color=(0, 0, 255))
-
-    # INFERENCE
-    coords = net.detect(srcimg)
-    for lane in coords:
-        for coord in lane:
-            cv2.circle(srcimg, coord, 3, (0, 255, 0), -1)
-
-    cv2.imwrite("/workspaces/Team04/lane-detector/test.jpg", srcimg)
