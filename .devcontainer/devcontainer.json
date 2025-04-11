@@ -10,6 +10,7 @@
 	},
 	"runArgs": [
 		"--net=host",
+		"--runtime=nvidia",
 		"--env=DISPLAY",
 		"--volume=${localEnv:HOME}/.Xauthority:/root/.Xauthority:rw"
 	],
@@ -22,7 +23,8 @@
 				"ms-azuretools.vscode-docker",
 				"cschlosser.doxdocgen",
 				"bbenoist.QML",
-				"Delgan.qml-format"
+				"Delgan.qml-format",
+				"ms-python.python"
 			],
 			"settings": {
 				"remote.autoForwardPorts": false
