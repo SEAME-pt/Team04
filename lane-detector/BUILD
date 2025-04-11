@@ -11,6 +11,16 @@ py_binary(
     visibility = ["//:__pkg__"],
     deps = [
         requirement("opencv-python"),
+        requirement("pyzmq"),
         "//lane-detector/src/models",
+    ],
+)
+
+py_binary(
+    name = "subscriber",
+    srcs = ["src/subscriber.py"],
+    visibility = ["//:__pkg__"],
+    deps = [
+        requirement("pyzmq"),
     ],
 )
