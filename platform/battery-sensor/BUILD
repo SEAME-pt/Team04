@@ -1,6 +1,8 @@
 cc_binary(
     name = "bin",
-    srcs = ["main.cpp"],
+    srcs = [
+        "main.cpp",
+    ],
     features = ["warnings_critical_code_gcc"],
     linkopts = [
         "-lzmq",
@@ -8,6 +10,7 @@ cc_binary(
     visibility = ["//platform:__pkg__"],
     deps = [
         "//mq",
+        "//platform/battery-sensor/ina219",
         "@cppzmq",
     ],
 )
