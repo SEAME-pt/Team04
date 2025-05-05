@@ -32,9 +32,9 @@ class carMove {
     // The constant MAX_ANGLE is 'constexpr' to allow direct use at compile time
     static constexpr int MAX_ANGLE = 80;
 
-    static const int SERVO_LEFT_PWM = 180;  // Adjust as needed >> TEST!!
-    static const int SERVO_CENTER_PWM = 307;
-    static const int SERVO_RIGHT_PWM = 435;
+    static const int SERVO_LEFT_PWM = 100;  // Adjust as needed >> TEST!!
+    static const int SERVO_CENTER_PWM = 300;
+    static const int SERVO_RIGHT_PWM = 550;
 };
 
 #endif
