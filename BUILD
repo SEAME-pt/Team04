@@ -4,9 +4,9 @@ load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 filegroup(
     name = "release_bins_filegroup",
     srcs = [
+        "//applications:bins_filegroup",
         "//com-middleware:bin",
         "//examples:bins_filegroup",
-        "//instrument-cluster:bin",
         "//platform:bins_filegroup",
     ],
 )
