@@ -1,6 +1,6 @@
 #include "DataManager.hpp"
 
-#include "instrument-cluster/mq/ZMQSubscriber.hpp"
+#include "applications/instrument-cluster/mq/ZMQSubscriber.hpp"
 
 DataManager::DataManager(QObject* parent) : QObject{parent}, context(1) {
     // ZeroMQ setup (in a separate thread)

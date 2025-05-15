@@ -6,6 +6,6 @@ qt_cc_library(
     hdrs = glob(["*.hpp"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//instrument-cluster/mq",
+        "//applications/instrument-cluster/mq",
     ],
 )
