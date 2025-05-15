@@ -1,14 +1,24 @@
 import cv2 
 import numpy as np
 import os
+import onnxruntime
 
 class UltraFastLaneDetectionV2:
     def __init__(self, modelpath):
-        self.net = cv2.dnn.readNet(modelpath)
-        input_shape = os.path.splitext(os.path.basename(modelpath))[0].split('_')[-1].split('x')
-        self.input_height = int(input_shape[0])
-        self.input_width = int(input_shape[1])
+        # Initialize model
+        session_option = onnxruntime.SessionOptions()
+        session_option.log_severity_level = 3
+        # self.session = onnxruntime.InferenceSession(path, providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+        self.session = onnxruntime.InferenceSession(modelpath, sess_options=session_option, providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+        model_inputs = self.session.get_inputs()
+        self.input_name = model_inputs[0].name
+        self.input_shape = model_inputs[0].shape
+        print(self.input_shape)
+        self.input_height = int(self.input_shape[2])
+        self.input_width = int(self.input_shape[3])
 
+        model_outputs = self.session.get_outputs()
+        self.output_names = [model_outputs[i].name for i in range(len(model_outputs))]
         dataset = os.path.basename(modelpath).split('_')[1]
         if dataset == 'culane':
             num_row = 72
@@ -33,7 +43,7 @@ class UltraFastLaneDetectionV2:
         exp_x = np.exp(x)
         return exp_x / np.sum(exp_x, axis=axis)
     def pred2coords(self, pred, local_width=1, original_image_width=1640, original_image_height=590):
-        exist_col, exist_row, loc_col, loc_row = pred
+        loc_row, loc_col, exist_row, exist_col = pred
         batch_size, num_grid_row, num_cls_row, num_lane_row = loc_row.shape
         batch_size, num_grid_col, num_cls_col, num_lane_col = loc_col.shape
 
@@ -83,8 +93,8 @@ class UltraFastLaneDetectionV2:
         img = cv2.resize(srcimg, (self.train_width, int(self.train_height / self.crop_ratio)))
         img = (img.astype(np.float32) / 255.0 - self.mean_) / self.std_
         img = img[-self.train_height:, :, :]
-        blob = cv2.dnn.blobFromImage(img)
-        self.net.setInput(blob)
-        pred = self.net.forward(self.net.getUnconnectedOutLayersNames())
+        img = img.transpose(2, 0, 1)
+        input_tensor = img[np.newaxis, :, :, :]
+        pred = self.session.run(None, {self.input_name: input_tensor})
         coords = self.pred2coords(pred, original_image_width=img_w, original_image_height=img_h)
         return coords

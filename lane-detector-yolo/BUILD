@@ -11,17 +11,10 @@ py_binary(
     visibility = ["//:__pkg__"],
     deps = [
         requirement("opencv-python"),
-        requirement("pyzmq"),
         requirement("onnxruntime-gpu"),
-        "//lane-detector/src/models",
-    ],
-)
-
-py_binary(
-    name = "subscriber",
-    srcs = ["src/subscriber.py"],
-    visibility = ["//:__pkg__"],
-    deps = [
+        requirement("scipy"),
+        requirement("scikit-learn"),
         requirement("pyzmq"),
+        "//lane-detector-yolo/src/models",
     ],
 )

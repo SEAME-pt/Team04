@@ -52,17 +52,47 @@ def send_controls(publisher, acceleration, steering):
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--imgpath", type=str, default='lane-detector/images/5.jpg', help="image path")
-    parser.add_argument("--modelpath", type=str, default='lane-detector/models/ufldv2_tusimple_res18_320x800.onnx', help="onnx modelpath")
+    parser.add_argument("--modelpath", type=str, default='lane-detector/models/ufldv3_tusimple_res18_320x800.onnx', help="onnx modelpath")
     args = parser.parse_args()
 
     net = UltraFastLaneDetectionV2(args.modelpath)
     srcimg = cv2.imread(args.imgpath)
 
-    cuda_available = cv2.cuda.getCudaEnabledDeviceCount()
-    if cuda_available > 0:
-        print(f"OpenCV CUDA is enabled and found {cuda_available} device(s).")
-    else:
-        print("OpenCV CUDA is NOT enabled. DNN module will run on CPU.")
+    # INFERENCE
+    coords = net.detect(srcimg)
+    for lane in coords:
+        for coord in lane:
+            cv2.circle(srcimg, coord, 3, (0, 255, 0), -1)
+
+    cv2.imwrite("/workspaces/Team04/lane-detector/test.jpg", srcimg)
+
+    # FPS Test
+    # num_runs=1000
+    # start_time = time.time()
+    # for _ in range(num_runs):
+    #     coords = net.detect(srcimg)
+    # end_time = time.time()
+
+    # total_time = end_time - start_time
+    # fps = num_runs / total_time
+    # print(f'FPS: {fps}')
+
+    # image_center_x = srcimg.shape[1] / 2  # Calculate the image center
+    # if len(coords) > 2:
+    #     lane_centers = []
+    #     for lane in coords:
+    #         center_x = get_lane_center_x(lane, srcimg.shape[1])
+    #         if center_x is not None:
+    #             lane_centers.append((abs(center_x - image_center_x), lane)) # store the distance from the center, and the lane.
+
+    #     lane_centers.sort(key=lambda x: x[0])  # Sort by distance from center, ascending
+    #     closest_lanes = [lane_centers[0][1], lane_centers[1][1]]  # Get the two closest lanes
+
+    #     for lane in closest_lanes:
+    #         fit_and_draw_polynomial(srcimg, lane, color=(0, 0, 255))
+    # elif len(coords) > 0:
+    #     for lane in coords:
+    #         fit_and_draw_polynomial(srcimg, lane, color=(0, 0, 255))
 
     # ZeroMQ Publisher Initialization
     context = zmq.Context()
@@ -85,39 +115,3 @@ if __name__=='__main__':
         publisher.close()
         context.term()
         print("Publisher resources closed.")
-
-    # INFERENCE
-    coords = net.detect(srcimg)
-    for lane in coords:
-        for coord in lane:
-            cv2.circle(srcimg, coord, 3, (0, 255, 0), -1)
-
-    cv2.imwrite("/workspaces/Team04/lane-detector/test.jpg", srcimg)
-
-    # num_runs=1000
-    # start_time = time.time()
-    # for _ in range(num_runs):
-    #     coords = net.detect(srcimg)
-    # end_time = time.time()
-
-    # total_time = end_time - start_time
-    # fps = num_runs / total_time
-    # print(f'FPS: {fps}')
-    
-
-    # image_center_x = srcimg.shape[1] / 2  # Calculate the image center
-    # if len(coords) > 2:
-    #     lane_centers = []
-    #     for lane in coords:
-    #         center_x = get_lane_center_x(lane, srcimg.shape[1])
-    #         if center_x is not None:
-    #             lane_centers.append((abs(center_x - image_center_x), lane)) # store the distance from the center, and the lane.
-
-    #     lane_centers.sort(key=lambda x: x[0])  # Sort by distance from center, ascending
-    #     closest_lanes = [lane_centers[0][1], lane_centers[1][1]]  # Get the two closest lanes
-
-    #     for lane in closest_lanes:
-    #         fit_and_draw_polynomial(srcimg, lane, color=(0, 0, 255))
-    # elif len(coords) > 0:
-    #     for lane in coords:
-    #         fit_and_draw_polynomial(srcimg, lane, color=(0, 0, 255))
