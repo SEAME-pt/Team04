@@ -25,7 +25,7 @@ auto main(int argc, char *argv[]) -> int {
     });
 
     // adding qml folder to import path
-    engine.addImportPath("qrc:/instrument-cluster/qml");
+    engine.addImportPath("qrc:/applications/instrument-cluster/qml");
 
     // Registering C++ objects as QML types
     qmlRegisterType<DataManager>("DataManager", 1, 0, "DataManager");
@@ -37,7 +37,7 @@ auto main(int argc, char *argv[]) -> int {
     QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
 #endif
 
-    engine.load(QUrl(QStringLiteral("qrc:/instrument-cluster/Main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/applications/instrument-cluster/Main.qml")));
 
     std::signal(SIGINT, sigHandler);
     std::signal(SIGTERM, sigHandler);
