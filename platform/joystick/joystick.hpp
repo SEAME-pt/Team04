@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "platform/carMove/carMove.hpp"
+#include "platform/remoteMove/remoteMove.hpp"
 
 struct Actions {
     std::function<void()> onPress;
@@ -33,4 +34,5 @@ class joystick {
         axisActions;  // Mapeia eixos a ações que recebem um valor
     std::array<bool, SDL_CONTROLLER_BUTTON_MAX> buttonStates{};  // Armazenar estados dos botões
     void processEvent(const SDL_Event& event);
+    RemoteMove* remote;
 };
