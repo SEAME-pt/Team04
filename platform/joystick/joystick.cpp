@@ -1,32 +1,54 @@
 #include "joystick.hpp"
 
-joystick::joystick(carMove& car) : gameController(nullptr) {
+joystick::joystick(carMove& car) : gameController(nullptr), remote(nullptr) {
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0) {
         throw std::runtime_error("Failed to initialize SDL2 GameController: " +
                                  std::string(SDL_GetError()));
     }
 
+    // Create the RemoteMove object as a member variable
+    remote = new RemoteMove(car, "tcp://*:5555");
+
     for (int i = 0; i < SDL_NumJoysticks(); ++i) {
         if (SDL_IsGameController(i) != 0U) {
             gameController = SDL_GameControllerOpen(i);
             if (gameController != nullptr) {
-                std::cout << "GameController connected: " << SDL_GameControllerName(gameController)
-                          << '\n';
                 setAxisMapping(car);
+                std::cout << "Game controller connected: " << SDL_GameControllerName(gameController)
+                          << '\n';
+                setButtonAction(1, Actions{[this, &car]() {
+                                               std::cout << "Autonomous driving on\n";
+                                               if (remote) {
+                                                   remote->start();
+                                               }
+                                           },
+                                           []() {}});
+
+                setButtonAction(3, Actions{[this, &car]() {
+                                               std::cout << "Autonomous driving out\n";
+                                               if (remote) {
+                                                   remote->stop();
+                                               }
+                                           },
+                                           [&car]() {
+                                               std::cout
+                                                   << "Button 3 released - Returning to neutral\n";
+                                               car.setServoAngle(0);
+                                           }});
+
                 printButtonStates();
                 break;
             }
         }
     }
-
-    if (gameController == nullptr) {
-        throw std::runtime_error("No compatible game controller found.");
-    }
+    // Rest of your constructor
 }
 
 joystick::~joystick() {
+    delete remote;  // Clean up the RemoteMove object
     if (gameController != nullptr) {
         SDL_GameControllerClose(gameController);
+        gameController = nullptr;
     }
     SDL_Quit();
 }

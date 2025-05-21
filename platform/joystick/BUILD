@@ -15,5 +15,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//platform/carMove",
+        "//platform/remoteMove",
     ],
 )
