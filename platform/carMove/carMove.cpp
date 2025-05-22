@@ -1,6 +1,6 @@
 #include "carMove.hpp"
 
-void carMove::setPWM(int device_handle, int channel, int on_value, int off_value) {
+void CarMove::setPWM(int device_handle, int channel, int on_value, int off_value) {
     int reg_base = 0x06 + (channel * 4);
     i2cWriteByteData(device_handle, reg_base, on_value & 0xFF);
     i2cWriteByteData(device_handle, reg_base + 1, on_value >> 8);
@@ -8,7 +8,7 @@ void carMove::setPWM(int device_handle, int channel, int on_value, int off_value
     i2cWriteByteData(device_handle, reg_base + 3, off_value >> 8);
 }
 
-void carMove::setServoAngle(int angle) {
+void CarMove::setServoAngle(int angle) {
     angle = std::max(-MAX_ANGLE, std::min(45, angle));
     int pwm = 0;
     if (angle < 0) {
@@ -23,7 +23,7 @@ void carMove::setServoAngle(int angle) {
     setPWM(servo_handle, STEERING_CHANNEL, 0, pwm);
 }
 
-void carMove::setMotorSpeed(int speed) {
+void CarMove::setMotorSpeed(int speed) {
     speed = std::max(-100, std::min(100, speed));
     int pwm_value = static_cast<int>(std::abs(speed) / 100.0 * 4095);
 
@@ -51,7 +51,7 @@ void carMove::setMotorSpeed(int speed) {
     }
 }
 
-carMove::carMove() {
+CarMove::CarMove() {
     if (gpioInitialise() < 0) {
         throw std::runtime_error("Failed to initialize pigpio library");
     }
@@ -82,13 +82,13 @@ carMove::carMove() {
     i2cWriteByteData(motor_handle, 0x00, oldmode | 0xA1);
 }
 
-carMove::~carMove() {
+CarMove::~CarMove() {
     i2cClose(servo_handle);
     i2cClose(motor_handle);
     gpioTerminate();
 }
 
-void carMove::sequence() {
+void CarMove::sequence() {
     setMotorSpeed(100);
     sleep(2);
 

@@ -2,9 +2,8 @@
 
 auto main() -> int {
     try {
-        carMove car;
-        joystick controller(car);
-
+        CarMove car;
+        Joystick controller(car);
         controller.listen();
 
     } catch (const std::runtime_error &e) {
