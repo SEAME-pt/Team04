@@ -1,7 +1,7 @@
 cc_library(
-    name = "joystick",
-    srcs = ["joystick.cpp"],
-    hdrs = ["joystick.hpp"],
+    name = "remoteMove",
+    srcs = ["remoteMove.cpp"],
+    hdrs = ["remoteMove.hpp"],
     linkopts = select({
         "@platforms//cpu:x86_64": [
             "-L/usr/lib/x86_64-linux-gnu",
@@ -14,7 +14,8 @@ cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
+        "//mq",
+        "@cppzmq",
         "//platform/carMove",
-        "//platform/remoteMove",
     ],
 )
