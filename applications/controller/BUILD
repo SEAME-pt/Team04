@@ -21,7 +21,7 @@ py_library(
         "runner.py",
     ],
     imports = ["."],
-    visibility = ["//applications/controller:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         requirement("numpy"),
         ":mpc_lib",

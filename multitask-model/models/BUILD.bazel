@@ -1,0 +1,13 @@
+filegroup(
+    name = "models",
+    srcs = glob(
+        [
+            "*.onnx",
+            "*.names",
+        ],
+        allow_empty = True,
+    ),
+    visibility = [
+        "//lane-detector-yolo:__subpackages__",
+    ],
+)
