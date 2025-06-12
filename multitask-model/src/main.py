@@ -4,15 +4,9 @@ import onnxruntime as ort
 import time
 import zmq
 import struct
-from models import YOLOPv2
-
-def get_controls(lanes):
-    if not lanes:
-        return None
-    
-    acceleration = -0.3
-    steering = 0.56
-    return acceleration, steering
+from models import YOLOPv2, MultiTask
+from typing import List, Tuple
+import matplotlib.pyplot as plt
 
 def send_controls(publisher, acceleration, steering):
     message_to_send = struct.pack("ff", acceleration, steering) 
@@ -21,28 +15,37 @@ def send_controls(publisher, acceleration, steering):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--modelpath", type=str, default='lane-detector-yolo/models/yolopv2_post_192x320.onnx', help="model path")
-    parser.add_argument("--imgpath", type=str, default='lane-detector-yolo/images/1.jpg', help="image path")
+    parser.add_argument("--modelpath", type=str, default='lane-detector-yolo/models/yolopv3_post_192x320.onnx', help="model path")
+    parser.add_argument("--imgpath", type=str, default='lane-detector-yolo/images/5.jpg', help="image path")
     parser.add_argument("--confThreshold", default=0.5, type=float, help='class confidence')
     args = parser.parse_args()
 
     print(ort.__version__)
     print(cv2.__version__)
 
-    net = YOLOPv2(args.modelpath, confThreshold=args.confThreshold)
+    net = MultiTask(args.modelpath, confThreshold=args.confThreshold)
     srcimg = cv2.imread(args.imgpath)
-    srcimg = net.detect(srcimg)
+    print(type(srcimg))
+    srcimg, stats = net.detect(srcimg)
 
-    # num_runs=1000
-    # start_time = time.time()
-    # for i in range(num_runs):
-    #     print(i)
-    #     net.detect(srcimg)
-    # end_time = time.time()
+    num_runs=100
+    total_time_inference = 0.0
+    total_time_nms = 0.0
+    start_time = time.time()
+    for i in range(num_runs):
+        srcimg, (inf_time, nms_time) = net.detect(srcimg)
+        total_time_inference += inf_time
+        total_time_nms += nms_time
+    end_time = time.time()
 
-    # total_time = end_time - start_time
-    # fps = num_runs / total_time
-    # print(f'FPS: {fps}')
+    total_time = end_time - start_time
+    fps_total = num_runs / total_time
+
+    fps_inf = num_runs / total_time_inference
+    fps_nms = num_runs / total_time_nms
+    print(f"FPS Test: {fps_inf:.2f} frames per second")
+    print(f"FPS NMS: {fps_nms:.2f} frames per second")
+    print(f'FPS: {fps_total:.2f} frames per second')
 
     cv2.imwrite("/workspaces/Team04/lane-detector-yolo/test.jpg", srcimg)
 
@@ -55,11 +58,8 @@ if __name__=='__main__':
     print("Controls publisher started. Press Ctrl+C to stop...")
     try:
         while True:
-            controls = get_controls([3])
-
-            if controls is not None:
-                acceleration, steering = controls
-                send_controls(publisher, acceleration, steering)
+            acceleration, steering = 1, 1
+            send_controls(publisher, acceleration, steering)
             time.sleep(1)  # Publish every 1 second
     except KeyboardInterrupt:
         print("\nInterrupt received, shutting down publisher...")

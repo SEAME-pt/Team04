@@ -121,6 +121,54 @@ def group_lane_coordinates_improved_v2(segmentation_mask, min_component_size=50,
     else:
         return []
     
+def group_lane_coordinates_improved_v3(segmentation_mask, min_component_size=50,
+                                        morph_kernel_size=(5, 5), max_merge_distance=50,
+                                        max_merge_angle_diff_deg=10, cutoff_ratio=0.5):
+    """
+    Improved function to group lane coordinates, aiming for the two largest lanes.
+    Includes pre-processing, size filtering, and merging of nearby, similarly oriented components.
+    The mask is modified to remove points above the cutoff before processing.
+    The final filtering prioritizes the two largest lanes based on the number of points.
+    """
+    height = segmentation_mask.shape[0]
+    width = segmentation_mask.shape[1]
+    cutoff_y = int(height * cutoff_ratio)
+
+    # 1. Modify the Mask: Remove points above the cutoff
+    modified_mask = segmentation_mask.copy()
+    modified_mask[:cutoff_y, :] = 0
+
+    # 2. Pre-processing: Morphological Opening (on the modified mask)
+    kernel = np.ones(morph_kernel_size, np.uint8)
+    opened_mask = cv2.morphologyEx(modified_mask, cv2.MORPH_OPEN, kernel)
+
+    # 3. Connected Components Analysis (on the pre-processed, modified mask)
+    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(opened_mask, connectivity=8)
+
+    potential_lanes = []
+    for label in range(1, num_labels):
+        area = stats[label, cv2.CC_STAT_AREA]
+        if area >= min_component_size:
+            component_pixels_indices = np.where(labels == label)
+            component_coordinates = np.stack((component_pixels_indices[1], component_pixels_indices[0]), axis=-1).tolist()
+            potential_lanes.append(component_coordinates)
+
+    # 4. Merge nearby and similarly oriented lanes
+    merged_lanes = merge_nearby_lanes(potential_lanes, max_distance=max_merge_distance,
+                                        max_angle_diff=np.deg2rad(max_merge_angle_diff_deg))
+
+    # 5. Filtering: Choose the two largest lanes
+    if len(merged_lanes) > 2:
+        # Sort lanes by their size (number of points) in descending order
+        sorted_lanes_by_size = sorted(merged_lanes, key=len, reverse=True)
+        # Take the two largest
+        largest_two = sorted_lanes_by_size[:2]
+        return largest_two
+    elif len(merged_lanes) > 0:
+        return merged_lanes
+    else:
+        return []
+    
 def draw_grouped_lanes(mask_shape, grouped_lanes, colors=None, thickness=5):
     """
     Draws the grouped lane coordinates onto a black mask.
@@ -186,12 +234,13 @@ class YOLOPv2():
         input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
         input_image = input_image.transpose(2, 0, 1)
         input_image = np.expand_dims(input_image, axis=0)
-        input_image = input_image.astype('float32')
+        input_image = input_image.astype('float16')
         input_image = input_image / 255.0
 
         # Inference
-        print(type(input_image))
+        #print(type(input_image))
         results = self.session.run(None, {self.input_name: input_image})
+        print("shape of results:", [result.shape for result in results])
 
         scores_ = results[2]
         batchno_classid_y1x1y2x2 = results[3]
@@ -234,16 +283,17 @@ class YOLOPv2():
         mask = cv2.resize(mask, (image_width, image_height), interpolation=cv2.INTER_NEAREST)
 
 
-        grouped_lanes = group_lane_coordinates_improved_v2(mask, min_component_size=20,
-                                                           morph_kernel_size=(5, 5),
-                                                           max_merge_distance=25,
-                                                           max_merge_angle_diff_deg=15,
-                                                           cutoff_ratio=0.5)
+        # grouped_lanes = group_lane_coordinates_improved_v3(mask, min_component_size=20,
+        #                                                    morph_kernel_size=(5, 5),
+        #                                                    max_merge_distance=25,
+        #                                                    max_merge_angle_diff_deg=15,
+        #                                                    cutoff_ratio=0.4)
         #print(f"Lanes after improvement: {len(grouped_lanes)}")
+        grouped_lanes = []
 
         # Save mask after clustering
-        lane_mask_default_colors = draw_grouped_lanes(mask.shape, grouped_lanes, thickness=3)
-        cv2.imwrite("/workspaces/Team04/lane-detector-yolo/mask.jpg", lane_mask_default_colors)
+        #lane_mask_default_colors = draw_grouped_lanes(mask.shape, grouped_lanes, thickness=3)
+        #cv2.imwrite("/workspaces/Team04/lane-detector-yolo/mask.jpg", lane_mask_default_colors)
 
         frame[mask==1] = [255, 0, 0]
-        return frame
+        return frame, grouped_lanes

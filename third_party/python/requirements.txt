@@ -32,3 +32,7 @@ matplotlib==3.10.1
 
 #ZeroMQ
 pyzmq==26.4.0
+
+# CARLA
+pygame==2.6.1
+carla==0.9.15
